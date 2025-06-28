@@ -1,0 +1,30 @@
+﻿<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:controls="using:KanaPlayer.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <controls:KanaSettingsCard />
+    </Design.PreviewWith>
+
+    <ControlTheme TargetType="controls:KanaSettingsCard" x:Key="{x:Type controls:KanaSettingsCard}">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Background="{DynamicResource BackgroundContainerColor}"
+                    CornerRadius="20"
+                    Padding="32,24">
+                    <Panel>
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                            <TextBlock Classes="h6" Text="{TemplateBinding Header}" />
+                            <TextBlock Classes="Caption" Text="{TemplateBinding Description}" />
+                        </StackPanel>
+                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Right" />
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

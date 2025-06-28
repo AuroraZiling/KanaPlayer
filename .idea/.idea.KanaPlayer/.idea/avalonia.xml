@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="KanaPlayer/App.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Controls/KanaNavigationView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Controls/KanaSettingsCard.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Controls/KanaWindowTitleBar.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Controls/ProgressRing.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Palettes/Purple.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Styles/ButtonStyle.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Styles/TextBlockStyle.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Theming/Button.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Theming/Styles/TextBlockStyle.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Theming/ToggleButton.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/MainView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/MainWindow.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/Pages/AccountView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/Pages/FavoritesView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/Pages/HomeView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/Pages/PlayListView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/Pages/SettingsView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="KanaPlayer/Views/SplashWindow.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
