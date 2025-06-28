@@ -92,13 +92,13 @@ public partial class BilibiliClient<TSettings>
             throw new HttpRequestException($"Failed to poll QR code: {response.ReasonPhrase}");
 
         response.Headers.TryGetValues("Set-Cookie", out var cookies);
-
-        if (cookies is null)
-            throw new HttpRequestException("No cookies found in response headers");
         
         var content = await response.Content.ReadAsStringAsync();
         var json = JsonSerializer.Deserialize<LoginQrCodeModel>(content)
                    ?? throw new HttpRequestException("Failed to poll QR code");
+
+        if (cookies is null)
+            return json;
         
         var response2 = await httpClient.GetAsync(endpoint2);
         if (!response2.IsSuccessStatusCode)
@@ -106,7 +106,7 @@ public partial class BilibiliClient<TSettings>
         
         var content2 = await response.Content.ReadAsStringAsync();
         var json2 = JsonSerializer.Deserialize<BvUid3Model>(content2)
-                   ?? throw new HttpRequestException("Failed to poll QR code");
+                    ?? throw new HttpRequestException("Failed to poll QR code");
         
         json.Cookies = [..cookies, json2.EnsureData().BuVid];  // Cookies would not null if success
         return json;

@@ -55,7 +55,7 @@ public partial class AccountViewModel(
             while (succeedLoginQrCodeModel == null)
             {
                 var loginQrCodeModel = await bilibiliClient.GetLoginQrCodeAsync(applyQrCodeModel.Data.QrCodeKey);
-                switch (loginQrCodeModel.Data.Code)
+                switch (loginQrCodeModel.EnsureData().Code)
                 {
                     case 86101: // 未扫码
                         LoginAttemptingStatus = "请扫码登录";
@@ -84,7 +84,7 @@ public partial class AccountViewModel(
 
 
             configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings(
-                succeedLoginQrCodeModel.Data.RefreshToken, succeedLoginQrCodeModel.Data.Timestamp,
+                succeedLoginQrCodeModel.EnsureData().RefreshToken, succeedLoginQrCodeModel.EnsureData().Timestamp,
                 succeedLoginQrCodeModel.Cookies!);
             configurationService.Save();
         }
@@ -143,10 +143,15 @@ public partial class AccountViewModel(
         {
             await bilibiliClient.AuthenticateAsync();
             if (!bilibiliClient.IsAuthenticated)
+            {
+                IsLoggedIn = false;   
                 await LoginAsync();
+            }
             else
+            {
                 LoadUserInfo(configurationService.Settings.CommonSettings.Account);
-            IsLoggedIn = bilibiliClient.IsAuthenticated;
+                IsLoggedIn = true;
+            }
         }
         catch (Exception e)
         {

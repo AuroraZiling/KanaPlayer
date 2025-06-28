@@ -1,6 +1,9 @@
-﻿using Avalonia.Threading;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 
-namespace KanaPlayer.Core.Extensions;
+namespace KanaPlayer.Extensions;
 
 public static class AvaloniaExtension
 {
