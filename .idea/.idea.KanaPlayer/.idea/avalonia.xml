@@ -22,6 +22,7 @@
         <entry key="KanaPlayer/Views/Pages/PlayListView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="KanaPlayer/Views/Pages/SettingsView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="KanaPlayer/Views/SplashWindow.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
+        <entry key="src/KanaPlayer/Views/MainView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
       </map>
     </option>
   </component>
