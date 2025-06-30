@@ -12,6 +12,10 @@
             </StackPanel>
         </Border>
     </Design.PreviewWith>
+    
+    <SolidColorBrush x:Key="KanaToggleButtonNavigationCheckedBackgroundBrush" Color="{DynamicResource KanaAccentColor}" Opacity="0.4"></SolidColorBrush>
+    <SolidColorBrush x:Key="KanaToggleButtonNavigationPointerOverBackgroundBrush" Color="{DynamicResource KanaAccentColor}" Opacity="0.5"></SolidColorBrush>
+    <SolidColorBrush x:Key="KanaToggleButtonNavigationBackgroundBrush" Color="{DynamicResource KanaAccentColor}" Opacity="0.1"></SolidColorBrush>
 
     <ControlTheme TargetType="ToggleButton" x:Key="{x:Type ToggleButton}">
         <Setter Property="Background" Value="{DynamicResource ToggleButtonBackground}" />
@@ -159,9 +163,10 @@
         </Style>
 
         <Style Selector="^.Navigation">
+            <Setter Property="Background" Value="{DynamicResource KanaToggleButtonNavigationBackgroundBrush}"></Setter>
             <Style Selector="^:checked">
                 <Style Selector="^ /template/ Border">
-                    <Setter Property="Background" Value="{DynamicResource BackgroundButtonPressedColor}" />
+                    <Setter Property="Background" Value="{DynamicResource KanaToggleButtonNavigationCheckedBackgroundBrush}"></Setter>
                     <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
                     <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                         <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
@@ -169,7 +174,7 @@
                 </Style>
 
                 <Style Selector="^:pointerover /template/ Border">
-                    <Setter Property="Background" Value="{DynamicResource BackgroundButtonPointerOverColor}" />
+                    <Setter Property="Background" Value="{DynamicResource KanaToggleButtonNavigationPointerOverBackgroundBrush}"></Setter>
                     <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
                     <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                         <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />

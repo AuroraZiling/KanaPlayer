@@ -1,5 +1,5 @@
 <Window
-    Background="{DynamicResource BackgroundPrimaryColor}"
+    Background="{DynamicResource KanaAccentColor20}"
     ExtendClientAreaChromeHints="NoChrome"
     ExtendClientAreaTitleBarHeightHint="-1"
     ExtendClientAreaToDecorationsHint="True"
@@ -36,7 +36,6 @@
                     Spacing="7">
                     <StackPanel.Styles>
                         <Style Selector="ToggleButton.KanaWindowTitleBarRightButton">
-                            <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryColor}" />
                             <Setter Property="CornerRadius" Value="20" />
                             <Setter Property="Padding" Value="4" />
                             <Setter Property="Height" Value="40" />

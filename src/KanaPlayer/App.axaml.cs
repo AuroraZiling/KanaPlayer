@@ -8,12 +8,14 @@ using AsyncImageLoader;
 using AsyncImageLoader.Loaders;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
 using KanaPlayer.Services;
+using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
 using KanaPlayer.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +51,8 @@ public partial class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-
+            
+            GetService<IThemeService>().SetThemeColor(new Color(255, 216, 196, 241), true);
             var splashWindow = new SplashWindow(() =>
                 {
                     var mainWindow = GetService<MainWindow>();

@@ -4,6 +4,7 @@ using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
+using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
 using KanaPlayer.ViewModels.Pages;
 using KanaPlayer.Views;
@@ -76,6 +77,8 @@ public static class ServiceExtensions
                 }
             });
 
+        services.AddSingleton<IThemeService, ThemeService>();
+        
         return services;
     }
 }

@@ -10,7 +10,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border
-                    Background="{DynamicResource BackgroundContainerColor}"
+                    Background="{DynamicResource KanaAccentColor25}"
                     CornerRadius="20"
                     Padding="32,24">
                     <Panel>

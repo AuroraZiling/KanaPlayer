@@ -20,8 +20,6 @@
 
                 <ResourceInclude Source="/Theming/Button.axaml" />
                 <ResourceInclude Source="/Theming/ToggleButton.axaml" />
-
-                <ResourceInclude Source="/Palettes/Purple.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
