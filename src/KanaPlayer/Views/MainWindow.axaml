@@ -66,6 +66,8 @@
                                         Height="30"
                                         VerticalAlignment="Center"
                                         Width="30"
+                                        x:Name="AvatarImage"
+                                        IsVisible="{Binding RelativeSource={RelativeSource Self}, Path=!(asyncImageLoader:ImageLoader.IsLoading)}"
                                         asyncImageLoader:ImageLoader.Source="{Binding AvatarUrl}" />
                                 </Border>
                                 <TextBlock

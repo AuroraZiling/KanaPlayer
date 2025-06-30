@@ -33,6 +33,7 @@
         <entry key="src/KanaPlayer/Theming/ToggleButton.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/MainView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/MainWindow.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/AccountView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/SettingsView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
       </map>
     </option>
