@@ -33,5 +33,4 @@ public partial class MainWindow : Window
 
     private void KanaWindowTitleBar_OnCloseButtonClick(object? sender, EventArgs e)
         => Close();
-
 }

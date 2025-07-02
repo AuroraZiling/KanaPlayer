@@ -52,7 +52,8 @@ public class KanaNavigationView : TemplatedControl
                         });
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(page.Category), page.Category, 
+                            "Unknown navigation page category");
                 }
             }
             TopNavigationSideBarItems = new AvaloniaList<NavigationSideBarItem>(topNavigationSideBarItems);

@@ -2,7 +2,6 @@
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;

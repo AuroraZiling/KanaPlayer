@@ -1,6 +1,5 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.ViewModels;
 

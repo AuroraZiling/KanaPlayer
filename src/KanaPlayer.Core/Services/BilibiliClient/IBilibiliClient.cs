@@ -18,4 +18,10 @@ public interface IBilibiliClient : INotifyPropertyChanged
     Task<AccountNavInfoModel> GetAccountNavInfoAsync(string[] cookies);
 
     #endregion
+
+    #region Feed
+
+    Task<MusicRegionFeedModel> GetMusicRegionFeedAsync(string?[] cookies, int requestCount = 15);
+
+    #endregion
 }

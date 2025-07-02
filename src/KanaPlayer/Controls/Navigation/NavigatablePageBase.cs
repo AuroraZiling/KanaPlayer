@@ -1,6 +1,4 @@
-﻿using System;
-using Avalonia.Controls;
-using Avalonia.Layout;
+﻿using Avalonia.Controls;
 using Lucide.Avalonia;
 
 namespace KanaPlayer.Controls.Navigation;

@@ -24,7 +24,9 @@
         <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="ObservableCollections" />
         <PackageReference Include="QRCoder" />
+        <PackageReference Include="Xaml.Behaviors" />
     </ItemGroup>
 
     <ItemGroup>

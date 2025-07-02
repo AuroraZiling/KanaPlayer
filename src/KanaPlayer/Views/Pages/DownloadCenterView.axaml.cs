@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using KanaPlayer.Controls.Navigation;
+﻿using KanaPlayer.Controls.Navigation;
 using KanaPlayer.ViewModels.Pages;
 using Lucide.Avalonia;
 

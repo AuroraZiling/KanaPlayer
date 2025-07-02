@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using KanaPlayer.Views;
 
 namespace KanaPlayer.Controls;
 

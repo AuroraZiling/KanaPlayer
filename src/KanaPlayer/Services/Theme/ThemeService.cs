@@ -8,13 +8,14 @@ public class ThemeService: IThemeService
 {
     private static readonly Application Application = Application.Current!;
     
-    private void SetColorKey(string key, HsvColor hsvColor)
+    private static void SetColorKey(string key, HsvColor hsvColor)
         => Application.Resources[key] = hsvColor.ToRgb();
     
     public void SetThemeColor(RgbColor accentRgbColor, bool applyTextForegroundAsThemeColor = false)
     {
         var accentHsvColor = accentRgbColor.ToHsv();
         SetColorKey("KanaAccentColor", accentHsvColor);
+        
         for (var value = 5; value < 100; value+=5)
         {
             SetColorKey($"KanaAccentColor{value}", new HsvColor(
@@ -24,9 +25,7 @@ public class ThemeService: IThemeService
                 accentHsvColor.V * value / 100d));    
         }
 
-        if (applyTextForegroundAsThemeColor)
-        {
+        if (applyTextForegroundAsThemeColor) 
             SetColorKey("KanaCommonForegroundColor", accentHsvColor);
-        }
     }
 }

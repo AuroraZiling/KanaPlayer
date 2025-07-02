@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Services.Player;
 
@@ -26,7 +25,6 @@ public partial class MainViewModel(IPlayerService playerService) : ViewModelBase
                 var newResponseMessage = await client.GetAsync(location);
                 resultResponseMessage = newResponseMessage;
             }
-            // 理论上不能为空吧，抛个异常还是返回就看你业务
         }
         playerService.Load(await resultResponseMessage.Content.ReadAsStreamAsync());
         playerService.Play();

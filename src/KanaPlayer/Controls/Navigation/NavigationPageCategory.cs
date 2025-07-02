@@ -4,6 +4,5 @@ public enum NavigationPageCategory
 {
     Top,
     AccountFeatures,
-    Tools,
-    Bottom
+    Tools
 }

@@ -1,19 +1,15 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using AsyncImageLoader;
 using AsyncImageLoader.Loaders;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services;
-using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Models;
 using KanaPlayer.Services;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
@@ -22,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace KanaPlayer;
 
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class App : Application
 {
     public override void Initialize()

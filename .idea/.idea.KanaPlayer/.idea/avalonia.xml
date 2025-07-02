@@ -26,6 +26,7 @@
         <entry key="src/KanaPlayer/Controls/KanaNavigationView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaSettingsCard.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaWindowTitleBar.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/ProgressRing.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Palettes/Purple.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Theming/Button.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Theming/Styles/LucideIconStyle.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
@@ -34,6 +35,9 @@
         <entry key="src/KanaPlayer/Views/MainView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/MainWindow.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/AccountView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/DownloadCenterView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/FavoritesView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/HomeView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/SettingsView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
       </map>
     </option>

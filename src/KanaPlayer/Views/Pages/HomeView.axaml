@@ -3,11 +3,86 @@
     d:DesignWidth="800"
     mc:Ignorable="d"
     x:Class="KanaPlayer.Views.Pages.HomeView"
-    x:DataType="pages:HomeViewModel"
+    x:DataType="viewModels:HomeViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    Welcome to Avalonia!
+    xmlns:viewModels="clr-namespace:KanaPlayer.ViewModels.Pages"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wrappers="clr-namespace:KanaPlayer.Core.Models.Wrappers;assembly=KanaPlayer.Core"
+    xmlns:pages="clr-namespace:KanaPlayer.Views.Pages"
+    xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+    xmlns:behaviors="clr-namespace:KanaPlayer.Behaviors"
+    xmlns:converters="clr-namespace:KanaPlayer.Converters"
+    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching">
+    
+    <UserControl.Resources>
+        <converters:CoverImageUrlResizeConverter x:Key="CoverImageUrlResizeConverter"/>
+        <converters:NumberHumanizerConverter x:Key="NumberHumanizerConverter"/>
+        <converters:DurationHumanizerConverter x:Key="DurationHumanizerConverter"/>
+        <converters:TimestampHumanizerConverter x:Key="TimestampHumanizerConverter"/>
+    </UserControl.Resources>
+    
+    <Grid RowDefinitions="Auto, *">
+        <StackPanel Grid.Row="0" Spacing="20" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <TextBlock Text="发现音乐" Classes="h1" ></TextBlock>
+            <Button Content="刷新" Command="{Binding RefreshCommand}" attaching:Icon.LucideIconKind="RefreshCcw" CornerRadius="10">
+            </Button>
+        </StackPanel>
+        
+        <ScrollViewer Margin="0, 36, 0, 0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl HorizontalAlignment="Center" ItemsSource="{Binding MusicRegionFeeds}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel LineSpacing="20" ItemSpacing="20"></WrapPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="wrappers:MusicRegionFeedDataListModel">
+                        <Border Width="320" pages:HomeView.EnableAnimations="True">
+                            <Border.Styles>
+                                <Style Selector="LucideIcon">
+                                    <Setter Property="Size" Value="16"></Setter>
+                                </Style>
+                            </Border.Styles>
+                            <StackPanel Spacing="10">
+                                <Border VerticalAlignment="Top" Height="180" CornerRadius="10" ClipToBounds="True">
+                                    <Panel>
+                                        <Image Width="320" Height="180" Stretch="UniformToFill" asyncImageLoader:ImageLoader.Source="{Binding Cover, Converter={StaticResource CoverImageUrlResizeConverter}}"></Image>
+                                        <Border Padding="0, 10, 0, 0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0%, 0%" EndPoint="0%, 100%">
+                                                    <GradientStop Color="#00000000" Offset="0"/>
+                                                    <GradientStop Color="#dd000000" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Panel>
+                                                <StackPanel Margin="10, 0, 0, 5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                                                    <LucideIcon Kind="CirclePlay"></LucideIcon>
+                                                    <TextBlock Text="{Binding Statistics.ViewCount, Converter={StaticResource NumberHumanizerConverter}}" Margin="3, 0, 0, 0"/>
+                                                    <LucideIcon Kind="ThumbsUp" Margin="10, 0, 0, 0"/>
+                                                    <TextBlock Text="{Binding Statistics.LikeCount, Converter={StaticResource NumberHumanizerConverter}}" Margin="3, 0, 0, 0"/>
+                                                </StackPanel>
+                                                <TextBlock Margin="0, 0, 10, 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}"></TextBlock>
+                                            </Panel>
+                                        </Border>
+                                    </Panel>
+                                </Border>
+                                <TextBlock TextTrimming="{x:Static TextTrimming.WordEllipsis}" FontSize="16" Height="42" Text="{Binding Title}" TextWrapping="Wrap"/>
+                                <StackPanel Margin="0, -6, 0, 0" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="3">
+                                    <LucideIcon Kind="UserRound" Foreground="Gray"></LucideIcon>
+                                    <TextBlock Text="{Binding Author.Name}" Foreground="Gray"/>
+                                    <LucideIcon Kind="Dot" Foreground="Gray"></LucideIcon>
+                                    <TextBlock Text="{Binding PublishTimestamp, Converter={StaticResource TimestampHumanizerConverter}}" Foreground="Gray"></TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
+            <Interaction.Behaviors>
+                <behaviors:ScrollViewerReachEndBehavior Bias="50" Interval="0:0:1" Command="{Binding LoadMoreCommand}"/>
+            </Interaction.Behaviors>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
