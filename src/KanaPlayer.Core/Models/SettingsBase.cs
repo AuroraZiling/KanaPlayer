@@ -7,12 +7,12 @@ public abstract class SettingsBase
     public CommonSettings CommonSettings { get; set; } = new();
 }
 
-#region Common Settings
-
 public class CommonSettings
 {
     public CommonAuthenticationSettings? Authentication { get; set; }
     public CommonAccountSettings? Account { get; set; }
+    public CommonAudioCacheSettings AudioCache { get; set; } = new();
+    public CommonImageCacheSettings ImageCache { get; set; } = new();
 }
 
 public class CommonAuthenticationSettings
@@ -25,4 +25,14 @@ public class CommonAuthenticationSettings
 public record CommonAccountSettings(string AvatarImgUri, ulong Mid, string UserName, CommonAccountLevelSettings Level, string VipLabelImgUri);
 public record CommonAccountLevelSettings(int CurrentLevel, long CurrentMin, long CurrentExp);
 
-#endregion
+public class CommonAudioCacheSettings
+{
+    public bool Enabled { get; set; } = true;
+    public int MaximumCacheSizeInMb { get; set; } = 512;
+}
+
+public class CommonImageCacheSettings
+{
+    public bool Enabled { get; set; } = true;
+    public int MaximumCacheSizeInMb { get; set; } = 512;
+}

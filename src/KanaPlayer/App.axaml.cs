@@ -25,7 +25,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
 
-        ImageLoader.AsyncImageLoader = new DiskCachedWebImageLoader(AppHelper.ApplicationCachesFolderPath);
+        ImageLoader.AsyncImageLoader = new DiskCachedWebImageLoader(AppHelper.ApplicationImageCachesFolderPath);
     }
     
     public static event Action<IServiceCollection>? ConfigureServices;

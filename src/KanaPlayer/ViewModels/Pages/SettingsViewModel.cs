@@ -20,4 +20,30 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     }
 
     #endregion
+
+    #region Cache
+
+    // Maximum Audio Cache Size (256MB - 10240MB)
+    [ObservableProperty]   
+    public partial int MaximumAudioCacheSizeInMb { get; set; } =
+        configurationService.Settings.CommonSettings.AudioCache.MaximumCacheSizeInMb;
+
+    partial void OnMaximumAudioCacheSizeInMbChanged(int value)
+    {
+        configurationService.Settings.CommonSettings.AudioCache.MaximumCacheSizeInMb = value;
+        configurationService.Save();
+    }
+
+    // Maximum Image Cache Size (128MB - 5120MB)
+    [ObservableProperty]    
+    public partial int MaximumImageCacheSizeInMb { get; set; } =
+        configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb;
+
+    partial void OnMaximumImageCacheSizeInMbChanged(int value)
+    {
+        configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb = value;
+        configurationService.Save();
+    }
+
+    #endregion
 }

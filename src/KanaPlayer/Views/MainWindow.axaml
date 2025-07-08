@@ -6,7 +6,7 @@
     Icon="/Assets/avalonia-logo.ico"
     Margin="0"
     MinHeight="500"
-    MinWidth="800"
+    MinWidth="1264"
     Title="KanaPlayer"
     TransparencyLevelHint="Transparent"
     x:Class="KanaPlayer.Views.MainWindow"
