@@ -1,4 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
@@ -44,6 +47,16 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb = value;
         configurationService.Save();
     }
+    
+    // Manual Cache Cleanup
+    [RelayCommand]
+    private static void CleanupCache(string cacheType)
+        => App.CleanupCache(cacheType switch
+        {
+            "audio" => AppHelper.ApplicationAudioCachesFolderPath,
+            "image" => AppHelper.ApplicationImageCachesFolderPath,
+            _ => throw new ArgumentException("Invalid cache type specified.")
+        }, 0);
 
     #endregion
 }

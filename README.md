@@ -4,6 +4,7 @@
 
 - [ ] Better Cache Management
 - [ ] UI Consistency
+- [ ] Complete Logging
 
 ## Special Thanks
 
