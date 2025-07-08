@@ -38,7 +38,9 @@
         <entry key="src/KanaPlayer/Views/Pages/DownloadCenterView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/FavoritesView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/HomeView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/PlayListView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/SettingsView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/SplashWindow.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
       </map>
     </option>
   </component>

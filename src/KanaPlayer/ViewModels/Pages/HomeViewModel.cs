@@ -31,7 +31,6 @@ public partial class HomeViewModel(
     [RelayCommand]
     private async Task LoadMoreAsync()
     {
-        await bilibiliClient.AuthenticateAsync();
         var authentication = configurationService.Settings.CommonSettings.Authentication;
         var cookies = bilibiliClient.IsAuthenticated && authentication is not null ? authentication.Cookies : [];
         var feeds = await bilibiliClient.GetMusicRegionFeedAsync(cookies);

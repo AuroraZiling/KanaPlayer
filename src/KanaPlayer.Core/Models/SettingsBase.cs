@@ -15,7 +15,13 @@ public class CommonSettings
     public CommonAccountSettings? Account { get; set; }
 }
 
-public record CommonAuthenticationSettings(string RefreshToken, long Timestamp, string?[] Cookies);
+public class CommonAuthenticationSettings
+{
+    public required string RefreshToken { get; init; }
+    public required long Timestamp { get; init; }
+    public required Dictionary<string, string> Cookies { get; set; }
+}
+
 public record CommonAccountSettings(string AvatarImgUri, ulong Mid, string UserName, CommonAccountLevelSettings Level, string VipLabelImgUri);
 public record CommonAccountLevelSettings(int CurrentLevel, long CurrentMin, long CurrentExp);
 

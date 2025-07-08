@@ -5,12 +5,12 @@ namespace KanaPlayer.Core.Services;
 
 public partial class BilibiliClient<TSettings>
 {
-    public async Task<AccountNavInfoModel> GetAccountNavInfoAsync(string?[] cookies)
+    public async Task<AccountNavInfoModel> GetAccountNavInfoAsync(Dictionary<string, string> cookies)
     {
         const string endpoint = "https://api.bilibili.com/x/web-interface/nav";
         
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
-        foreach (var cookie in cookies.OfType<string>())
+        foreach (var cookie in cookies.Values)
         {
             request.Headers.Add("Cookie", cookie);
         }

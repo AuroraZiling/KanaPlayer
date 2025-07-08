@@ -15,13 +15,13 @@ public interface IBilibiliClient : INotifyPropertyChanged
 
     #region Account
 
-    Task<AccountNavInfoModel> GetAccountNavInfoAsync(string[] cookies);
+    Task<AccountNavInfoModel> GetAccountNavInfoAsync(Dictionary<string, string> cookies);
 
     #endregion
 
     #region Feed
 
-    Task<MusicRegionFeedModel> GetMusicRegionFeedAsync(string?[] cookies, int requestCount = 15);
+    Task<MusicRegionFeedModel> GetMusicRegionFeedAsync(Dictionary<string, string> cookies, int requestCount = 15);
 
     #endregion
 }

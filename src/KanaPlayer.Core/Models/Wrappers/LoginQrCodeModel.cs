@@ -4,7 +4,7 @@ namespace KanaPlayer.Core.Models.Wrappers;
 
 public class LoginQrCodeModel: CommonApiModel<LoginQrCodeDataModel>
 {
-    [JsonIgnore] public string[]? Cookies { get; set; }
+    [JsonIgnore] public Dictionary<string, string>? Cookies { get; set; }
 }
 
 public record LoginQrCodeDataModel

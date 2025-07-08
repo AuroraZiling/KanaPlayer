@@ -68,7 +68,7 @@ public partial class AccountViewModel(
                         LoginAttemptingQrCodeImage = null;
                         LoginAttempting = false;
                         return;
-                    case 0 when loginQrCodeModel is { Cookies.Length: > 0 }: // 登录成功
+                    case 0 when loginQrCodeModel is { Cookies.Count: > 0 }: // 登录成功
                         LoginAttemptingStatus = "登录成功";
                         LoginAttemptingQrCodeImage = null;
                         succeedLoginQrCodeModel = loginQrCodeModel;
@@ -83,9 +83,12 @@ public partial class AccountViewModel(
             }
 
 
-            configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings(
-                succeedLoginQrCodeModel.EnsureData().RefreshToken, succeedLoginQrCodeModel.EnsureData().Timestamp,
-                succeedLoginQrCodeModel.Cookies!);
+            configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings()
+            {
+                Timestamp = succeedLoginQrCodeModel.EnsureData().Timestamp,
+                RefreshToken = succeedLoginQrCodeModel.EnsureData().RefreshToken, 
+                Cookies = succeedLoginQrCodeModel.Cookies!
+            };
             configurationService.Save();
         }
         catch (Exception e)
