@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
+using Avalonia.Platform.Storage;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
@@ -16,8 +18,11 @@ public static class ServiceExtensions
 {
     public static IServiceCollection RegisterViews(this IServiceCollection services)
     {
-        services.AddSingleton<MainWindow>();
         services.AddSingleton<SplashWindow>();
+        services.AddTransient<IStorageProvider>(x => x.GetRequiredService<SplashWindow>().StorageProvider);
+        services.AddTransient<ILauncher>(x => x.GetRequiredService<SplashWindow>().Launcher);
+
+        services.AddSingleton<MainWindow>();
         services.AddSingleton<MainView>();
 
         // Navigation - Top
@@ -65,7 +70,11 @@ public static class ServiceExtensions
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();
         services.AddSingleton<IBilibiliClient, BilibiliClient<SettingsModel>>();
         services.AddKeyedSingleton<HttpClient, HttpClient>("bilibili", (_, _) =>
-            new HttpClient
+            new HttpClient(new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.GZip,
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            })
             {
                 DefaultRequestHeaders =
                 {
@@ -77,7 +86,7 @@ public static class ServiceExtensions
             });
 
         services.AddSingleton<IThemeService, ThemeService>();
-        
+
         return services;
     }
 }

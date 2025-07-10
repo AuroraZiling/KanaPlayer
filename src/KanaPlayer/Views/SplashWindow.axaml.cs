@@ -7,30 +7,14 @@ namespace KanaPlayer.Views;
 
 public partial class SplashWindow : Window
 {
-    private readonly Action _mainAction;
-    private readonly Func<Task> _task;
-    
-    public SplashWindow(Action mainAction, Func<Task> task)
+    public SplashWindow()
     {
         InitializeComponent();
-        _mainAction = mainAction;
-        _task = task;
     }
-
-    protected override async void OnLoaded(RoutedEventArgs e)
+    public async Task RunAsync(Func<Task> task) 
     {
-        try
-        {
-            await _task();
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine(exception);
-        }
-        finally
-        {
-            _mainAction.Invoke();
-            Close();
-        }
+        Show();
+        await task();
+        Hide();
     }
 }

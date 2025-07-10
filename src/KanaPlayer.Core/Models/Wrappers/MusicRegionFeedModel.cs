@@ -6,10 +6,10 @@ public class MusicRegionFeedModel: CommonApiModel<MusicRegionFeedDataModel>;
 
 public record MusicRegionFeedDataModel
 (
-    [property: JsonPropertyName("archives")] List<MusicRegionFeedDataListModel> Archives
+    [property: JsonPropertyName("archives")] List<MusicRegionFeedDataInfoModel> Archives
 );
 
-public record MusicRegionFeedDataListModel
+public record MusicRegionFeedDataInfoModel
 (
     [property: JsonPropertyName("aid")] ulong Aid,
     [property: JsonPropertyName("bvid")] string Bvid,

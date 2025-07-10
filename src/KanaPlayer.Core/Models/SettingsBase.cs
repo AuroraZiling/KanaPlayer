@@ -13,6 +13,7 @@ public class CommonSettings
     public CommonAccountSettings? Account { get; set; }
     public CommonAudioCacheSettings AudioCache { get; set; } = new();
     public CommonImageCacheSettings ImageCache { get; set; } = new();
+    public CommonBehaviorHistorySettings BehaviorHistory { get; set; } = new();
 }
 
 public class CommonAuthenticationSettings
@@ -35,4 +36,9 @@ public class CommonImageCacheSettings
 {
     public bool Enabled { get; set; } = true;
     public int MaximumCacheSizeInMb { get; set; } = 512;
+}
+
+public class CommonBehaviorHistorySettings
+{
+    public double Volume { get; set; } = 0.3;
 }

@@ -17,6 +17,7 @@
                 <ResourceInclude Source="/Controls/KanaNavigationView.axaml" />
                 <ResourceInclude Source="/Controls/KanaSettingsGroup.axaml" />
                 <ResourceInclude Source="/Controls/ProgressRing.axaml" />
+                <ResourceInclude Source="/Controls/InlineHyperlink.axaml" />
 
                 <ResourceInclude Source="/Theming/Button.axaml" />
                 <ResourceInclude Source="/Theming/ToggleButton.axaml" />

@@ -1,15 +1,29 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
+using KanaPlayer.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace KanaPlayer.ViewModels;
 
-public partial class MainViewModel(IPlayerService playerService) : ViewModelBase
+public partial class MainViewModel(IPlayerService playerService, IConfigurationService<SettingsModel> configurationService) : ViewModelBase
 {
     public IPlayerService PlayerService => playerService;
-    
+
+    [ObservableProperty]
+    public partial double Volume { get; set; } = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+
+    partial void OnVolumeChanged(double value)
+    {
+        playerService.Volume = value;
+        configurationService.Settings.CommonSettings.BehaviorHistory.Volume = value;
+        configurationService.Save();
+    }
+
     [RelayCommand]
     private async Task TogglePlayAsync()
     {

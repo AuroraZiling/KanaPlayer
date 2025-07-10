@@ -1,9 +1,6 @@
 using Foundation;
-using UIKit;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.iOS;
-using Avalonia.Media;
 
 namespace KanaPlayer.iOS;
 
@@ -12,6 +9,7 @@ namespace KanaPlayer.iOS;
 // application events from iOS.
 [Register("AppDelegate")]
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class AppDelegate : AvaloniaAppDelegate<App>
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 {

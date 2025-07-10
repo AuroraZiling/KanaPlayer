@@ -32,5 +32,5 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
 
     private void KanaWindowTitleBar_OnCloseButtonClick(object? sender, EventArgs e)
-        => Close();
+        => Environment.Exit(0);  // TODO: Customized
 }

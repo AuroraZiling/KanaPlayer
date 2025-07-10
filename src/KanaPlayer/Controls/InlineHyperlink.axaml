@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:KanaPlayer.Controls">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <StackPanel Orientation="Horizontal">
+                <ThemeVariantScope RequestedThemeVariant="Light">
+                    <Border Padding="10" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                        <StackPanel Spacing="5">
+                            <TextBlock>
+                                <controls:InlineHyperlink Text="Example Url"></controls:InlineHyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </ThemeVariantScope>
+                <ThemeVariantScope RequestedThemeVariant="Dark">
+                    <Border Padding="10" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                        <StackPanel Spacing="5">
+                            <TextBlock>
+                                <controls:InlineHyperlink Text="Example Url"></controls:InlineHyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </ThemeVariantScope>
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+</ResourceDictionary>

@@ -7,7 +7,12 @@
     xmlns:controls="clr-namespace:KanaPlayer.Controls"
     xmlns:vm="clr-namespace:KanaPlayer.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:player="clr-namespace:KanaPlayer.Core.Services.Player;assembly=KanaPlayer.Core">
+    xmlns:player="clr-namespace:KanaPlayer.Core.Services.Player;assembly=KanaPlayer.Core"
+    xmlns:converters="clr-namespace:KanaPlayer.Converters">
+    
+    <UserControl.Resources>
+        <converters:VolumeToIconKindConverter x:Key="VolumeToIconKindConverter"/>
+    </UserControl.Resources>
 
     <Grid RowDefinitions="*, 72">
         <controls:KanaNavigationView Grid.Row="0" Name="MainNavigationView" />
@@ -36,13 +41,16 @@
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
-                    
                     <Button Classes="accent" CornerRadius="50" Width="40" Height="40" Command="{Binding TogglePlayCommand}" Padding="0">
                         <Panel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <LucideIcon IsVisible="{Binding PlayerService.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static player:PlayStatus.Playing}}" Foreground="{DynamicResource KanaAccentColor20}" Kind="Play" Size="22" Margin="2, 0,0 ,0" />
                             <LucideIcon IsVisible="{Binding PlayerService.Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static player:PlayStatus.Playing}}" Foreground="{DynamicResource KanaAccentColor20}" Kind="Pause" Size="22" />
                         </Panel>
                     </Button>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" Margin="0, 0, 30, 0" Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                    <LucideIcon Kind="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource VolumeToIconKindConverter}}"></LucideIcon>
+                    <Slider Value="{Binding Volume, Mode=TwoWay}" x:Name="VolumeSlider" Width="130" Maximum="1" Minimum="0"></Slider>
                 </StackPanel>
             </Grid>
         </Panel>

@@ -36,4 +36,10 @@
     <ItemGroup>
       <AdditionalFiles Include="Theming\Styles\TextBlockStyle.axaml" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Controls\InlineHyperlink.cs">
+        <DependentUpon>InlineHyperlink.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>

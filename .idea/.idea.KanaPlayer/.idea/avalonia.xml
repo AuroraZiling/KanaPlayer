@@ -23,6 +23,7 @@
         <entry key="KanaPlayer/Views/Pages/SettingsView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="KanaPlayer/Views/SplashWindow.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="src/KanaPlayer/App.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/InlineHyperlink.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaNavigationView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaSettingsCard.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaWindowTitleBar.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />

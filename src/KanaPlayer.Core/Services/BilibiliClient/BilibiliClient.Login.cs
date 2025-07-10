@@ -15,7 +15,7 @@ public partial class BilibiliClient<TSettings>
 
     public async Task AuthenticateAsync()
     {
-        if (configurationService.Settings.CommonSettings.Authentication != null)
+        if (configurationService.Settings.CommonSettings.Authentication is not null)
         {
             var refreshToken = configurationService.Settings.CommonSettings.Authentication.RefreshToken;
             var cookies = configurationService.Settings.CommonSettings.Authentication.Cookies;
@@ -68,6 +68,19 @@ public partial class BilibiliClient<TSettings>
             IsAuthenticated = configurationService.Settings.CommonSettings.Authentication != null;
         }
     }
+    
+    public bool TryGetCookies(out Dictionary<string, string> cookies)
+    {
+        var authentication = configurationService.Settings.CommonSettings.Authentication;
+        if (IsAuthenticated && authentication is not null)
+        {
+            cookies = authentication.Cookies;
+            return true;
+        }
+
+        cookies = [];
+        return false;
+    }
 
     private static string GenerateCorrespondPath()
     {
@@ -112,7 +125,7 @@ public partial class BilibiliClient<TSettings>
         return RefreshCsrfRegex().Matches(content)[0].Groups[1].Value;
     }
 
-    private async Task<RefreshCookiesModel> RefreshCookiesAsync(string refreshToken, string refreshCsrf, Dictionary<string, string> cookies)
+    private static async Task<RefreshCookiesModel> RefreshCookiesAsync(string refreshToken, string refreshCsrf, Dictionary<string, string> cookies)
     {
         const string endpoint = "https://passport.bilibili.com/x/passport-login/web/cookie/refresh";
         

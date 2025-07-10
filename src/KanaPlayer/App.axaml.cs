@@ -11,7 +11,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
-using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
@@ -19,7 +18,6 @@ using KanaPlayer.Services;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
 using KanaPlayer.Views;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace KanaPlayer;
@@ -56,29 +54,32 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             
             GetService<IThemeService>().SetThemeColor(new Color(255, 216, 196, 241), true);
-            var splashWindow = new SplashWindow(() =>
-                {
-                    var mainWindow = GetService<MainWindow>();
 
-                    mainWindow.Show();
-                    mainWindow.Focus();
-
-                    desktop.MainWindow = mainWindow;
-                },
-                async () =>
-                {
-                    // First Authenticate Attempt
-                    await GetService<IBilibiliClient>().AuthenticateAsync();
-
-                    // Cache Cleanup
-                    await Task.Run(() =>
-                    {
-                        var configuration = GetService<IConfigurationService<SettingsModel>>().Settings.CommonSettings;
-                        CleanupCache(AppHelper.ApplicationAudioCachesFolderPath, configuration.AudioCache.MaximumCacheSizeInMb);
-                        CleanupCache(AppHelper.ApplicationImageCachesFolderPath, configuration.ImageCache.MaximumCacheSizeInMb);
-                    });
-                });
+            var splashWindow = GetService<SplashWindow>();
             desktop.MainWindow = splashWindow;
+            splashWindow.RunAsync(async () =>
+            {
+                // First Authenticate Attempt
+                await GetService<IBilibiliClient>().AuthenticateAsync();
+
+                // Cache Cleanup
+                await Task.Run(() =>
+                {
+                    var configuration = GetService<IConfigurationService<SettingsModel>>().Settings.CommonSettings;
+                    CleanupCache(AppHelper.ApplicationAudioCachesFolderPath,
+                        configuration.AudioCache.MaximumCacheSizeInMb);
+                    CleanupCache(AppHelper.ApplicationImageCachesFolderPath,
+                        configuration.ImageCache.MaximumCacheSizeInMb);
+                });
+            }).ContinueWith(_ =>
+            {
+                var mainWindow = GetService<MainWindow>();
+
+                mainWindow.Show();
+                mainWindow.Focus();
+
+                desktop.MainWindow = mainWindow;
+            }, TaskContinuationOptions.ExecuteSynchronously).Detach();  // TODO: Exception Handler
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
