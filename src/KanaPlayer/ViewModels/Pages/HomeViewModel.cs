@@ -57,15 +57,15 @@ public partial class HomeViewModel(
     
     public async void OnNavigatedTo()
     {
-        try
-        {
-            if (MusicRegionFeeds.Count > 0)
-                return;
-            await LoadMoreAsync();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        // try
+        // {
+        //     if (MusicRegionFeeds.Count > 0)
+        //         return;
+        //     await LoadMoreAsync();
+        // }
+        // catch (Exception e)
+        // {
+        //     Console.WriteLine(e);
+        // }
     }
 }

@@ -40,8 +40,6 @@ public class ScrollViewerReachEndBehavior : Behavior<ScrollViewer>
         get => GetValue(OrientationProperty);
         set => SetValue(OrientationProperty, value);
     }
-    
-    private TimeSpan _interval;
 
     public static readonly DirectProperty<ScrollViewerReachEndBehavior, TimeSpan> IntervalProperty = 
         AvaloniaProperty.RegisterDirect<ScrollViewerReachEndBehavior, TimeSpan>(
@@ -49,12 +47,21 @@ public class ScrollViewerReachEndBehavior : Behavior<ScrollViewer>
 
     public TimeSpan Interval
     {
-        get => _interval;
+        get;
         set
         {
-            if (!SetAndRaise(IntervalProperty, ref _interval, value)) return;
+            if (!SetAndRaise(IntervalProperty, ref field, value)) return;
             _executionTimer.Interval = value;
         }
+    }
+
+    public static readonly StyledProperty<TimeSpan> DebounceIntervalProperty = AvaloniaProperty.Register<ScrollViewerReachEndBehavior, TimeSpan>(
+        nameof(DebounceInterval), TimeSpan.FromSeconds(0.1));
+
+    public TimeSpan DebounceInterval
+    {
+        get => GetValue(DebounceIntervalProperty);
+        set => SetValue(DebounceIntervalProperty, value);
     }
 
     public static readonly StyledProperty<double> BiasProperty = 
@@ -99,6 +106,11 @@ public class ScrollViewerReachEndBehavior : Behavior<ScrollViewer>
         };
         
         if (!isAtEnd) return;
+        
+        if (DateTimeOffset.UtcNow - _previousExecutionTime < DebounceInterval)
+        {
+            return;
+        }
         
         if (DateTimeOffset.UtcNow - _previousExecutionTime >= Interval)
             ExecuteCommand();

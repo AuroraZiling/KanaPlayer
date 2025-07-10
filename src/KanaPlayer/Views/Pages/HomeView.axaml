@@ -153,7 +153,7 @@
                 </ItemsControl.DataTemplates>
             </ItemsControl>
             <Interaction.Behaviors>
-                <behaviors:ScrollViewerReachEndBehavior Bias="50" Interval="0:0:2" Command="{Binding LoadMoreCommand}" />
+                <behaviors:ScrollViewerReachEndBehavior Bias="50" Interval="0:0:1" Command="{Binding LoadMoreCommand}" />
             </Interaction.Behaviors>
         </ScrollViewer>
     </Grid>
