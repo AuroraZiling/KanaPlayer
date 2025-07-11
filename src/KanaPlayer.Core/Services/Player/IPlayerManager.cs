@@ -1,10 +1,11 @@
-﻿using KanaPlayer.Core.Interfaces;
+﻿using System.ComponentModel;
+using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models.PlayerManager;
 using ObservableCollections;
 
 namespace KanaPlayer.Core.Services.Player;
 
-public interface IPlayerManager
+public interface IPlayerManager : INotifyPropertyChanged
 {
     NotifyCollectionChangedSynchronizedViewList<PlayListItemModel> PlayList { get; }
     double Volume { get; set; }
@@ -15,6 +16,8 @@ public interface IPlayerManager
 
     PlaybackMode PlaybackMode { get; set; }
     Task LoadAsync(PlayListItemModel playListItemModel);
+    Task LoadPrevious();
+    Task LoadForward();
     void Play();
     void Pause();
 

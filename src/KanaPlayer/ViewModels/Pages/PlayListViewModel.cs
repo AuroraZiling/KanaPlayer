@@ -11,13 +11,13 @@ namespace KanaPlayer.ViewModels.Pages;
 
 public partial class PlayListViewModel : ViewModelBase
 {
-    [ObservableProperty] public partial PlayListItemModel SelectedPlayListItem { get; set; }
+    [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
     readonly List<string> _bvids = ["BV1oVGHzTEjN", "BV1kv3RzTEaB", "BV17d3LznEW6", "BV1xa33znEGD", "BV1pgKnzZEze"];
 
     [RelayCommand]
     private async Task PlaySelectedItemAsync()
     {
-        await PlayerManager.LoadAsync(SelectedPlayListItem);
+        await PlayerManager.LoadAsync(PlayerManager.PlayList[SelectedPlayListItemIndex]);
         PlayerManager.Play();
     }
 
@@ -26,6 +26,19 @@ public partial class PlayListViewModel : ViewModelBase
         PlayerManager = playerManager;
         BilibiliClient = bilibiliClient;
         _ = InitializeAsync();
+        
+        playerManager.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IPlayerManager.CurrentPlayListItem))
+            {
+                if (playerManager.CurrentPlayListItem is null)
+                {
+                    SelectedPlayListItemIndex = -1;
+                    return;
+                }
+                SelectedPlayListItemIndex = playerManager.IndexOf(playerManager.CurrentPlayListItem);
+            }
+        };
     }
     
     private async Task InitializeAsync()

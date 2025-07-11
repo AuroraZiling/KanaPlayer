@@ -41,8 +41,7 @@ public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
         }
     }
     
-    public TimeSpan Duration
-        => _reader?.TotalTime ?? TimeSpan.Zero;
+    public TimeSpan Duration => _reader?.TotalTime ?? TimeSpan.Zero;
 
     private WaveOutEvent? _outputDevice;
     private StreamMediaFoundationReader? _reader;
@@ -69,6 +68,7 @@ public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
             _outputDevice.Dispose();
         }
         _reader?.Dispose();
+        
         Status = PlayStatus.Loading;
         
         _reader = new StreamMediaFoundationReader(audioStream);

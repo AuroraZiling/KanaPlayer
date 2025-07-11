@@ -27,20 +27,24 @@
                         Opacity="0.1" />
                 </Border.Effect>
             </Border>
-            <Grid ColumnDefinitions="*, *, *" Margin="12">
+            <Grid ColumnDefinitions="*, 550, *" Margin="12">
                 <StackPanel
                     Grid.Column="0"
-                    HorizontalAlignment="Left"
                     Orientation="Horizontal"
                     Spacing="10">
                     <Border ClipToBounds="True" CornerRadius="6">
-                        <Image
-                            asyncImageLoader:ImageLoader.Source="{Binding PlayerManager.CurrentPlayListItem.CoverUrl, FallbackValue={x:Null}}" />
+                        <Image x:Name="CoverImage"
+                               asyncImageLoader:ImageLoader.Source="{Binding PlayerManager.CurrentPlayListItem.CoverUrl, FallbackValue={x:Null}}" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="16"
+                                   TextTrimming="CharacterEllipsis"
+                                   HorizontalAlignment="Left"
+                                   Width="{Binding $parent[StackPanel;1].Bounds.Width}"
                                    Text="{Binding PlayerManager.CurrentPlayListItem.Title, FallbackValue={x:Null}}" />
                         <TextBlock Classes="Caption"
+                                   HorizontalAlignment="Left"
+                                   Width="{Binding $parent[StackPanel;1].Bounds.Width}"
                                    Text="{Binding PlayerManager.CurrentPlayListItem.AuthorName, FallbackValue={x:Null}}" />
                     </StackPanel>
                 </StackPanel>
@@ -52,6 +56,7 @@
                                     Size="18" />
                     </Button>
                     <Button
+                        Command="{Binding LoadPreviousCommand}"
                         IsEnabled="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipBack" Size="18" />
@@ -74,17 +79,12 @@
                         </Panel>
                     </Button>
                     <Button
+                        Command="{Binding LoadForwardCommand}"
                         IsEnabled="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipForward"
                                     Size="18" />
                     </Button>
-                    <StackPanel TextElement.Foreground="{DynamicResource KanaAccentColor}" VerticalAlignment="Center"
-                                Orientation="Horizontal" Spacing="3">
-                        <TextBlock Text="{Binding PlaybackTime, StringFormat='hh\\:mm\\:ss'}"></TextBlock>
-                        <TextBlock Text="/"></TextBlock>
-                        <TextBlock Text="{Binding Duration, StringFormat='hh\\:mm\\:ss'}"></TextBlock>
-                    </StackPanel>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right" Margin="0, 0, 30, 0" Grid.Column="2" Orientation="Horizontal"
                             Spacing="10">
@@ -96,6 +96,15 @@
                     </Slider>
                 </StackPanel>
             </Grid>
+            
+            <StackPanel TextElement.Foreground="{DynamicResource KanaAccentColor}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Margin="400, 0, 0, 0"
+                        IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
+                        Orientation="Horizontal" Spacing="3">
+                <TextBlock Text="{Binding PlaybackTime, StringFormat='hh\\:mm\\:ss'}"></TextBlock>
+                <TextBlock Text="/"></TextBlock>
+                <TextBlock Text="{Binding Duration, StringFormat='hh\\:mm\\:ss'}"></TextBlock>
+            </StackPanel>
 
             <Slider Thumb.DragCompleted="Thumb_OnDragCompleted"
                     Thumb.DragStarted="Thumb_OnDragStarted" Minimum="0" Maximum="1"

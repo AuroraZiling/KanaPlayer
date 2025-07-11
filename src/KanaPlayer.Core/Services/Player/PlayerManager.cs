@@ -63,14 +63,25 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         CurrentPlayListItem = null;
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItemModel);
-
-        var index = IndexOf(playListItemModel);
-        if (index < 0)
-            throw new ArgumentException("The specified item is not in the playlist.", nameof(playListItemModel));
-
         await Task.Run(() =>
             _audioPlayer.Load(new CachedAudioStream(playListItemModel.AudioBvid, _cookies, _bilibiliClient)));
         CurrentPlayListItem = playListItemModel;
+    }
+    
+    public async Task LoadPrevious()
+    {
+        if (CurrentPlayListItem is null) return;
+        var index = IndexOf(CurrentPlayListItem);
+        if (index <= 0) return;
+        await LoadAsync(PlayList[index - 1]);
+    }
+    
+    public async Task LoadForward()
+    {
+        if (CurrentPlayListItem is null) return;
+        var index = IndexOf(CurrentPlayListItem);
+        if (index < 0 || index >= PlayList.Count - 1) return;
+        await LoadAsync(PlayList[index + 1]);
     }
 
     public void Play()

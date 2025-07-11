@@ -98,6 +98,13 @@ public partial class MainViewModel : ViewModelBase
         _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = PlaybackMode;
         _configurationService.Save();
     }
+    
+    [RelayCommand]
+    private async Task LoadPreviousAsync()
+    {
+        await PlayerManager.LoadPrevious();
+        PlayerManager.Play();
+    }
 
     [RelayCommand]
     private void TogglePlay()
@@ -106,5 +113,12 @@ public partial class MainViewModel : ViewModelBase
             PlayerManager.Pause();
         else
             PlayerManager.Play();
+    }
+    
+    [RelayCommand]
+    private async Task LoadForwardAsync()
+    {
+        await PlayerManager.LoadForward();
+        PlayerManager.Play();
     }
 }

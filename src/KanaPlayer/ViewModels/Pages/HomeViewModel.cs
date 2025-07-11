@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Interfaces;
+using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
@@ -16,7 +18,7 @@ namespace KanaPlayer.ViewModels.Pages;
 
 public partial class HomeViewModel(
     IBilibiliClient bilibiliClient,
-    IAudioPlayer audioPlayer,
+    IPlayerManager playerManager,
     ILauncher launcher) : ViewModelBase, INavigationAware
 {
     [field: AllowNull, MaybeNull]
@@ -43,12 +45,20 @@ public partial class HomeViewModel(
     }
 
     [RelayCommand]
-    private async Task StartPlayingMusicAsync(AudioRegionFeedDataInfoModel audioRegionFeedDataInfoModel)
+    private async Task LoadAudioAsync(AudioRegionFeedDataInfoModel audioRegionFeedDataInfoModel)
     {
         bilibiliClient.TryGetCookies(out var cookies);
-        var musicStream = await bilibiliClient.GetAudioStreamAsync(audioRegionFeedDataInfoModel.Bvid, cookies);
-        audioPlayer.Load(musicStream);
-        audioPlayer.Play();
+        var audioInfo = await bilibiliClient.GetAudioInfoAsync(audioRegionFeedDataInfoModel.Bvid, cookies);
+        var audioInfoData = audioInfo.EnsureData();
+        await playerManager.LoadAsync(new PlayListItemModel(
+            audioInfoData.Title,
+            audioInfoData.CoverUrl,
+            audioInfoData.Owner.Name,
+            audioInfoData.Owner.Mid,
+            audioRegionFeedDataInfoModel.Bvid,
+            TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
+        ));
+        playerManager.Play();
     }
 
     [RelayCommand]

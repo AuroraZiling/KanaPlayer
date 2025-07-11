@@ -82,7 +82,7 @@
                                 <Border VerticalAlignment="Top" Height="180" CornerRadius="10" ClipToBounds="True">
                                     <Button Classes="CoverButton" Padding="0" BorderThickness="0" Cursor="Hand"
                                             CommandParameter="{Binding}"
-                                            Command="{Binding ((viewModels:HomeViewModel)DataContext).StartPlayingMusicCommand, RelativeSource={RelativeSource AncestorType=pages:HomeView}, FallbackValue={x:Null}}">
+                                            Command="{Binding ((viewModels:HomeViewModel)DataContext).LoadAudioCommand, RelativeSource={RelativeSource AncestorType=pages:HomeView}, FallbackValue={x:Null}}">
                                         <Panel>
                                             <Image Width="320" Height="180" Stretch="UniformToFill"
                                                    asyncImageLoader:ImageLoader.Source="{Binding Cover, Converter={StaticResource CoverImageUrlResizeConverter}}">
