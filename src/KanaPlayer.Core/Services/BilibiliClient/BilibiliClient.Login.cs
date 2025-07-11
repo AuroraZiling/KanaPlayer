@@ -24,16 +24,26 @@ public partial class BilibiliClient<TSettings>
               
             if (checkRefreshCookies.Data == null || checkRefreshCookies.Data.Refresh)  // 登录失效
             {
-                var correspondPath = GenerateCorrespondPath();
-                var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
-                var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
-                var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
-                confirmRefreshCookies.EnsureSuccess();
-                configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
+                try
+                {
+                    var correspondPath = GenerateCorrespondPath();
+                    var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
+                    var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
+                    var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
+                    confirmRefreshCookies.EnsureSuccess();
+                    configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return;
+                }
             }
             else
             {
-                cookies["buvid3"] = $"buvid3={await GetBvUid3Async()}";
+                var buVid = await GetBuVidAsync();
+                cookies["buvid3"] = $"buvid3={buVid.BuVid3}";
+                cookies["buvid4"] = $"buvid4={buVid.BuVid4}";
                 configurationService.Settings.CommonSettings.Authentication.Cookies = cookies;
             }
             configurationService.Save();
@@ -109,15 +119,15 @@ public partial class BilibiliClient<TSettings>
     {
         var endpoint = $"https://www.bilibili.com/correspond/1/{correspondPath}";
 
-        var cookieSessData = cookies.TryGetValue("SESSDATA", out var sessData);
-        if (!cookieSessData)
-            throw new InvalidOperationException("SESSDATA cookie is required for refresh CSRF token.");
         using var scopedHttpClient = new HttpClient(new HttpClientHandler
         {
             AutomaticDecompression = DecompressionMethods.GZip
         });
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
-        request.Headers.Add("Cookie", sessData);
+        foreach (var cookie in cookies)
+        {
+            request.Headers.Add("Cookie", cookie.Value);
+        }
         var response = await scopedHttpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
             throw new HttpRequestException($"Failed to get refresh csrf: {response.ReasonPhrase}");
@@ -154,9 +164,10 @@ public partial class BilibiliClient<TSettings>
                           ?? throw new HttpRequestException("Failed to refresh cookies");
                 
         response.Headers.TryGetValues("Set-Cookie", out var newCookies);
-        if (newCookies is null)
-            throw new HttpRequestException("No cookies returned in the response.");
+        if (newCookies is null || jsonContent.Data is null)
+            throw new HttpRequestException("No/Broken cookies returned in the response.");
         var newCookiesDictionary = newCookies.ToDictionary(newCookie => newCookie.Split('=')[0], newCookie => newCookie);
+        newCookiesDictionary["ac_time_value"] = $"ac_time_value={jsonContent.Data.RefreshToken}";
 
         return new RefreshCookiesModel(jsonContent, newCookiesDictionary);
     }
@@ -215,16 +226,21 @@ public partial class BilibiliClient<TSettings>
 
         if (cookies is null)
             return json;
+        
+        if(json.Data is null)
+            throw new HttpRequestException("QR code data is null, login may have failed.");
         var cookiesDictionary = cookies.ToDictionary(cookie => cookie.Split('=')[0], cookie => cookie);
+        cookiesDictionary["ac_time_value"] = json.Data.RefreshToken;
         
         var response2 = await httpClient.GetAsync(endpoint2);
         if (!response2.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get buvid3: {response2.ReasonPhrase}");
+            throw new HttpRequestException($"Failed to get buvid: {response2.ReasonPhrase}");
         var content2 = await response.Content.ReadAsStringAsync();
-        var json2 = JsonSerializer.Deserialize<BvUid3Model>(content2)
+        var json2 = JsonSerializer.Deserialize<BuVidModel>(content2)
                     ?? throw new HttpRequestException("Failed to poll QR code");
         
-        cookiesDictionary["buvid3"] = $"buvid3={json2.EnsureData().BuVid}";
+        cookiesDictionary["buvid3"] = $"buvid3={json2.EnsureData().BuVid3}";
+        cookiesDictionary["buvid4"] = $"buvid4={json2.EnsureData().BuVid4}";
         json.Cookies = cookiesDictionary;  // Cookies would not null if success
         return json;
     }
@@ -246,19 +262,19 @@ public partial class BilibiliClient<TSettings>
                ?? throw new HttpRequestException("Failed to refresh cookies");
     }
     
-    private async Task<string> GetBvUid3Async()
+    private async Task<BuVidDataModel> GetBuVidAsync()
     {
-        const string endpoint = "https://api.bilibili.com/x/web-frontend/getbuvid";
+        const string endpoint = "https://api.bilibili.com/x/frontend/finger/spi";
         
         var response = await httpClient.GetAsync(endpoint);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get buvid3: {response.ReasonPhrase}");
+            throw new HttpRequestException($"Failed to get buvid: {response.ReasonPhrase}");
         
         var content = await response.Content.ReadAsStringAsync();
-        var json = JsonSerializer.Deserialize<BvUid3Model>(content)
-                   ?? throw new HttpRequestException("Failed to get buvid3");
-        
-        return json.EnsureData().BuVid;
+        var json = JsonSerializer.Deserialize<BuVidModel>(content)
+                   ?? throw new HttpRequestException("Failed to get buvid");
+
+        return json.EnsureData();
     }
 
     [GeneratedRegex("""<div id="1-name">(.*?)<\/div>""")]
