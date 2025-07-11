@@ -17,24 +17,29 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
     [ObservableProperty] public partial PlayListItemModel? CurrentPlayListItem { get; private set; }
 
+    public TimeSpan PlaybackTime
+    {
+        get => Duration * _audioPlayer.Progress;
+        set => _audioPlayer.Progress = value / Duration;
+    }
+    
+    public TimeSpan Duration
+        => _audioPlayer.Duration;
+
     [ObservableProperty] public partial double Volume { get; set; }
     public PlayStatus Status => _audioPlayer.Status;
-
     public PlaybackMode PlaybackMode { get; set; }
-
     partial void OnVolumeChanged(double value)
         => _audioPlayer.Volume = value;
 
     private readonly ObservableList<PlayListItemModel> _playList = [];
-    private Dictionary<string, string> _cookies;
+    private readonly Dictionary<string, string> _cookies;
     private readonly IAudioPlayer _audioPlayer;
     private readonly IBilibiliClient _bilibiliClient;
-    private readonly IConfigurationService<TSettings> _configurationService;
 
     public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer,
         IBilibiliClient bilibiliClient)
     {
-        _configurationService = configurationService;
         _audioPlayer = audioPlayer;
         _bilibiliClient = bilibiliClient;
 
@@ -44,13 +49,13 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 OnPropertyChanged(nameof(Status));
         };
 
-        PlaybackMode = _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
-        Volume = _configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+        PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
+        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
 
         _bilibiliClient.TryGetCookies(out var cookies);
         _cookies = cookies;
 
-        _audioPlayer.Volume = _configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+        _audioPlayer.Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
     }
 
     public async Task LoadAsync(PlayListItemModel playListItemModel)

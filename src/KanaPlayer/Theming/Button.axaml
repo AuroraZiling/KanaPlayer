@@ -129,7 +129,6 @@
                 <Setter Property="Background">
                     <SolidColorBrush Color="White" Opacity="0"></SolidColorBrush>
                 </Setter>
-                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrush}" />
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
                 </Style>
@@ -144,7 +143,6 @@
                 <Setter Property="Background">
                     <SolidColorBrush Color="White" Opacity="0.1"></SolidColorBrush>
                 </Setter>
-                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPointerOver}" />
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
                 </Style>
@@ -154,17 +152,17 @@
                 <Setter Property="Background">
                     <SolidColorBrush Color="White" Opacity="0.2"></SolidColorBrush>
                 </Setter>
-                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPressed}" />
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
                 </Style>
             </Style>
 
             <Style Selector="^:disabled /template/ Border">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
+                <Setter Property="Background">
+                    <SolidColorBrush Color="White" Opacity="0"></SolidColorBrush>
+                </Setter>
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
+                    <Setter Property="Foreground" Value="Gray" />
                 </Style>
             </Style>
         </Style>

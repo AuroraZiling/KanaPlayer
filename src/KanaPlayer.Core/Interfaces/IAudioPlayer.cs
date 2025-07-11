@@ -19,6 +19,7 @@ public interface IAudioPlayer : INotifyPropertyChanged
     /// Audio Progress in percentage (0.0 to 1.0)
     /// </summary>
     double Progress { get; set; }
+    TimeSpan Duration { get; }
     
     double Volume { get; set; }
 

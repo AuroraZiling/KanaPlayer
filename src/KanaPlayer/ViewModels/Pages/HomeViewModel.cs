@@ -55,17 +55,7 @@ public partial class HomeViewModel(
     private void OpenAuthorSpaceUrl(ulong mid)
         =>  launcher.LaunchUriAsync(new Uri($"https://space.bilibili.com/{mid}", UriKind.Absolute));
     
-    public async void OnNavigatedTo()
+    public void OnNavigatedTo()
     {
-        // try
-        // {
-        //     if (MusicRegionFeeds.Count > 0)
-        //         return;
-        //     await LoadMoreAsync();
-        // }
-        // catch (Exception e)
-        // {
-        //     Console.WriteLine(e);
-        // }
     }
 }

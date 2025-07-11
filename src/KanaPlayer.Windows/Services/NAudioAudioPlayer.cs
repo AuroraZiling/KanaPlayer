@@ -41,8 +41,8 @@ public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
         }
     }
     
-    private readonly IBilibiliClient _bilibiliClient;
-    private Dictionary<string, string> _cookies;
+    public TimeSpan Duration
+        => _reader?.TotalTime ?? TimeSpan.Zero;
 
     private WaveOutEvent? _outputDevice;
     private StreamMediaFoundationReader? _reader;
@@ -53,11 +53,8 @@ public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
         IsEnabled = false,
     };
 
-    public NAudioAudioPlayer(IBilibiliClient bilibiliClient)
+    public NAudioAudioPlayer()
     {
-        _bilibiliClient = bilibiliClient;
-        _cookies = bilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>();
-        
         _progressTimer.Tick += delegate
         {
             OnPropertyChanged(nameof(Progress));

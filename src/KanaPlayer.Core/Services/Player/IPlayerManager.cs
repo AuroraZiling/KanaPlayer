@@ -9,6 +9,8 @@ public interface IPlayerManager
     NotifyCollectionChangedSynchronizedViewList<PlayListItemModel> PlayList { get; }
     double Volume { get; set; }
     PlayStatus Status { get; }
+    TimeSpan PlaybackTime { get; set; }
+    TimeSpan Duration { get; }
     PlayListItemModel? CurrentPlayListItem { get; }
 
     PlaybackMode PlaybackMode { get; set; }
