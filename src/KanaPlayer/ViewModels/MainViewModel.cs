@@ -47,9 +47,7 @@ public partial class MainViewModel : ViewModelBase
         set
         {
             if (value)
-            {
                 _playbackTimeExecutionTimer.Stop();
-            }
             else
             {
                 PlayerManager.PlaybackTime = TimeSpan.FromSeconds(Progress * PlayerManager.Duration.TotalSeconds);

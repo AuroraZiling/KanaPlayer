@@ -3,7 +3,7 @@
     CornerRadius="20"
     ExtendClientAreaToDecorationsHint="True"
     Height="120"
-    Icon="/Assets/avalonia-logo.ico"
+    Icon="/Assets/kana-logo.ico"
     SystemDecorations="None"
     Title="KanaPlayer - Splash"
     TransparencyLevelHint="AcrylicBlur"
@@ -29,7 +29,7 @@
             VerticalAlignment="Center">
             <Image
                 Height="48"
-                Source="/Assets/avalonia-logo.ico"
+                Source="/Assets/kana-logo.ico"
                 VerticalAlignment="Center"
                 Width="48" />
             <TextBlock

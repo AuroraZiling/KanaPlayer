@@ -12,7 +12,7 @@ namespace KanaPlayer.ViewModels.Pages;
 public partial class PlayListViewModel : ViewModelBase
 {
     [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
-    readonly List<string> _bvids = ["BV1oVGHzTEjN", "BV1kv3RzTEaB", "BV17d3LznEW6", "BV1xa33znEGD", "BV1pgKnzZEze"];
+    readonly List<string> _bvId = ["BV1oVGHzTEjN", "BV1kv3RzTEaB", "BV17d3LznEW6", "BV1xa33znEGD", "BV1pgKnzZEze"];
 
     [RelayCommand]
     private async Task PlaySelectedItemAsync()
@@ -21,43 +21,38 @@ public partial class PlayListViewModel : ViewModelBase
         PlayerManager.Play();
     }
 
+    public IPlayerManager PlayerManager { get; }
+    private readonly IBilibiliClient _bilibiliClient;
     public PlayListViewModel(IPlayerManager playerManager, IBilibiliClient bilibiliClient)
     {
         PlayerManager = playerManager;
-        BilibiliClient = bilibiliClient;
-        _ = InitializeAsync();
+        _bilibiliClient = bilibiliClient;
         
+        _ = InitializeAsync();
         playerManager.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IPlayerManager.CurrentPlayListItem))
             {
-                if (playerManager.CurrentPlayListItem is null)
-                {
-                    SelectedPlayListItemIndex = -1;
-                    return;
-                }
-                SelectedPlayListItemIndex = playerManager.IndexOf(playerManager.CurrentPlayListItem);
+                SelectedPlayListItemIndex = playerManager.CurrentPlayListItem is null ? -1 : playerManager.IndexOf(playerManager.CurrentPlayListItem);
             }
         };
     }
     
     private async Task InitializeAsync()
     {
-        foreach (var bvid in _bvids)
+        foreach (var bvid in _bvId)
         {
-            var audioInfo = await BilibiliClient.GetAudioInfoAsync(bvid, BilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>());
+            var audioUniqueId = new AudioUniqueId(bvid);
+            var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, _bilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>());
             var audioInfoData = audioInfo.EnsureData();
             PlayerManager.Append(new PlayListItemModel(
                 audioInfoData.Title,
                 audioInfoData.CoverUrl,
                 audioInfoData.Owner.Name,
                 audioInfoData.Owner.Mid,
-                bvid,
+                audioUniqueId,
                 TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
             ));
         }
     }
-
-    public IPlayerManager PlayerManager { get; }
-    public IBilibiliClient BilibiliClient { get; }
 }

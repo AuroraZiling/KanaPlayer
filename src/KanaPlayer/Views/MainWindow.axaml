@@ -3,7 +3,7 @@
     ExtendClientAreaChromeHints="NoChrome"
     ExtendClientAreaTitleBarHeightHint="-1"
     ExtendClientAreaToDecorationsHint="True"
-    Icon="/Assets/avalonia-logo.ico"
+    Icon="/Assets/kana-logo.ico"
     Margin="0"
     MinHeight="500"
     MinWidth="1264"
@@ -24,7 +24,7 @@
         <controls:KanaWindowTitleBar
             CloseButtonClick="KanaWindowTitleBar_OnCloseButtonClick"
             Grid.Row="0"
-            Icon="avares://KanaPlayer/Assets/avalonia-logo.ico"
+            Icon="avares://KanaPlayer/Assets/kana-logo.ico"
             MaximizeButtonClick="KanaWindowTitleBar_OnMaximizeButtonClick"
             MinimizeButtonClick="KanaWindowTitleBar_OnMinimizeButtonClick"
             Title="KanaPlayer"

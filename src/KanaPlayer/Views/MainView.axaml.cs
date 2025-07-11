@@ -17,13 +17,9 @@ public partial class MainView : UserControl
         navigationService.Initialize(MainNavigationView, serviceProvider);
     }
 
-    private void Thumb_OnDragCompleted(object? sender, VectorEventArgs e)
-    {
-        _mainViewModel.IsSeeking = false;
-    }
+    private void AudioSliderThumb_OnDragCompleted(object? sender, VectorEventArgs e)
+        => _mainViewModel.IsSeeking = false;
 
-    private void Thumb_OnDragStarted(object? sender, VectorEventArgs e)
-    {
-        _mainViewModel.IsSeeking = true;
-    }
+    private void AudioSliderThumb_OnDragStarted(object? sender, VectorEventArgs e)
+        => _mainViewModel.IsSeeking = true;
 }

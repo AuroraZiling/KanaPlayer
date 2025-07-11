@@ -11,6 +11,23 @@ namespace KanaPlayer.Core.Services.Player;
 
 public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager where TSettings : SettingsBase, new()
 {
+    public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient)
+    {
+        _audioPlayer = audioPlayer;
+        _bilibiliClient = bilibiliClient;
+
+        _audioPlayer.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IAudioPlayer.Status))
+                OnPropertyChanged(nameof(Status));
+        };
+
+        PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
+        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+
+        _bilibiliClient.TryGetCookies(out _cookies);
+    }
+    
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<PlayListItemModel> PlayList =>
         field ??= _playList.ToNotifyCollectionChangedSlim();
@@ -37,34 +54,13 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     private readonly IAudioPlayer _audioPlayer;
     private readonly IBilibiliClient _bilibiliClient;
 
-    public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer,
-        IBilibiliClient bilibiliClient)
-    {
-        _audioPlayer = audioPlayer;
-        _bilibiliClient = bilibiliClient;
-
-        _audioPlayer.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(IAudioPlayer.Status))
-                OnPropertyChanged(nameof(Status));
-        };
-
-        PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
-        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
-
-        _bilibiliClient.TryGetCookies(out var cookies);
-        _cookies = cookies;
-
-        _audioPlayer.Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
-    }
-
     public async Task LoadAsync(PlayListItemModel playListItemModel)
     {
         CurrentPlayListItem = null;
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItemModel);
         await Task.Run(() =>
-            _audioPlayer.Load(new CachedAudioStream(playListItemModel.AudioBvid, _cookies, _bilibiliClient)));
+            _audioPlayer.Load(new CachedAudioStream(playListItemModel.AudioUniqueId, _cookies, _bilibiliClient)));
         CurrentPlayListItem = playListItemModel;
     }
     
@@ -106,7 +102,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _playList.Clear();
 }
 
-file class CachedAudioStream(string audioBvid, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient)
+file class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient)
     : Stream
 {
     public override void Flush()
@@ -122,14 +118,12 @@ file class CachedAudioStream(string audioBvid, Dictionary<string, string> cookie
         // For example, it could load the audio data from a file or a database.
         // The implementation is omitted for brevity.
         if (_stream is not null) return;
-        var cachedAudioFilePath = Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, audioBvid.ToLower());
+        var cachedAudioFilePath = Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, $"{audioUniqueId.Bvid}_p{audioUniqueId.Page}");
         if (File.Exists(cachedAudioFilePath))
-        {
             _stream = File.OpenRead(cachedAudioFilePath);
-        }
         else
         {
-            _stream = bilibiliClient.GetAudioStreamAsync(audioBvid, cookies)
+            _stream = bilibiliClient.GetAudioStreamAsync(audioUniqueId, cookies)
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
@@ -151,14 +145,10 @@ file class CachedAudioStream(string audioBvid, Dictionary<string, string> cookie
     }
 
     public override void SetLength(long value)
-    {
-        throw new InvalidOperationException();
-    }
+        => throw new InvalidOperationException();
 
     public override void Write(byte[] buffer, int offset, int count)
-    {
-        throw new InvalidOperationException();
-    }
+        => throw new InvalidOperationException();
 
     public override bool CanRead => true;
     public override bool CanSeek => true;

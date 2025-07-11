@@ -28,9 +28,7 @@ public partial class MainWindowViewModel : ViewModelBase
         bilibiliClient.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IBilibiliClient.IsAuthenticated))
-            {
                 OnAuthenticationStatusChanged(bilibiliClient.IsAuthenticated);
-            }
         };
         navigationService.PropertyChanged += (_, args) =>
         {

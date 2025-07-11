@@ -106,8 +106,8 @@
                 <TextBlock Text="{Binding Duration, StringFormat='hh\\:mm\\:ss'}"></TextBlock>
             </StackPanel>
 
-            <Slider Thumb.DragCompleted="Thumb_OnDragCompleted"
-                    Thumb.DragStarted="Thumb_OnDragStarted" Minimum="0" Maximum="1"
+            <Slider Thumb.DragCompleted="AudioSliderThumb_OnDragCompleted"
+                    Thumb.DragStarted="AudioSliderThumb_OnDragStarted" Minimum="0" Maximum="1"
                     Value="{Binding Progress, Mode=TwoWay}" HorizontalAlignment="Stretch"
                     Margin="0, -24, 0, 0" VerticalAlignment="Top" />
         </Panel>

@@ -8,7 +8,7 @@ public enum PlayStatus
     Loading,
     Loaded,
     Playing,
-    Paused,
+    Paused
 }
 
 public interface IAudioPlayer : INotifyPropertyChanged

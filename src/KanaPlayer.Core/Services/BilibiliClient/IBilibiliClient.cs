@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 
 namespace KanaPlayer.Core.Services;
@@ -6,6 +7,7 @@ namespace KanaPlayer.Core.Services;
 public interface IBilibiliClient : INotifyPropertyChanged
 {
     #region Login
+
     bool IsAuthenticated { get; }
     Task AuthenticateAsync();
     bool TryGetCookies(out Dictionary<string, string> cookies);
@@ -28,11 +30,11 @@ public interface IBilibiliClient : INotifyPropertyChanged
 
     #region Music
 
-    Task<AudioInfoModel> GetAudioInfoAsync(string bvid, Dictionary<string, string> cookies);
+    Task<AudioInfoModel> GetAudioInfoAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
 
-    Task<string> GetAudioUrlAsync(string bvid, Dictionary<string, string> cookies);
-    Task<Stream> GetAudioStreamAsync(string bvid,
-        Dictionary<string, string> cookies);
+    Task<string> GetAudioUrlAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
+    Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId,
+                                     Dictionary<string, string> cookies);
 
     #endregion
 }

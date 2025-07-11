@@ -5,12 +5,12 @@ public record PlayListItemModel(
     string CoverUrl,
     string AuthorName,
     ulong AuthorMid,
-    string AudioBvid,
+    AudioUniqueId AudioUniqueId,
     TimeSpan Duration)
 {
     public virtual bool Equals(PlayListItemModel? other)
-        => other?.AudioBvid == AudioBvid;
+        => other?.AudioUniqueId.Equals(AudioUniqueId) ?? false;
 
     public override int GetHashCode()
-        => AudioBvid.GetHashCode();
+        => AudioUniqueId.GetHashCode();
 }
