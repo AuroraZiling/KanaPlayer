@@ -31,7 +31,7 @@
             <controls:FitSquarelyWithinAspectRatioConverter x:Key="FitSquarelyWithinAspectRatioConverter" />
         </ControlTheme.Resources>
 
-        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
         <Setter Property="BorderThickness" Value="9" />
         <Setter Property="MinHeight" Value="16" />

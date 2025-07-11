@@ -1,4 +1,6 @@
-﻿namespace KanaPlayer.Core.Services.Player;
+﻿using System.ComponentModel;
+
+namespace KanaPlayer.Core.Interfaces;
 
 public enum PlayStatus
 {
@@ -9,7 +11,7 @@ public enum PlayStatus
     Paused,
 }
 
-public interface IPlayerService
+public interface IAudioPlayer : INotifyPropertyChanged
 {
     PlayStatus Status { get; }
     
@@ -21,6 +23,7 @@ public interface IPlayerService
     double Volume { get; set; }
 
     void Load(Stream audioStream);
+    Task LoadFromAudioUrlAsync(string bvid);
 
     void Play();
 

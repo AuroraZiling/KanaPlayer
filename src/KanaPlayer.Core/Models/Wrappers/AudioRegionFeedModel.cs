@@ -2,14 +2,14 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class MusicRegionFeedModel: CommonApiModel<MusicRegionFeedDataModel>;
+public class AudioRegionFeedModel: CommonApiModel<AudioRegionFeedDataModel>;
 
-public record MusicRegionFeedDataModel
+public record AudioRegionFeedDataModel
 (
-    [property: JsonPropertyName("archives")] List<MusicRegionFeedDataInfoModel> Archives
+    [property: JsonPropertyName("archives")] List<AudioRegionFeedDataInfoModel> Archives
 );
 
-public record MusicRegionFeedDataInfoModel
+public record AudioRegionFeedDataInfoModel
 (
     [property: JsonPropertyName("aid")] ulong Aid,
     [property: JsonPropertyName("bvid")] string Bvid,
@@ -18,18 +18,18 @@ public record MusicRegionFeedDataInfoModel
     [property: JsonPropertyName("cover")] string Cover,
     [property: JsonPropertyName("duration")] ulong DurationSeconds,
     [property: JsonPropertyName("pubdate")] ulong PublishTimestamp,
-    [property: JsonPropertyName("stat")] MusicRegionFeedDataStatisticsModel Statistics,
-    [property: JsonPropertyName("author")] MusicRegionFeedDataAuthorModel Author
+    [property: JsonPropertyName("stat")] AudioRegionFeedDataStatisticsModel Statistics,
+    [property: JsonPropertyName("author")] AudioRegionFeedDataAuthorModel Author
 );
 
-public record MusicRegionFeedDataStatisticsModel
+public record AudioRegionFeedDataStatisticsModel
 (
     [property: JsonPropertyName("view")] ulong ViewCount,
     [property: JsonPropertyName("like")] ulong LikeCount,
     [property: JsonPropertyName("danmaku")] ulong DanmakuCount
 );
 
-public record MusicRegionFeedDataAuthorModel
+public record AudioRegionFeedDataAuthorModel
 (
     [property: JsonPropertyName("mid")] ulong Mid,
     [property: JsonPropertyName("name")] string Name

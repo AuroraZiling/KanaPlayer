@@ -6,9 +6,26 @@ namespace KanaPlayer.Core.Services;
 
 public partial class BilibiliClient<TSettings>
 {
-    public async Task<Stream> GetAudioStreamAsync(MusicRegionFeedDataInfoModel musicInfoModel, Dictionary<string, string> cookies)
+    public async Task<AudioInfoModel> GetAudioInfoAsync(string bvid, Dictionary<string, string> cookies)
     {
-        var videoEndpoint = $"https://www.bilibili.com/video/{musicInfoModel.Bvid}";
+        var endpoint = $"https://api.bilibili.com/x/web-interface/view?bvid={bvid}";
+        
+        var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+        foreach (var cookie in cookies.Values)
+        {
+            request.Headers.Add("Cookie", cookie);
+        }
+        var response = await httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Failed to get audio info: {response.ReasonPhrase}");
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<AudioInfoModel>(content) 
+               ?? throw new HttpRequestException("Failed to get audio info");
+    }
+    
+    public async Task<string> GetAudioUrlAsync(string bvid, Dictionary<string, string> cookies)
+    {
+        var videoEndpoint = $"https://www.bilibili.com/video/{bvid}";
         
         var videoPageRequest = new HttpRequestMessage(HttpMethod.Get, videoEndpoint);
         foreach (var cookie in cookies.Values)
@@ -34,6 +51,12 @@ public partial class BilibiliClient<TSettings>
             .GetString();
         if (audioUrl is null)
             throw new Exception("Audio URL not found in PlayInfo JSON.");
+        return audioUrl;
+    }
+    
+    public async Task<Stream> GetAudioStreamAsync(string bvid, Dictionary<string, string> cookies)
+    {
+        var audioUrl = await GetAudioUrlAsync(bvid, cookies);
         
         var audioResponse = await httpClient.SendAsync(new HttpRequestMessage
         {
@@ -41,7 +64,7 @@ public partial class BilibiliClient<TSettings>
             Method = HttpMethod.Get,
             Headers =
             {
-                {"Referer", videoEndpoint}
+                {"Referer", $"https://www.bilibili.com/video/{bvid}"}
             }
         });
         

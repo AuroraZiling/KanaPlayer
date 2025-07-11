@@ -76,7 +76,7 @@
                     </Style>
                 </ItemsControl.Styles>
                 <ItemsControl.DataTemplates>
-                    <DataTemplate DataType="wrappers:MusicRegionFeedDataInfoModel">
+                    <DataTemplate DataType="wrappers:AudioRegionFeedDataInfoModel">
                         <Border Width="320" pages:HomeView.EnableAnimations="True">
                             <StackPanel Spacing="10">
                                 <Border VerticalAlignment="Top" Height="180" CornerRadius="10" ClipToBounds="True">

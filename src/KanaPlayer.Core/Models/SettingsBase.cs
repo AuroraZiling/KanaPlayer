@@ -1,5 +1,7 @@
 ﻿// ReSharper disable CommentTypo
 
+using KanaPlayer.Core.Models.PlayerManager;
+
 namespace KanaPlayer.Core.Models;
 
 public abstract class SettingsBase
@@ -41,4 +43,5 @@ public class CommonImageCacheSettings
 public class CommonBehaviorHistorySettings
 {
     public double Volume { get; set; } = 0.3;
+    public PlaybackMode PlaybackMode { get; set; } = PlaybackMode.Sequential;
 }

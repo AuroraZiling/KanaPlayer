@@ -4,6 +4,7 @@ using Avalonia.Platform.Storage;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
@@ -68,6 +69,7 @@ public static class ServiceExtensions
     {
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();
+        services.AddSingleton<IPlayerManager, PlayerManager<SettingsModel>>();
         services.AddSingleton<IBilibiliClient, BilibiliClient<SettingsModel>>();
         services.AddKeyedSingleton<HttpClient, HttpClient>("bilibili", (_, _) =>
             new HttpClient(new HttpClientHandler
@@ -81,6 +83,10 @@ public static class ServiceExtensions
                     {
                         "User-Agent",
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+                    },
+                    {
+                        "Referer",
+                        "https://www.bilibili.com"
                     }
                 }
             });

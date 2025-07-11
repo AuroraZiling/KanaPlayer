@@ -22,13 +22,16 @@ public interface IBilibiliClient : INotifyPropertyChanged
 
     #region Feed
 
-    Task<MusicRegionFeedModel> GetMusicRegionFeedAsync(Dictionary<string, string> cookies, int requestCount = 15);
+    Task<AudioRegionFeedModel> GetAudioRegionFeedAsync(Dictionary<string, string> cookies, int requestCount = 15);
 
     #endregion
 
     #region Music
 
-    Task<Stream> GetAudioStreamAsync(MusicRegionFeedDataInfoModel musicInfoModel,
+    Task<AudioInfoModel> GetAudioInfoAsync(string bvid, Dictionary<string, string> cookies);
+
+    Task<string> GetAudioUrlAsync(string bvid, Dictionary<string, string> cookies);
+    Task<Stream> GetAudioStreamAsync(string bvid,
         Dictionary<string, string> cookies);
 
     #endregion

@@ -3,6 +3,29 @@
     x:DataType="pages:PlayListViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    Welcome to Play List!
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core">
+    
+    <StackPanel>
+        <TextBlock Text="播放列表" Classes="h1" VerticalAlignment="Center"></TextBlock>
+        
+        <ListBox Cursor="Hand" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type playerManager:PlayListItemModel}">
+                    <Grid ColumnDefinitions="60, *, *, 100">
+                        <TextBlock Grid.Column="0" Text="序号"></TextBlock>
+                        <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
+                        <TextBlock Grid.Column="2" Text="{Binding AuthorName}"></TextBlock>
+                        <TextBlock Grid.Column="3" Text="{Binding Duration}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding PlaySelectedItemCommand}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+        </ListBox>
+    </StackPanel>
 </UserControl>

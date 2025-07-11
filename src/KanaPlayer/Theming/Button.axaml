@@ -20,6 +20,7 @@
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Cursor" Value="Hand"></Setter>
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="RenderTransform" Value="none" />
         <Setter Property="Transitions">
@@ -119,6 +120,51 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor20}" />
+                </Style>
+            </Style>
+        </Style>
+        
+        <Style Selector="^.ghost">
+            <Style Selector="^ /template/ Border">
+                <Setter Property="Background">
+                    <SolidColorBrush Color="White" Opacity="0"></SolidColorBrush>
+                </Setter>
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrush}" />
+                <Style Selector="^ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
+                </Style>
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.2" Easing="CubicEaseInOut"></BrushTransition>
+                    </Transitions>
+                </Setter>
+            </Style>
+
+            <Style Selector="^:pointerover /template/ Border">
+                <Setter Property="Background">
+                    <SolidColorBrush Color="White" Opacity="0.1"></SolidColorBrush>
+                </Setter>
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPointerOver}" />
+                <Style Selector="^ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
+                </Style>
+            </Style>
+
+            <Style Selector="^:pressed  /template/ Border">
+                <Setter Property="Background">
+                    <SolidColorBrush Color="White" Opacity="0.2"></SolidColorBrush>
+                </Setter>
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPressed}" />
+                <Style Selector="^ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
+                </Style>
+            </Style>
+
+            <Style Selector="^:disabled /template/ Border">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
+                <Style Selector="^ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor}" />
                 </Style>
             </Style>
         </Style>

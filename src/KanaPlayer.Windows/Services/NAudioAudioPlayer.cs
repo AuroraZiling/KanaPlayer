@@ -1,12 +1,14 @@
 ﻿using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Extensions;
+using KanaPlayer.Core.Interfaces;
+using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Player;
 using NAudio.Wave;
 
 namespace KanaPlayer.Windows.Services;
 
-public partial class NAudioPlayerService : ObservableObject, IPlayerService
+public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
 {
     [ObservableProperty] public partial PlayStatus Status { get; private set; } = PlayStatus.Stopped;
 
@@ -39,6 +41,9 @@ public partial class NAudioPlayerService : ObservableObject, IPlayerService
             OnPropertyChanged();
         }
     }
+    
+    private readonly IBilibiliClient _bilibiliClient;
+    private Dictionary<string, string> _cookies;
 
     private WaveOutEvent? _outputDevice;
     private StreamMediaFoundationReader? _reader;
@@ -49,8 +54,11 @@ public partial class NAudioPlayerService : ObservableObject, IPlayerService
         IsEnabled = false,
     };
 
-    public NAudioPlayerService()
+    public NAudioAudioPlayer(IBilibiliClient bilibiliClient)
     {
+        _bilibiliClient = bilibiliClient;
+        _cookies = bilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>();
+        
         _progressTimer.Tick += delegate
         {
             OnPropertyChanged(nameof(Progress));
@@ -59,9 +67,9 @@ public partial class NAudioPlayerService : ObservableObject, IPlayerService
 
     public void Load(Stream audioStream)
     {
+        Status = PlayStatus.Loading;
         _reader?.Dispose();
         _outputDevice?.Dispose();
-        Status = PlayStatus.Loading;
         
         _reader = new StreamMediaFoundationReader(audioStream);
         _outputDevice = new WaveOutEvent();
@@ -71,6 +79,33 @@ public partial class NAudioPlayerService : ObservableObject, IPlayerService
         {
             Status = PlayStatus.Stopped;
         };
+        
+        Status = PlayStatus.Loaded;
+    }
+    
+    public async Task LoadFromAudioUrlAsync(string bvid)
+    {
+        if (_outputDevice is not null)
+        {
+            _outputDevice.PlaybackStopped -= OnOutputDeviceOnPlaybackStopped;
+            _outputDevice.Dispose();
+        }
+        if (_reader is not null)
+        {
+            await _reader.DisposeAsync();
+        }
+        
+        Status = PlayStatus.Loading;
+        _reader = new StreamMediaFoundationReader(await _bilibiliClient.GetAudioStreamAsync(bvid, _cookies));
+        _outputDevice = new WaveOutEvent();
+        _outputDevice.Init(_reader);
+        _outputDevice.Volume = (float)Volume;
+        _outputDevice.PlaybackStopped += OnOutputDeviceOnPlaybackStopped;
+
+        void OnOutputDeviceOnPlaybackStopped(object? sender, StoppedEventArgs e)
+        {
+            Status = PlayStatus.Stopped;
+        }
         
         Status = PlayStatus.Loaded;
     }

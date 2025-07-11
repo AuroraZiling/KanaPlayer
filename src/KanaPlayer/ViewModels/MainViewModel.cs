@@ -1,46 +1,48 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KanaPlayer.Core.Interfaces;
+using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace KanaPlayer.ViewModels;
 
-public partial class MainViewModel(IPlayerService playerService, IConfigurationService<SettingsModel> configurationService) : ViewModelBase
+public partial class MainViewModel(IConfigurationService<SettingsModel> configurationService, IPlayerManager playerManager)
+    : ViewModelBase
 {
-    public IPlayerService PlayerService => playerService;
+    public IPlayerManager PlayerManager => playerManager;
 
     [ObservableProperty]
     public partial double Volume { get; set; } = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
 
     partial void OnVolumeChanged(double value)
     {
-        playerService.Volume = value;
+        PlayerManager.Volume = value;
         configurationService.Settings.CommonSettings.BehaviorHistory.Volume = value;
         configurationService.Save();
     }
 
-    [RelayCommand]
-    private async Task TogglePlayAsync()
-    {
-        var client = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = true });
-        var httpResponseMessage = await client.GetAsync("https://music.163.com/song/media/outer/url?id=447925558.mp3");
-        var resultResponseMessage = httpResponseMessage;
+    [ObservableProperty]
+    public partial PlaybackMode PlaybackMode { get; set; } =
+        configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
 
-        if (httpResponseMessage.StatusCode == HttpStatusCode.Redirect)
-        {
-            var location = httpResponseMessage.Headers.Location;
-            if (location is not null)
-            {
-                var newResponseMessage = await client.GetAsync(location);
-                resultResponseMessage = newResponseMessage;
-            }
-        }
-        playerService.Load(await resultResponseMessage.Content.ReadAsStreamAsync());
-        playerService.Play();
+    [RelayCommand]
+    private void SwitchPlaybackModes()
+    {
+        PlaybackMode = (PlaybackMode)((int)(PlaybackMode + 1) % (int)PlaybackMode.MaxValue);
+        PlayerManager.PlaybackMode = PlaybackMode;
+        configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = PlaybackMode;
+        configurationService.Save();
+    }
+
+    [RelayCommand]
+    private void TogglePlay()
+    {
+        if (PlayerManager.Status == PlayStatus.Playing)
+            PlayerManager.Pause();
+        else
+            PlayerManager.Play();
     }
 }

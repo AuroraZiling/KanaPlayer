@@ -25,7 +25,7 @@ public partial class AccountViewModel(
     [ObservableProperty] public partial ulong? Mid { get; set; } = null;
     [ObservableProperty] public partial string? VipLabelUrl { get; set; } = null;
 
-    #region Login Process
+    #region Login
 
     [ObservableProperty] public partial bool LoginAttempting { get; set; } = false;
     [ObservableProperty] public partial string LoginAttemptingStatus { get; set; } = "等待登录";
@@ -83,7 +83,7 @@ public partial class AccountViewModel(
             }
 
 
-            configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings()
+            configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings
             {
                 Timestamp = succeedLoginQrCodeModel.EnsureData().Timestamp,
                 RefreshToken = succeedLoginQrCodeModel.EnsureData().RefreshToken, 

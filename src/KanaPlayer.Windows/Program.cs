@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Windows.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ public static class Program
     {
         App.ConfigureServices += x =>
         {
-            x.AddSingleton<IPlayerService, NAudioPlayerService>();
+            x.AddSingleton<IAudioPlayer, NAudioAudioPlayer>();
         };
         
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
