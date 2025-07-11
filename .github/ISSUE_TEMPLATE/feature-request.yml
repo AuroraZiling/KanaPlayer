@@ -1,0 +1,28 @@
+name: 功能请求 / Feature Request
+description: 提交新的功能请求
+title: "[Feat] "
+labels:
+  - enhancement
+  - triage
+body:
+  - type: checkboxes
+    attributes:
+      label: 请检查以下项目
+      options:
+        - label: 确保此请求没有与现有 Pull Requests 重复
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 新功能描述
+      description: 请详细描述新功能
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: KanaPlayer 版本
+      description: 输入您正在使用的版本
+      placeholder: 例如 1.0.0
+    validations:
+      required: true

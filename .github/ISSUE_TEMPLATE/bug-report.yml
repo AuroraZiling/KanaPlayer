@@ -1,0 +1,58 @@
+name: 错误报告 / Bug Report
+description: 提交错误报告以帮助改进
+title: "[Bug] "
+labels:
+  - Bug
+  - Triage
+body:
+  - type: checkboxes
+    attributes:
+      label: 请检查以下项目
+      options:
+        - label: 确保此报告没有与现有 Issues 重复
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请详细描述遇到的问题。如有需要，请添加截图以帮助说明您的问题。
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: KanaPlayer 版本
+      description: 输入您正在使用的版本
+      placeholder: 例如 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 运行环境
+      description: 出现错误的平台或环境
+      placeholder: 例如 Windows 11 22631
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为
+      description: 清晰简要地描述您期望发生的情况。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 详细描述复现过程
+      placeholder: 如果无法复现，请填写“无法复现”
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: 其他信息
+      description: 在此处添加与问题相关的其他上下文信息
+    validations:
+      required: false

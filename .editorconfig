@@ -1,0 +1,44 @@
+
+[*]
+
+# Microsoft .NET properties
+csharp_new_line_before_members_in_object_initializers = false
+csharp_preferred_modifier_order = public, internal, protected, private, file, new, required, sealed, virtual, abstract, static, override, extern, unsafe, volatile, async, readonly:suggestion
+csharp_preserve_single_line_blocks = true
+
+# ReSharper properties
+resharper_accessor_owner_body = expression_body
+resharper_align_first_arg_by_paren = false
+resharper_blank_lines_after_block_statements = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_single_line_type = 0
+resharper_braces_for_for = required
+resharper_braces_for_foreach = required
+resharper_braces_for_ifelse = not_required
+resharper_braces_redundant = false
+resharper_csharp_blank_lines_around_field = 0
+resharper_csharp_blank_lines_around_invocable = 0
+resharper_csharp_keep_existing_enum_arrangement = false
+resharper_csharp_max_line_length = 165
+resharper_csharp_wrap_before_binary_opsign = true
+resharper_csharp_wrap_ternary_expr_style = wrap_if_long
+resharper_force_attribute_style = join
+resharper_indent_preprocessor_if = do_not_change
+resharper_instance_members_qualify_declared_in = 
+resharper_keep_existing_attribute_arrangement = true
+resharper_keep_existing_declaration_block_arrangement = false
+resharper_max_attribute_length_for_same_line = 70
+resharper_method_or_operator_body = expression_body
+resharper_parentheses_redundancy_style = remove_if_not_clarifies_precedence
+resharper_place_expr_accessor_on_single_line = true
+resharper_place_expr_method_on_single_line = true
+resharper_place_expr_property_on_single_line = true
+resharper_place_record_field_attribute_on_same_line = true
+resharper_place_simple_embedded_statement_on_same_line = true
+resharper_place_simple_initializer_on_single_line = false
+resharper_space_before_trailing_comment_text = true
+resharper_space_between_attribute_sections = false
+resharper_wrap_after_primary_constructor_declaration_lpar = false
+resharper_wrap_list_pattern = chop_if_long
+resharper_wrap_object_and_collection_initializer_style = chop_always
+resharper_wrap_primary_constructor_parameters_style = wrap_if_long
