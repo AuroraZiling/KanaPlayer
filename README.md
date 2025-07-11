@@ -103,7 +103,7 @@ KanaPlayer 依赖 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download
 
 KanaPlayer 使用 [MIT 许可证](LICENSE)
 
-## Acknowledgments
+## 鸣谢 / Acknowledgements
 
 - [Dear.Va](https://github.com/DearVa)
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
