@@ -23,7 +23,6 @@ public interface IAudioPlayer : INotifyPropertyChanged
     double Volume { get; set; }
 
     void Load(Stream audioStream);
-    Task LoadFromAudioUrlAsync(string bvid);
 
     void Play();
 

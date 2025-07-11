@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Services;
-using KanaPlayer.Core.Services.Player;
 using NAudio.Wave;
 
 namespace KanaPlayer.Windows.Services;
@@ -67,36 +66,15 @@ public partial class NAudioAudioPlayer : ObservableObject, IAudioPlayer
 
     public void Load(Stream audioStream)
     {
-        Status = PlayStatus.Loading;
-        _reader?.Dispose();
-        _outputDevice?.Dispose();
-        
-        _reader = new StreamMediaFoundationReader(audioStream);
-        _outputDevice = new WaveOutEvent();
-        _outputDevice.Init(_reader);
-        _outputDevice.Volume = (float)Volume;
-        _outputDevice.PlaybackStopped += delegate
-        {
-            Status = PlayStatus.Stopped;
-        };
-        
-        Status = PlayStatus.Loaded;
-    }
-    
-    public async Task LoadFromAudioUrlAsync(string bvid)
-    {
         if (_outputDevice is not null)
         {
             _outputDevice.PlaybackStopped -= OnOutputDeviceOnPlaybackStopped;
             _outputDevice.Dispose();
         }
-        if (_reader is not null)
-        {
-            await _reader.DisposeAsync();
-        }
-        
+        _reader?.Dispose();
         Status = PlayStatus.Loading;
-        _reader = new StreamMediaFoundationReader(await _bilibiliClient.GetAudioStreamAsync(bvid, _cookies));
+        
+        _reader = new StreamMediaFoundationReader(audioStream);
         _outputDevice = new WaveOutEvent();
         _outputDevice.Init(_reader);
         _outputDevice.Volume = (float)Volume;

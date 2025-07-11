@@ -51,7 +51,7 @@
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipBack" Size="18" />
                     </Button>
-                    <controls:ProgressRing BorderThickness="2" IsIndeterminate="True" Background="Transparent"
+                    <controls:ProgressRing BorderThickness="3" IsIndeterminate="True" Background="Transparent"
                                            IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
                                            Width="40" Height="40" />
                     <Button
