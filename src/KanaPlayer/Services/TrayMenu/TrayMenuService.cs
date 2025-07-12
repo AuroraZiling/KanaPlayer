@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using KanaPlayer.Controls;
 using KanaPlayer.Core.Extensions;
+using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
-using KanaPlayer.Extensions;
 using KanaPlayer.Models;
 
 namespace KanaPlayer.Services.TrayMenu;
@@ -23,18 +24,9 @@ public class TrayMenuService : ITrayMenuService
     {
         _configurationService = configurationService;
         _playerManager = playerManager;
-        
+
+        GetKanaTrayIcon().PlayerManager = playerManager;
         GetKanaTrayIcon().TrayMenuService = this;
-        
-        _playerManager.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(IPlayerManager.PlaybackMode))  // MainViewModel Switch Listening
-                SwitchPlaybackMode(_playerManager.PlaybackMode, false);
-            else if (args.PropertyName == nameof(IPlayerManager.CanLoadPrevious))
-                ChangeCanPrevious(_playerManager.CanLoadPrevious);
-            else if (args.PropertyName == nameof(IPlayerManager.CanLoadForward))
-                ChangeCanForward(_playerManager.CanLoadForward);
-        };
     }
 
     [MemberNotNull(nameof(CurrentApp))]
@@ -42,12 +34,13 @@ public class TrayMenuService : ITrayMenuService
     {
         if (CurrentApp is null)
             throw new InvalidOperationException("Application instance is not available.");
+
         var trayIcons = TrayIcon.GetIcons(CurrentApp);
         if (trayIcons is null || trayIcons.Count == 0)
             throw new InvalidOperationException("No tray icons found in the application.");
         return trayIcons;
     }
-    
+
     private KanaTrayIcon GetKanaTrayIcon()
     {
         var trayIcons = GetRootTrayIcons();
@@ -68,63 +61,54 @@ public class TrayMenuService : ITrayMenuService
         ApplyChanges(kanaTrayIcon);
     }
 
-    public void SwitchPlaybackMode(PlaybackMode playbackMode, bool saveConfiguration)
+    public void SwitchPlaybackMode(PlaybackMode playbackMode, bool save)
     {
         var kanaTrayIcon = GetKanaTrayIcon();
         var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
+
         foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
-        {
-            if (nativeMenuItem.Header is not null &&
-                (nativeMenuItem.Header == "播放模式" || nativeMenuItem.Header.IsStringValidPlaybackMode()))
-            {
-                nativeMenuItem.Header = playbackMode.ToDisplayString();
-            }
-        }
+            if (nativeMenuItem.CommandParameter is "PlaybackMode")
+                nativeMenuItem.Header = playbackMode.ToFriendlyString();
+
         _playerManager.PlaybackMode = playbackMode;
         ApplyChanges(kanaTrayIcon);
 
-        if (saveConfiguration)
+        if (save)
         {
             _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = playbackMode;
             _configurationService.Save();
         }
     }
-    
-    public void ChangeCanPrevious(bool canPrevious)
+
+    public void TogglePlayStatus()
     {
-        var kanaTrayIcon = GetKanaTrayIcon();
-        var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
-        foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
-        {
-            if (nativeMenuItem.Header is not null && nativeMenuItem.Header == "上一首")
-            {
-                nativeMenuItem.IsEnabled = canPrevious;
-            }
-        }
-        ApplyChanges(kanaTrayIcon);
+        if (_playerManager.Status == PlayStatus.Playing)
+            _playerManager.Pause();
+        else
+            _playerManager.Play();
     }
-    
-    public void ChangeCanForward(bool canNext)
+
+    public async Task LoadPlayPreviousAsync()
     {
-        var kanaTrayIcon = GetKanaTrayIcon();
-        var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
-        foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
+        if (_playerManager.CanLoadPrevious)
         {
-            if (nativeMenuItem.Header is not null && nativeMenuItem.Header == "下一首")
-            {
-                nativeMenuItem.IsEnabled = canNext;
-            }
+            await _playerManager.LoadPrevious();
+            _playerManager.Play();
         }
-        ApplyChanges(kanaTrayIcon);
+    }
+
+    public async Task LoadPlayForwardAsync()
+    {
+        if (_playerManager.CanLoadForward)
+        {
+            await _playerManager.LoadForward();
+            _playerManager.Play();
+        }
     }
 }
 
 file static class TrayMenuServiceExtensions
 {
     internal static NativeMenu EnsureNativeMenu(this NativeMenu? menu)
-    {
-        if (menu is null)
-            throw new InvalidOperationException("NativeMenu cannot be null.");
-        return menu;
-    }
+        => menu ?? throw new InvalidOperationException("NativeMenu cannot be null.");
 }

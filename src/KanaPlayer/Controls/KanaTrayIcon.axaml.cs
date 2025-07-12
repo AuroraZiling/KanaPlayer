@@ -1,15 +1,35 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls;
-using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Services.TrayMenu;
 using KanaPlayer.Views;
 
 namespace KanaPlayer.Controls;
 
-public partial class KanaTrayIcon : TrayIcon
+public class NamedTrayIcon : TrayIcon
 {
+    public static readonly StyledProperty<string?> NameProperty = AvaloniaProperty.Register<NamedTrayIcon, string?>(nameof(Name));
+
+    public string? Name
+    {
+        get => GetValue(NameProperty);
+        set => SetValue(NameProperty, value);
+    }
+}
+
+public class KanaTrayIcon : NamedTrayIcon
+{
+    public static readonly StyledProperty<IPlayerManager?> PlayerManagerProperty = AvaloniaProperty.Register<KanaTrayIcon, IPlayerManager?>(
+        nameof(PlayerManager));
+
+    public IPlayerManager? PlayerManager
+    {
+        get => GetValue(PlayerManagerProperty);
+        set => SetValue(PlayerManagerProperty, value);
+    }
+    
     public ITrayMenuService? TrayMenuService { get; set; }
     
     private void TrayIcon_OnClicked(object? sender, EventArgs e)
@@ -34,4 +54,30 @@ public partial class KanaTrayIcon : TrayIcon
         => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Shuffle, true);
     private void PlaybackMode_Sequential_NativeMenuItem_OnClick(object? sender, EventArgs e)
         => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Sequential, true);
+    private void PlayOrPause_NativeMenuItem_OnClick(object? sender, EventArgs e)
+        => TrayMenuService?.TogglePlayStatus();
+    private async void LoadPrevious_NativeMenuItem_OnClick(object? sender, EventArgs e)
+    {
+        try
+        {
+            await TrayMenuService?.LoadPlayPreviousAsync()!;
+        }
+        catch (Exception)
+        {
+            // TODO: Handle error loading previous
+            Console.WriteLine("[NativeMenu] Error loading previous");
+        }
+    }
+    private async void LoadForward_NativeMenuItem_OnClick(object? sender, EventArgs e)
+    {
+        try
+        {
+            await TrayMenuService?.LoadPlayForwardAsync()!;
+        }
+        catch (Exception)
+        {
+            // TODO: Handle error loading forward
+            Console.WriteLine("[NativeMenu] Error loading forward");
+        }
+    }
 }

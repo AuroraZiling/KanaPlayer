@@ -1,26 +1,49 @@
-﻿<TrayIcon
+﻿<controls:NamedTrayIcon
     Clicked="TrayIcon_OnClicked"
     Icon="/Assets/kana-logo.ico"
     ToolTipText="KanaPlayer"
+    x:Name="NamedTrayIcon"
     x:Class="KanaPlayer.Controls.KanaTrayIcon"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:KanaPlayer.Controls"
+    xmlns:converters="clr-namespace:KanaPlayer.Converters"
+    xmlns:markupExtensions="clr-namespace:KanaPlayer.MarkupExtensions">
+
+    <!-- Thanks to Avalonia, we cannot use x:Name/MVVM here for a tray menu. (So we use commandParameter as x:Name) -->
+    <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
 
     <TrayIcon.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="播放" />
-            <NativeMenuItem Header="上一首" IsEnabled="False" />
-            <NativeMenuItem Header="下一首" IsEnabled="False" />
-            <NativeMenuItem Header="播放模式">
+            <NativeMenuItem
+                Header="{ReflectionBinding Path=PlayerManager.Status, Source={markupExtensions:RootObjectProvider}, Converter={x:Static converters:PlayerConverters.PlayStatusToStringConverter}}"
+                Click="PlayOrPause_NativeMenuItem_OnClick" CommandParameter="PlayStatus" />
+            <NativeMenuItem Header="上一首"
+                            Click="LoadPrevious_NativeMenuItem_OnClick"
+                            Command="{ReflectionBinding PlayerManager.LoadPlayPreviousAsync, Source={markupExtensions:RootObjectProvider}}"
+                            IsEnabled="{ReflectionBinding PlayerManager.CanLoadPrevious, Source={markupExtensions:RootObjectProvider}}"
+                            CommandParameter="LoadPrevious" />
+            <NativeMenuItem Header="下一首"
+                            Click="LoadForward_NativeMenuItem_OnClick"
+                            Command="{ReflectionBinding PlayerManager.LoadPlayForwardAsync, Source={markupExtensions:RootObjectProvider}}"
+                            IsEnabled="{ReflectionBinding PlayerManager.CanLoadForward, Source={markupExtensions:RootObjectProvider}}"
+                            CommandParameter="LoadForward" />
+            <NativeMenuItem
+                Header="{ReflectionBinding PlayerManager.PlaybackMode, Source={markupExtensions:RootObjectProvider}, Converter={x:Static converters:PlayerConverters.PlaybackModeToStringConverter}}"
+                CommandParameter="PlaybackMode">
                 <NativeMenu>
-                    <NativeMenuItem Click="PlaybackMode_RepeatAll_NativeMenuItem_OnClick" Header="列表循环" />
-                    <NativeMenuItem Click="PlaybackMode_RepeatOne_NativeMenuItem_OnClick" Header="单曲循环" />
-                    <NativeMenuItem Click="PlaybackMode_Shuffle_NativeMenuItem_OnClick" Header="随机播放" />
-                    <NativeMenuItem Click="PlaybackMode_Sequential_NativeMenuItem_OnClick" Header="顺序播放" />
+                    <NativeMenuItem Click="PlaybackMode_RepeatAll_NativeMenuItem_OnClick" Header="列表循环"
+                                    ToggleType="Radio" />
+                    <NativeMenuItem Click="PlaybackMode_RepeatOne_NativeMenuItem_OnClick" Header="单曲循环"
+                                    ToggleType="Radio" />
+                    <NativeMenuItem Click="PlaybackMode_Shuffle_NativeMenuItem_OnClick" Header="随机播放"
+                                    ToggleType="Radio" />
+                    <NativeMenuItem Click="PlaybackMode_Sequential_NativeMenuItem_OnClick" Header="顺序播放"
+                                    ToggleType="Radio" />
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItemSeparator />
             <NativeMenuItem Click="Exit_NativeMenuItem_OnClick" Header="退出" />
         </NativeMenu>
     </TrayIcon.Menu>
-</TrayIcon>
+</controls:NamedTrayIcon>
