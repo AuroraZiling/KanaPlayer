@@ -88,9 +88,11 @@
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right" Margin="0, 0, 30, 0" Grid.Column="2" Orientation="Horizontal"
                             Spacing="10">
-                    <LucideIcon
-                        Kind="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource VolumeToIconKindConverter}}">
-                    </LucideIcon>
+                    <Button Classes="ghost" CornerRadius="50" Margin="0, 3, 0, 0" Command="{Binding MuteCommand}">
+                        <LucideIcon
+                            Kind="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource VolumeToIconKindConverter}}">
+                        </LucideIcon>
+                    </Button>
                     <Slider Value="{Binding Volume, Mode=TwoWay}" x:Name="VolumeSlider" Width="130" Maximum="1"
                             Minimum="0">
                     </Slider>

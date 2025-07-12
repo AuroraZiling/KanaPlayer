@@ -89,6 +89,20 @@ public partial class MainViewModel : ViewModelBase
         _configurationService.Settings.CommonSettings.BehaviorHistory.Volume = value;
         _configurationService.Save();
     }
+    
+    private double _beforeMuteVolume;
+    
+    [RelayCommand]
+    private void Mute()
+    {
+        if (Volume > 0)
+        {
+            _beforeMuteVolume = Volume;
+            Volume = 0;
+        }
+        else
+            Volume = _beforeMuteVolume;
+    }
 
     [ObservableProperty] public partial PlaybackMode PlaybackMode { get; set; }
 
