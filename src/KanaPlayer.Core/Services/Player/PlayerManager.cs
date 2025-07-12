@@ -11,6 +11,8 @@ namespace KanaPlayer.Core.Services.Player;
 
 public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager where TSettings : SettingsBase, new()
 {
+    private readonly IAudioPlayer _audioPlayer;
+    private readonly IBilibiliClient _bilibiliClient;
     public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient)
     {
         _audioPlayer = audioPlayer;
@@ -51,19 +53,27 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
     private readonly ObservableList<PlayListItemModel> _playList = [];
     private readonly Dictionary<string, string> _cookies;
-    private readonly IAudioPlayer _audioPlayer;
-    private readonly IBilibiliClient _bilibiliClient;
 
     public async Task LoadAsync(PlayListItemModel playListItemModel)
     {
         CurrentPlayListItem = null;
+        CanLoadPrevious = false;
+        CanLoadForward = false;
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItemModel);
+        
         await Task.Run(() =>
             _audioPlayer.Load(new CachedAudioStream(playListItemModel.AudioUniqueId, _cookies, _bilibiliClient)));
+        
         CurrentPlayListItem = playListItemModel;
+        if (PlayList.Contains(playListItemModel))
+        {
+            CanLoadPrevious = IndexOf(playListItemModel) > 0;
+            CanLoadForward = IndexOf(playListItemModel) < PlayList.Count - 1;
+        }
     }
-    
+
+    [ObservableProperty] public partial bool CanLoadPrevious { get; private set; }
     public async Task LoadPrevious()
     {
         if (CurrentPlayListItem is null) return;
@@ -72,6 +82,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         await LoadAsync(PlayList[index - 1]);
     }
     
+    [ObservableProperty] public partial bool CanLoadForward { get; private set; }
     public async Task LoadForward()
     {
         if (CurrentPlayListItem is null) return;
@@ -82,22 +93,16 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
     public void Play()
         => _audioPlayer.Play();
-
     public void Pause()
         => _audioPlayer.Pause();
-
     public void Append(PlayListItemModel playListItemModel)
         => _playList.Add(playListItemModel);
-
     public void Insert(PlayListItemModel playListItemModel, int index)
         => _playList.Insert(index, playListItemModel);
-
     public void Remove(PlayListItemModel playListItemModel)
         => _playList.Remove(playListItemModel);
-
     public int IndexOf(PlayListItemModel playListItemModel)
         => _playList.IndexOf(playListItemModel);
-
     public void Clear()
         => _playList.Clear();
 }

@@ -52,12 +52,12 @@
                     <Button Classes="ghost" CornerRadius="50" Width="36" Height="36"
                             Command="{Binding SwitchPlaybackModesCommand}" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center"
-                                    Kind="{Binding PlaybackMode, Converter={StaticResource PlaybackModeToIconKindConverter}}"
+                                    Kind="{Binding PlayerManager.PlaybackMode, Converter={StaticResource PlaybackModeToIconKindConverter}}"
                                     Size="18" />
                     </Button>
                     <Button
                         Command="{Binding LoadPreviousCommand}"
-                        IsEnabled="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
+                        IsEnabled="{Binding PlayerManager.CanLoadPrevious}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipBack" Size="18" />
                     </Button>
@@ -80,7 +80,7 @@
                     </Button>
                     <Button
                         Command="{Binding LoadForwardCommand}"
-                        IsEnabled="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
+                        IsEnabled="{Binding PlayerManager.CanLoadForward}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipForward"
                                     Size="18" />

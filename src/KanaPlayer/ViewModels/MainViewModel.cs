@@ -72,13 +72,6 @@ public partial class MainViewModel : ViewModelBase
         
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
         trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
-        PlayerManager.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(IPlayerManager.PlaybackMode))  // Tray Menu Switch Listening
-            {
-                PlaybackMode = PlayerManager.PlaybackMode;
-            }
-        };
 
         _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, delegate
         {
