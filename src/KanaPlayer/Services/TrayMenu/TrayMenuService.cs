@@ -1,22 +1,36 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using KanaPlayer.Controls;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Extensions;
+using KanaPlayer.Models;
 
 namespace KanaPlayer.Services.TrayMenu;
 
 public class TrayMenuService : ITrayMenuService
 {
-    private Application? CurrentApp { get; init; } = Application.Current;
+    private Application? CurrentApp { get; } = Application.Current;
+    private readonly IConfigurationService<SettingsModel> _configurationService;
+    private readonly IPlayerManager _playerManager;
 
-    public TrayMenuService()
+    public TrayMenuService(IPlayerManager playerManager, IConfigurationService<SettingsModel> configurationService)
     {
-        var kanaTrayIcon = GetKanaTrayIcon();
-        kanaTrayIcon.TrayMenuService = this;
+        _configurationService = configurationService;
+        _playerManager = playerManager;
+        
+        GetKanaTrayIcon().TrayMenuService = this;
+        
+        _playerManager.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IPlayerManager.PlaybackMode))  // MainViewModel Switch Listening
+                SwitchPlaybackMode(_playerManager.PlaybackMode, false);
+        };
     }
 
     [MemberNotNull(nameof(CurrentApp))]
@@ -50,22 +64,26 @@ public class TrayMenuService : ITrayMenuService
         ApplyChanges(kanaTrayIcon);
     }
 
-    public void SwitchPlaybackMode(PlaybackMode playbackMode)
+    public void SwitchPlaybackMode(PlaybackMode playbackMode, bool saveConfiguration)
     {
         var kanaTrayIcon = GetKanaTrayIcon();
         var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
-        foreach (var innerNativeMenuItem in innerNativeMenuItems)
+        foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
         {
-            if (innerNativeMenuItem is NativeMenuItem nativeMenuItem)
+            if (nativeMenuItem.Header is not null &&
+                (nativeMenuItem.Header == "播放模式" || nativeMenuItem.Header.IsStringValidPlaybackMode()))
             {
-                if (nativeMenuItem.Header is not null &&
-                    (nativeMenuItem.Header == "播放模式" || nativeMenuItem.Header.IsStringValidPlaybackMode()))
-                {
-                    nativeMenuItem.Header = playbackMode.ToDisplayString();
-                }
+                nativeMenuItem.Header = playbackMode.ToDisplayString();
             }
         }
+        _playerManager.PlaybackMode = playbackMode;
         ApplyChanges(kanaTrayIcon);
+
+        if (saveConfiguration)
+        {
+            _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = playbackMode;
+            _configurationService.Save();
+        }
     }
 }
 

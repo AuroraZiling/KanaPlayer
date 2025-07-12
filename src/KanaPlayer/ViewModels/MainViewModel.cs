@@ -8,6 +8,7 @@ using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
+using KanaPlayer.Services.TrayMenu;
 
 namespace KanaPlayer.ViewModels;
 
@@ -62,12 +63,22 @@ public partial class MainViewModel : ViewModelBase
     private readonly DispatcherTimer _playbackTimeExecutionTimer;
     private readonly IConfigurationService<SettingsModel> _configurationService;
 
-    public MainViewModel(IConfigurationService<SettingsModel> configurationService, IPlayerManager playerManager)
+    public MainViewModel(IConfigurationService<SettingsModel> configurationService, IPlayerManager playerManager, ITrayMenuService trayMenuService)
     {
         _configurationService = configurationService;
         PlayerManager = playerManager;
+        
         Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+        
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
+        trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
+        PlayerManager.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IPlayerManager.PlaybackMode))  // Tray Menu Switch Listening
+            {
+                PlaybackMode = PlayerManager.PlaybackMode;
+            }
+        };
 
         _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, delegate
         {

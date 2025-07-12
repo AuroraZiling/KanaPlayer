@@ -14,7 +14,7 @@ using ObservableCollections;
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManager playerManager,
-    ILauncher launcher, ITrayMenuService trayMenuService) : ViewModelBase, INavigationAware
+    ILauncher launcher) : ViewModelBase, INavigationAware
 {
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<AudioRegionFeedDataInfoModel> MusicRegionFeeds 
@@ -62,7 +62,5 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
     
     public void OnNavigatedTo()
     {
-        trayMenuService.ChangeTooltipText("test");
-        trayMenuService.SwitchPlaybackMode(PlaybackMode.RepeatOne);
     }
 }

@@ -5,5 +5,5 @@ namespace KanaPlayer.Services.TrayMenu;
 public interface ITrayMenuService
 {
     void ChangeTooltipText(string toolTipText);
-    void SwitchPlaybackMode(PlaybackMode playbackMode);
+    public void SwitchPlaybackMode(PlaybackMode playbackMode, bool saveConfiguration);
 }

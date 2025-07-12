@@ -27,11 +27,11 @@ public partial class KanaTrayIcon : TrayIcon
         => Environment.Exit(0);
 
     private void PlaybackMode_RepeatAll_NativeMenuItem_OnClick(object? sender, EventArgs e)
-        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.RepeatAll);
+        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.RepeatAll, true);
     private void PlaybackMode_RepeatOne_NativeMenuItem_OnClick(object? sender, EventArgs e)
-        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.RepeatOne);
+        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.RepeatOne, true);
     private void PlaybackMode_Shuffle_NativeMenuItem_OnClick(object? sender, EventArgs e)
-        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Shuffle);
+        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Shuffle, true);
     private void PlaybackMode_Sequential_NativeMenuItem_OnClick(object? sender, EventArgs e)
-        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Sequential);
+        => TrayMenuService?.SwitchPlaybackMode(PlaybackMode.Sequential, true);
 }

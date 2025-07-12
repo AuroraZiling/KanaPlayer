@@ -45,7 +45,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
     [ObservableProperty] public partial double Volume { get; set; }
     public PlayStatus Status => _audioPlayer.Status;
-    public PlaybackMode PlaybackMode { get; set; }
+    [ObservableProperty] public partial PlaybackMode PlaybackMode { get; set; }
     partial void OnVolumeChanged(double value)
         => _audioPlayer.Volume = value;
 
