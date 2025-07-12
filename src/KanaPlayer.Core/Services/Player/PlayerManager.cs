@@ -57,8 +57,12 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     public async Task LoadAsync(PlayListItemModel playListItemModel)
     {
         CurrentPlayListItem = null;
+        
         CanLoadPrevious = false;
         CanLoadForward = false;
+        OnPropertyChanged(nameof(CanLoadPrevious));
+        OnPropertyChanged(nameof(CanLoadForward));
+        
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItemModel);
         

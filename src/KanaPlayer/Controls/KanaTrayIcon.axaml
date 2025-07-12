@@ -9,8 +9,8 @@
     <TrayIcon.Menu>
         <NativeMenu>
             <NativeMenuItem Header="播放" />
-            <NativeMenuItem Header="上一首" />
-            <NativeMenuItem Header="下一首" />
+            <NativeMenuItem Header="上一首" IsEnabled="False" />
+            <NativeMenuItem Header="下一首" IsEnabled="False" />
             <NativeMenuItem Header="播放模式">
                 <NativeMenu>
                     <NativeMenuItem Click="PlaybackMode_RepeatAll_NativeMenuItem_OnClick" Header="列表循环" />

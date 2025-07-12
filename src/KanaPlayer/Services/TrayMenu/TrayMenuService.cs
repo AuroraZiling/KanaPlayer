@@ -30,6 +30,10 @@ public class TrayMenuService : ITrayMenuService
         {
             if (args.PropertyName == nameof(IPlayerManager.PlaybackMode))  // MainViewModel Switch Listening
                 SwitchPlaybackMode(_playerManager.PlaybackMode, false);
+            else if (args.PropertyName == nameof(IPlayerManager.CanLoadPrevious))
+                ChangeCanPrevious(_playerManager.CanLoadPrevious);
+            else if (args.PropertyName == nameof(IPlayerManager.CanLoadForward))
+                ChangeCanForward(_playerManager.CanLoadForward);
         };
     }
 
@@ -84,6 +88,34 @@ public class TrayMenuService : ITrayMenuService
             _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = playbackMode;
             _configurationService.Save();
         }
+    }
+    
+    public void ChangeCanPrevious(bool canPrevious)
+    {
+        var kanaTrayIcon = GetKanaTrayIcon();
+        var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
+        foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
+        {
+            if (nativeMenuItem.Header is not null && nativeMenuItem.Header == "上一首")
+            {
+                nativeMenuItem.IsEnabled = canPrevious;
+            }
+        }
+        ApplyChanges(kanaTrayIcon);
+    }
+    
+    public void ChangeCanForward(bool canNext)
+    {
+        var kanaTrayIcon = GetKanaTrayIcon();
+        var innerNativeMenuItems = kanaTrayIcon.Menu.EnsureNativeMenu().Items;
+        foreach (var nativeMenuItem in innerNativeMenuItems.OfType<NativeMenuItem>())
+        {
+            if (nativeMenuItem.Header is not null && nativeMenuItem.Header == "下一首")
+            {
+                nativeMenuItem.IsEnabled = canNext;
+            }
+        }
+        ApplyChanges(kanaTrayIcon);
     }
 }
 
