@@ -7,8 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using AsyncImageLoader;
 using AsyncImageLoader.Loaders;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using KanaPlayer.Controls;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services;
@@ -89,6 +91,12 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+    
+    public static void SafeShutdown()
+    {
+        //TODO: Implement a proper shutdown sequence
+        Environment.Exit(0);
     }
     
     internal static void CleanupCache(string cacheFolderPath, int desiredCacheSizeInMb)

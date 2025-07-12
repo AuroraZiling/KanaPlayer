@@ -1,0 +1,26 @@
+﻿<TrayIcon
+    Clicked="TrayIcon_OnClicked"
+    Icon="/Assets/kana-logo.ico"
+    ToolTipText="KanaPlayer"
+    x:Class="KanaPlayer.Controls.KanaTrayIcon"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <TrayIcon.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="播放" />
+            <NativeMenuItem Header="上一首" />
+            <NativeMenuItem Header="下一首" />
+            <NativeMenuItem Header="播放模式">
+                <NativeMenu>
+                    <NativeMenuItem Click="PlaybackMode_RepeatAll_NativeMenuItem_OnClick" Header="列表循环" />
+                    <NativeMenuItem Click="PlaybackMode_RepeatOne_NativeMenuItem_OnClick" Header="单曲循环" />
+                    <NativeMenuItem Click="PlaybackMode_Shuffle_NativeMenuItem_OnClick" Header="随机播放" />
+                    <NativeMenuItem Click="PlaybackMode_Sequential_NativeMenuItem_OnClick" Header="顺序播放" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Click="Exit_NativeMenuItem_OnClick" Header="退出" />
+        </NativeMenu>
+    </TrayIcon.Menu>
+</TrayIcon>

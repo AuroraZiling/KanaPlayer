@@ -41,5 +41,9 @@
       <Compile Update="Controls\InlineHyperlink.cs">
         <DependentUpon>InlineHyperlink.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Controls\KanaTrayIcon.axaml.cs">
+        <DependentUpon>AppTrayIcon.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

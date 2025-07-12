@@ -7,6 +7,7 @@ using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Services.Theme;
+using KanaPlayer.Services.TrayMenu;
 using KanaPlayer.ViewModels;
 using KanaPlayer.ViewModels.Pages;
 using KanaPlayer.Views;
@@ -68,6 +69,7 @@ public static class ServiceExtensions
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<ITrayMenuService, TrayMenuService>();
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();
         services.AddSingleton<IPlayerManager, PlayerManager<SettingsModel>>();
         services.AddSingleton<IBilibiliClient, BilibiliClient<SettingsModel>>();

@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CommentTypo
 
+using System.Text.Json.Serialization;
 using KanaPlayer.Core.Models.PlayerManager;
 
 namespace KanaPlayer.Core.Models;
@@ -43,5 +44,7 @@ public class CommonImageCacheSettings
 public class CommonBehaviorHistorySettings
 {
     public double Volume { get; set; } = 0.3;
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]  
     public PlaybackMode PlaybackMode { get; set; } = PlaybackMode.Sequential;
 }
