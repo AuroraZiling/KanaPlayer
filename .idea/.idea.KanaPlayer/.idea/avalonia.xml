@@ -23,6 +23,14 @@
         <entry key="KanaPlayer/Views/Pages/SettingsView.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="KanaPlayer/Views/SplashWindow.axaml" value="KanaPlayer.Desktop/KanaPlayer.Desktop.csproj" />
         <entry key="src/KanaPlayer/App.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Dialog/KanaDialog.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Dialog/KanaDialogHost.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Dialog/SukiDialogHost.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/KanaHost.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/SukiToast.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Toast/KanaToast.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Toast/KanaToastHost.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/Hosts/Toast/SukiToastHost.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/InlineHyperlink.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaNavigationView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaSettingsCard.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />

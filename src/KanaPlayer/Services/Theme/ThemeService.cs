@@ -7,9 +7,21 @@ namespace KanaPlayer.Services.Theme;
 public class ThemeService: IThemeService
 {
     private static readonly Application Application = Application.Current!;
+
+    #region Notification Colors
+
+    public static readonly RgbColor KanaNotificationInformationColor = Colors.DodgerBlue;
+    public static readonly RgbColor KanaNotificationSuccessColor = Colors.LimeGreen;
+    public static readonly RgbColor KanaNotificationWarningColor = Colors.Orange;
+    public static readonly RgbColor KanaNotificationErrorColor = Colors.OrangeRed;
+
+    #endregion
     
     private static void SetColorKey(string key, HsvColor hsvColor)
         => Application.Resources[key] = hsvColor.ToRgb();
+    
+    private static void SetColorKey(string key, RgbColor rgbColor)
+        => Application.Resources[key] = rgbColor;
     
     public void SetThemeColor(RgbColor accentRgbColor, bool applyTextForegroundAsThemeColor = false)
     {
@@ -27,5 +39,11 @@ public class ThemeService: IThemeService
 
         if (applyTextForegroundAsThemeColor) 
             SetColorKey("KanaCommonForegroundColor", accentHsvColor);
+        
+        // Notification colors
+        SetColorKey("KanaNotificationInformationColor", KanaNotificationInformationColor);
+        SetColorKey("KanaNotificationSuccessColor", KanaNotificationSuccessColor);
+        SetColorKey("KanaNotificationWarningColor", KanaNotificationWarningColor);
+        SetColorKey("KanaNotificationCriticalColor", KanaNotificationErrorColor);
     }
 }

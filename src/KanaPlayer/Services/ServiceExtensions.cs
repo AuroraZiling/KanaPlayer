@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using Avalonia.Platform.Storage;
+using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
@@ -68,6 +69,8 @@ public static class ServiceExtensions
 
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
+        services.AddSingleton<IKanaToastManager, KanaToastManager>();
+        services.AddSingleton<IKanaDialogManager, KanaDialogManager>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<ITrayMenuService, TrayMenuService>();
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();

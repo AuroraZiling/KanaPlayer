@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
@@ -10,6 +11,9 @@ namespace KanaPlayer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+
+    public IKanaToastManager ToastManager { get; }
+    public IKanaDialogManager DialogManager { get; }
     [ObservableProperty] public partial bool IsLoggedIn { get; set; } = false;
     [ObservableProperty] public partial string? UserName { get; set; } = null;
     [ObservableProperty] public partial string? AvatarUrl { get; set; } = null;
@@ -20,10 +24,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly INavigationService _navigationService;
     private readonly IConfigurationService<SettingsModel> _configurationService;
     
-    public MainWindowViewModel(INavigationService navigationService, IConfigurationService<SettingsModel> configurationService, IBilibiliClient bilibiliClient)
+    public MainWindowViewModel(INavigationService navigationService, IConfigurationService<SettingsModel> configurationService, IBilibiliClient bilibiliClient, IKanaToastManager toastManager, IKanaDialogManager dialogManager)
     {
         _navigationService = navigationService;
         _configurationService = configurationService;
+        ToastManager = toastManager;
+        DialogManager = dialogManager;
+        
         OnAuthenticationStatusChanged(bilibiliClient.IsAuthenticated);
         bilibiliClient.PropertyChanged += (_, args) =>
         {

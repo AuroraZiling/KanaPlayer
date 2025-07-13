@@ -105,7 +105,6 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     {
         if (CurrentPlayListItem is null || !CanLoadPrevious) return;
         
-        PlayListItemModel 
         switch (PlaybackMode)
         {
             case PlaybackMode.Sequential:
@@ -136,6 +135,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
         if (playWhenLoaded)
             _audioPlayer.Play();
     }
@@ -145,25 +145,36 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     {
         if (CurrentPlayListItem is null || !CanLoadForward) return;
 
-        if (PlaybackMode == PlaybackMode.Sequential)
+        switch (PlaybackMode)
         {
-            var index = IndexOf(CurrentPlayListItem);
-            if (index < 0 || index >= PlayList.Count - 1) return;
-            await LoadAsync(PlayList[index + 1]);
-        }else if (PlaybackMode == PlaybackMode.Shuffle)
-        {
-            var randomIndex = new Random().Next(PlayList.Count);
-            await LoadAsync(PlayList[randomIndex]);
-        }else if (PlaybackMode == PlaybackMode.RepeatOne && !isManuallyTriggered)
-        {
-            await LoadAsync(CurrentPlayListItem);
-        }
-        else if (PlaybackMode == PlaybackMode.RepeatAll || (PlaybackMode == PlaybackMode.RepeatOne && isManuallyTriggered))
-        {
-            var index = IndexOf(CurrentPlayListItem);
-            if (index < 0) return;
-            if (index >= PlayList.Count - 1) index = -1;
-            await LoadAsync(PlayList[index + 1]);
+            case PlaybackMode.Sequential:
+            {
+                var index = IndexOf(CurrentPlayListItem);
+                if (index < 0 || index >= PlayList.Count - 1) return;
+                await LoadAsync(PlayList[index + 1]);
+                break;
+            }
+            case PlaybackMode.Shuffle:
+            {
+                var randomIndex = new Random().Next(PlayList.Count);
+                await LoadAsync(PlayList[randomIndex]);
+                break;
+            }
+            case PlaybackMode.RepeatOne when !isManuallyTriggered:
+                await LoadAsync(CurrentPlayListItem);
+                break;
+            case PlaybackMode.RepeatAll:
+            case PlaybackMode.RepeatOne when isManuallyTriggered:
+            {
+                var index = IndexOf(CurrentPlayListItem);
+                if (index < 0) return;
+                if (index >= PlayList.Count - 1) index = -1;
+                await LoadAsync(PlayList[index + 1]);
+                break;
+            }
+            case PlaybackMode.MaxValue:
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         
         if (playWhenLoaded)

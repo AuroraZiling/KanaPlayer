@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:hosts="clr-namespace:KanaPlayer.Controls.Hosts">
+    
+    <ControlTheme x:Key="KanaToastTheme" TargetType="hosts:KanaToast">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <Border Name="PART_ToastCard"
+                            MinWidth="300"
+                            MaxWidth="400"
+                            Margin="15,5,15,15"
+                            Padding="0"
+                            Background="{DynamicResource KanaAccentColor30}"
+                            BoxShadow="1 1 7 1 #77101010"
+                            CornerRadius="15">
+                        <Border ClipToBounds="True" CornerRadius="15">
+                            <Panel Background="{TemplateBinding Background}">
+                                <Panel Margin="10,20,20,8">
+                                    <DockPanel Margin="0,-7,0,-4" LastChildFill="True">
+                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                                            <ContentPresenter Margin="12,0,0,0"
+                                                              Content="{TemplateBinding Title}">
+                                                <ContentPresenter.Styles>
+                                                    <Style Selector="TextBlock">
+                                                        <Setter Property="FontSize" Value="16" />
+                                                        <Setter Property="FontWeight" Value="DemiBold" />
+                                                        <Setter Property="Foreground" Value="White" />
+                                                    </Style>
+                                                </ContentPresenter.Styles>
+                                            </ContentPresenter>
+                                        </StackPanel>
+                                        <ItemsControl Margin="0,8,0,0"
+                                                      HorizontalAlignment="Right"
+                                                      DockPanel.Dock="Bottom"
+                                                      ItemsSource="{TemplateBinding ActionButtons}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+                                        <ContentPresenter Margin="12,8,0,0"
+                                                          Content="{TemplateBinding Content}"
+                                                          TextWrapping="Wrap">
+                                            <ContentPresenter.Styles>
+                                                <Style Selector="TextBlock">
+                                                    <Setter Property="FontSize" Value="14" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                </Style>
+                                            </ContentPresenter.Styles>
+                                        </ContentPresenter>
+
+                                    </DockPanel>
+                                </Panel>
+                            </Panel>
+                        </Border>
+                    </Border>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+    <ControlTheme x:Key="{x:Type hosts:KanaToast}"
+                  BasedOn="{StaticResource KanaToastTheme}"
+                  TargetType="hosts:KanaToast" />
+</ResourceDictionary>

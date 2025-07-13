@@ -25,6 +25,10 @@
                 <ResourceInclude Source="/Controls/KanaSettingsGroup.axaml" />
                 <ResourceInclude Source="/Controls/ProgressRing.axaml" />
                 <ResourceInclude Source="/Controls/InlineHyperlink.axaml" />
+                <ResourceInclude Source="/Controls/Hosts/Dialog/KanaDialog.axaml" />
+                <ResourceInclude Source="/Controls/Hosts/Dialog/KanaDialogHost.axaml" />
+                <ResourceInclude Source="/Controls/Hosts/Toast/KanaToast.axaml" />
+                <ResourceInclude Source="/Controls/Hosts/Toast/KanaToastHost.axaml" />
 
                 <ResourceInclude Source="/Theming/Button.axaml" />
                 <ResourceInclude Source="/Theming/ToggleButton.axaml" />

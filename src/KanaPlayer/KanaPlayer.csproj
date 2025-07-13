@@ -45,5 +45,16 @@
         <DependentUpon>AppTrayIcon.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Controls\Hosts\Toast\KanaToast.axaml.cs">
+        <DependentUpon>KanaToast.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Hosts\Toast\KanaToastHost.axaml.cs">
+        <DependentUpon>KanaToastHost.axaml.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="KanaPlayer.csproj.DotSettings" />
     </ItemGroup>
 </Project>

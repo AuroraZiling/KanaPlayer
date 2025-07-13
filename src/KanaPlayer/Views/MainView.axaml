@@ -34,6 +34,7 @@
                     Spacing="10">
                     <Border ClipToBounds="True" CornerRadius="6">
                         <Image x:Name="CoverImage"
+                               RenderOptions.BitmapInterpolationMode="LowQuality"
                                asyncImageLoader:ImageLoader.Source="{Binding PlayerManager.CurrentPlayListItem.CoverUrl, FallbackValue={x:Null}}" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">

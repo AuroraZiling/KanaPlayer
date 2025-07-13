@@ -107,6 +107,7 @@ KanaPlayer 使用 [MIT 许可证](LICENSE)
 
 - **[Dear.Va](https://github.com/DearVa)**
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
+- [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI)
 - [ymg2006/FluentAvalonia.ProgressRing](https://github.com/ymg2006/FluentAvalonia.ProgressRing)
 - [solstice23/material-you-theme-netease](https://github.com/solstice23/material-you-theme-netease)
 

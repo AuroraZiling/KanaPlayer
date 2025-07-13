@@ -16,77 +16,85 @@
     xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
     xmlns:controls="clr-namespace:KanaPlayer.Controls"
     xmlns:viewModels="clr-namespace:KanaPlayer.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:hosts="clr-namespace:KanaPlayer.Controls.Hosts">
 
-    <Grid
-        Margin="{Binding #KanaWindow.OffScreenMargin}"
-        Name="MainWindowGrid"
-        RowDefinitions="60, *">
-        <controls:KanaWindowTitleBar
-            CloseButtonClick="KanaWindowTitleBar_OnCloseButtonClick"
-            Grid.Row="0"
-            Icon="avares://KanaPlayer/Assets/kana-logo.ico"
-            MaximizeButtonClick="KanaWindowTitleBar_OnMaximizeButtonClick"
-            MinimizeButtonClick="KanaWindowTitleBar_OnMinimizeButtonClick"
-            Title="KanaPlayer"
-            x:Name="MainWindowTitleBar">
-            <controls:KanaWindowTitleBar.RightControl>
-                <StackPanel
-                    Margin="0,0,20,0"
-                    Orientation="Horizontal"
-                    Spacing="7">
-                    <StackPanel.Styles>
-                        <Style Selector="ToggleButton.KanaWindowTitleBarRightButton">
-                            <Setter Property="CornerRadius" Value="20" />
-                            <Setter Property="Padding" Value="4" />
-                            <Setter Property="Height" Value="40" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </Style>
-                    </StackPanel.Styles>
-                    <ToggleButton
-                        Classes="KanaWindowTitleBarRightButton Navigation"
-                        Command="{Binding NavigateToSettingsCommand}"
-                        Content="{LucideIconContent Kind=Cog,
+    <VisualLayerManager>
+        <VisualLayerManager.ChromeOverlayLayer>
+            <hosts:KanaToastHost Manager="{Binding ToastManager}" />
+            <hosts:KanaDialogHost Manager="{Binding DialogManager}" />
+        </VisualLayerManager.ChromeOverlayLayer>
+
+        <Grid
+            Margin="{Binding #KanaWindow.OffScreenMargin}"
+            Name="MainWindowGrid"
+            RowDefinitions="60, *">
+            <controls:KanaWindowTitleBar
+                CloseButtonClick="KanaWindowTitleBar_OnCloseButtonClick"
+                Grid.Row="0"
+                Icon="avares://KanaPlayer/Assets/kana-logo.ico"
+                MaximizeButtonClick="KanaWindowTitleBar_OnMaximizeButtonClick"
+                MinimizeButtonClick="KanaWindowTitleBar_OnMinimizeButtonClick"
+                Title="KanaPlayer"
+                x:Name="MainWindowTitleBar">
+                <controls:KanaWindowTitleBar.RightControl>
+                    <StackPanel
+                        Margin="0,0,20,0"
+                        Orientation="Horizontal"
+                        Spacing="7">
+                        <StackPanel.Styles>
+                            <Style Selector="ToggleButton.KanaWindowTitleBarRightButton">
+                                <Setter Property="CornerRadius" Value="20" />
+                                <Setter Property="Padding" Value="4" />
+                                <Setter Property="Height" Value="40" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <ToggleButton
+                            Classes="KanaWindowTitleBarRightButton Navigation"
+                            Command="{Binding NavigateToSettingsCommand}"
+                            Content="{LucideIconContent Kind=Cog,
                                                     Size=24}"
-                        IsChecked="{Binding IsSettingsChecked, Mode=OneWay}"
-                        IsHitTestVisible="{Binding !$self.IsChecked}"
-                        Width="40" />
-                    <ToggleButton
-                        Classes="KanaWindowTitleBarRightButton Navigation"
-                        Command="{Binding NavigateToAccountCommand}"
-                        IsChecked="{Binding IsAccountChecked, Mode=OneWay}"
-                        IsHitTestVisible="{Binding !$self.IsChecked}">
-                        <Panel>
-                            <StackPanel
-                                IsVisible="{Binding AvatarUrl, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                Orientation="Horizontal"
-                                Spacing="10">
-                                <Border ClipToBounds="True" CornerRadius="16">
-                                    <Image
-                                        Height="30"
-                                        IsVisible="{Binding RelativeSource={RelativeSource Self}, Path=!(asyncImageLoader:ImageLoader.IsLoading)}"
-                                        RenderOptions.BitmapInterpolationMode="HighQuality"
-                                        VerticalAlignment="Center"
-                                        Width="30"
-                                        asyncImageLoader:ImageLoader.Source="{Binding AvatarUrl}"
-                                        x:Name="AvatarImage" />
-                                </Border>
-                                <TextBlock
-                                    Margin="0,0,8,0"
-                                    Text="{Binding UserName}"
-                                    VerticalAlignment="Center" />
-                            </StackPanel>
+                            IsChecked="{Binding IsSettingsChecked, Mode=OneWay}"
+                            IsHitTestVisible="{Binding !$self.IsChecked}"
+                            Width="40" />
+                        <ToggleButton
+                            Classes="KanaWindowTitleBarRightButton Navigation"
+                            Command="{Binding NavigateToAccountCommand}"
+                            IsChecked="{Binding IsAccountChecked, Mode=OneWay}"
+                            IsHitTestVisible="{Binding !$self.IsChecked}">
+                            <Panel>
+                                <StackPanel
+                                    IsVisible="{Binding AvatarUrl, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                    Orientation="Horizontal"
+                                    Spacing="10">
+                                    <Border ClipToBounds="True" CornerRadius="16">
+                                        <Image
+                                            Height="30"
+                                            IsVisible="{Binding RelativeSource={RelativeSource Self}, Path=!(asyncImageLoader:ImageLoader.IsLoading)}"
+                                            RenderOptions.BitmapInterpolationMode="HighQuality"
+                                            VerticalAlignment="Center"
+                                            Width="30"
+                                            asyncImageLoader:ImageLoader.Source="{Binding AvatarUrl}"
+                                            x:Name="AvatarImage" />
+                                    </Border>
+                                    <TextBlock
+                                        Margin="0,0,8,0"
+                                        Text="{Binding UserName}"
+                                        VerticalAlignment="Center" />
+                                </StackPanel>
 
-                            <TextBlock
-                                IsVisible="{Binding AvatarUrl, Converter={x:Static ObjectConverters.IsNull}}"
-                                Margin="6,4"
-                                Text="未登录"
-                                VerticalAlignment="Center" />
-                        </Panel>
-                    </ToggleButton>
-                </StackPanel>
-            </controls:KanaWindowTitleBar.RightControl>
-        </controls:KanaWindowTitleBar>
-    </Grid>
+                                <TextBlock
+                                    IsVisible="{Binding AvatarUrl, Converter={x:Static ObjectConverters.IsNull}}"
+                                    Margin="6,4"
+                                    Text="未登录"
+                                    VerticalAlignment="Center" />
+                            </Panel>
+                        </ToggleButton>
+                    </StackPanel>
+                </controls:KanaWindowTitleBar.RightControl>
+            </controls:KanaWindowTitleBar>
+        </Grid>
+    </VisualLayerManager>
 </Window>
