@@ -5,7 +5,7 @@ namespace KanaPlayer.Controls.Hosts;
 
 internal static class ToastPool
 {
-    private static readonly ConcurrentBag<IKanaToast> Pool = new();
+    private static readonly ConcurrentBag<IKanaToast> Pool = [];
 
     internal static IKanaToast Get()
     {

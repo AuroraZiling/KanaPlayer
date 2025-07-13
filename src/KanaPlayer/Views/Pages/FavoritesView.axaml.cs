@@ -6,9 +6,9 @@ namespace KanaPlayer.Views.Pages;
 
 public partial class FavoritesView : NavigablePageBase
 {
-    public FavoritesView(FavoritesViewModel favoritesViewModel) : base("收藏夹", LucideIconKind.Star, NavigationPageCategory.AccountFeatures, 0)
+    public FavoritesView() : base("收藏夹", LucideIconKind.Star, NavigationPageCategory.AccountFeatures, 0)
     {
         InitializeComponent();
-        DataContext = favoritesViewModel;
+        DataContext = App.GetService<FavoritesViewModel>();
     }
 }

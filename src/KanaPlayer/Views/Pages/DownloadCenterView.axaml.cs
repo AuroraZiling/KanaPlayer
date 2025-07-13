@@ -6,9 +6,9 @@ namespace KanaPlayer.Views.Pages;
 
 public partial class DownloadQueueView : NavigablePageBase
 {
-    public DownloadQueueView(DownloadQueueViewModel downloadQueueViewModel) : base("下载队列", LucideIconKind.Download, NavigationPageCategory.Tools, 0)
+    public DownloadQueueView() : base("下载队列", LucideIconKind.Download, NavigationPageCategory.Tools, 0)
     {
         InitializeComponent();
-        DataContext = downloadQueueViewModel;
+        DataContext = App.GetService<DownloadQueueViewModel>();
     }
 }

@@ -69,7 +69,7 @@ namespace KanaPlayer.Controls.Hosts
         public ObservableCollection<object> ActionButtons
         {
             get => GetValue(ActionButtonsProperty);
-            set => SetValue(ActionButtonsProperty, value);
+            init => SetValue(ActionButtonsProperty, value);
         }
         
         public IKanaDialogManager? Manager { get; set; }

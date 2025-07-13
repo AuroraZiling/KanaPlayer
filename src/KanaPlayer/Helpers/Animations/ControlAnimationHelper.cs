@@ -5,7 +5,7 @@ using Avalonia.Animation.Easings;
 using Avalonia.Rendering.Composition;
 using Avalonia.Styling;
 
-namespace KanaPlayer.Helpers;
+namespace KanaPlayer.Helpers.Animations;
 
 public static class ControlAnimationHelper
 {

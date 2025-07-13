@@ -9,8 +9,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using KanaPlayer.Helpers;
+using KanaPlayer.Helpers.Animations;
 using KanaPlayer.Services.Theme;
-using Lucide.Avalonia;
 
 namespace KanaPlayer.Controls.Hosts;
 
@@ -29,11 +29,10 @@ public class KanaToast : ContentControl, IKanaToast
         AvaloniaProperty.RegisterDirect<KanaToast, double>(nameof(DismissStartTimestamp), o => o.DismissStartTimestamp,
             (o, value) => o.DismissStartTimestamp = value);
 
-    private double _dismissStartTimestamp;
     public double DismissStartTimestamp
     {
-        get => _dismissStartTimestamp;
-        set => SetAndRaise(DismissStartTimestampProperty, ref _dismissStartTimestamp, value);
+        get;
+        set => SetAndRaise(DismissStartTimestampProperty, ref field, value);
     }
 
     public static readonly StyledProperty<string> TitleProperty =
@@ -92,12 +91,11 @@ public class KanaToast : ContentControl, IKanaToast
         AvaloniaProperty.RegisterDirect<KanaToast, ObservableCollection<object>>(nameof(ActionButtons), o => o.ActionButtons,
             (o, value) => o.ActionButtons = value);
 
-    private ObservableCollection<object> _actionButtons = new();
     public ObservableCollection<object> ActionButtons
     {
-        get => _actionButtons;
-        set => SetAndRaise(ActionButtonsProperty, ref _actionButtons, value);
-    }
+        get;
+        set => SetAndRaise(ActionButtonsProperty, ref field, value);
+    } = [];
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -119,7 +117,7 @@ public class KanaToast : ContentControl, IKanaToast
         foreach (var actionButton in ActionButtons)
         {
             if (actionButton is not Button button) continue;
-            if (button.Tag is not ValueTuple<Action<IKanaToast>, bool> tuple) continue;
+            if (button.Tag is not ValueTuple<Action<IKanaToast>, bool>) continue;
             button.Click += OnActionButtonClick;
         }
 
@@ -134,7 +132,7 @@ public class KanaToast : ContentControl, IKanaToast
         foreach (var actionButton in ActionButtons)
         {
             if (actionButton is not Button button) continue;
-            if (button.Tag is not ValueTuple<Action<IKanaToast>, bool> tuple) continue;
+            if (button.Tag is not ValueTuple<Action<IKanaToast>, bool>) continue;
             button.Click -= OnActionButtonClick;
         }
     }
@@ -157,19 +155,19 @@ public class KanaToast : ContentControl, IKanaToast
         if (_wasDismissTimerInterrupted)
         {
             _wasDismissTimerInterrupted = false;
-            if (IsLoaded && CanDismissByTime) // Need to check for IsLoaded as this method will still trigger after Unloaded!
+            if (IsLoaded && CanDismissByTime)  // Need to check for IsLoaded as this method will still trigger after Unloaded!
                 DismissStartTimestamp = Stopwatch.GetTimestamp() * 1000d / Stopwatch.Frequency;
         }
     }
 
-    private void ToastCardClickedHandler(object o, PointerPressedEventArgs pointerPressedEventArgs)
+    private void ToastCardClickedHandler(object? o, PointerPressedEventArgs pointerPressedEventArgs)
     {
         OnClicked?.Invoke(this);
         if (!CanDismissByClicking) return;
         Dismiss(KanaToastDismissSource.Click);
     }
 
-    private void OnActionButtonClick(object sender, RoutedEventArgs e)
+    private void OnActionButtonClick(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
         if (button.Tag is not ValueTuple<Action<IKanaToast>, bool> tuple) return;
@@ -181,9 +179,7 @@ public class KanaToast : ContentControl, IKanaToast
     }
 
     public void Dismiss(KanaToastDismissSource dismiss = KanaToastDismissSource.Code)
-    {
-        Manager.Dismiss(this, dismiss);
-    }
+        => Manager?.Dismiss(this, dismiss);
 
     public void AnimateShow()
     {
@@ -220,29 +216,17 @@ public class KanaToast : ContentControl, IKanaToast
     }
 }
 
-public class KanaToastDismissedEventArgs : EventArgs
+public class KanaToastDismissedEventArgs(IKanaToast toast, KanaToastDismissSource dismissSource) : EventArgs
 {
-    public IKanaToast Toast { get; init; }
-
-    public KanaToastDismissSource DismissSource { get; init; }
-
-    public KanaToastDismissedEventArgs(IKanaToast toast, KanaToastDismissSource dismissSource)
-    {
-        Toast = toast;
-        DismissSource = dismissSource;
-    }
+    public IKanaToast Toast { get; init; } = toast;
+    public KanaToastDismissSource DismissSource { get; init; } = dismissSource;
 }
 
 public delegate void KanaToastDismissedEventHandler(object sender, KanaToastDismissedEventArgs args);
 
-public class KanaToastQueuedEventArgs : EventArgs
+public class KanaToastQueuedEventArgs(IKanaToast toast) : EventArgs
 {
-    public IKanaToast Toast { get; set; }
-
-    public KanaToastQueuedEventArgs(IKanaToast toast)
-    {
-        Toast = toast;
-    }
+    public IKanaToast Toast { get; set; } = toast;
 }
 
 public delegate void KanaToastQueuedEventHandler(object sender, KanaToastQueuedEventArgs args);

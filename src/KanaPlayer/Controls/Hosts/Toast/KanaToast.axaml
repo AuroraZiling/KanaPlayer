@@ -50,7 +50,6 @@
                                                 </Style>
                                             </ContentPresenter.Styles>
                                         </ContentPresenter>
-
                                     </DockPanel>
                                 </Panel>
                             </Panel>
@@ -60,6 +59,7 @@
             </ControlTemplate>
         </Setter>
     </ControlTheme>
+    
     <ControlTheme x:Key="{x:Type hosts:KanaToast}"
                   BasedOn="{StaticResource KanaToastTheme}"
                   TargetType="hosts:KanaToast" />

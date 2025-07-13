@@ -5,9 +5,10 @@ namespace KanaPlayer.Helpers.Animations;
 
 public enum EasingIntensity
 {
-    Soft,Normal,Strong
+    Soft,
+    Normal,
+    Strong
 }
-
 
 public class KanaEaseInBackOutBack : Easing
 {
@@ -15,8 +16,7 @@ public class KanaEaseInBackOutBack : Easing
 
     public override double Ease(double progress)
     {
-        double Pi = Math.PI;
-        double c1 = BounceIntensity switch
+        var c1 = BounceIntensity switch
         {
             EasingIntensity.Soft   => 0.9,
             EasingIntensity.Normal => 1.15,
@@ -24,16 +24,15 @@ public class KanaEaseInBackOutBack : Easing
             _                      => 1.0
         };
 
-        double c2 = c1 * 1.525;
-
+        var c2 = c1 * 1.525;
         if (progress < 0.5)
         {
-            double term = 2 * progress;
-            return (Math.Pow(term, 2) * ((c2 + 1) * term - c2)) / 2.0;
+            var term = 2 * progress;
+            return Math.Pow(term, 2) * ((c2 + 1) * term - c2) / 2.0;
         }
         else
         {
-            double term = 2 * progress - 2;
+            var term = 2 * progress - 2;
             return (Math.Pow(term, 2) * ((c2 + 1) * term + c2) + 2) / 2.0;
         }
     }
@@ -45,7 +44,7 @@ public class KanaEaseInOutBack: Easing
         
     public override double Ease(double progress)
     {
-        double c1 = BounceIntensity switch
+        var c1 = BounceIntensity switch
         {
             EasingIntensity.Soft   => 0.9,
             EasingIntensity.Normal => 1.15,
@@ -53,13 +52,10 @@ public class KanaEaseInOutBack: Easing
             _                      => 1.0
         };
             
-        double c3 = c1 + 1;
+        var c3 = c1 + 1;
+        var smoothedStart = progress * progress * (2 - progress);
 
-        double t = progress;
-        double smoothedStart = t * t * (2 - t); 
-        double p = smoothedStart;
-
-        return 1 + c3 * Math.Pow(p - 1, 3) + c1 * Math.Pow(p - 1, 2);
+        return 1 + c3 * Math.Pow(smoothedStart - 1, 3) + c1 * Math.Pow(smoothedStart - 1, 2);
     }
 
 }
@@ -70,7 +66,7 @@ public class KanaEaseOutBack: Easing
      
     public override double Ease(double progress)
     {
-        double c1 = BounceIntensity switch
+        var c1 = BounceIntensity switch
         {
             EasingIntensity.Soft   => 0.9,
             EasingIntensity.Normal => 1.15,
@@ -78,19 +74,16 @@ public class KanaEaseOutBack: Easing
             _                      => 1.0
         };
         
-        double  c3 = c1 + 1;
-            
+        var c3 = c1 + 1;
         return 1 + c3 * Math.Pow(progress - 1, 3) + c1 * Math.Pow(progress - 1, 2);
-   
     }
-    
 }
     
 public class KanaEaseOut : Easing
 {
     public override double Ease(double progress)
     {
-        double warpedProgress = Math.Sqrt(progress);
+        var warpedProgress = Math.Sqrt(progress);
         return 1.0 - Math.Pow(1.0 - warpedProgress, 3);
     }
 }
@@ -99,16 +92,13 @@ public class KanaEaseInOut : Easing
 {
     public override double Ease(double progress)
     {
-        double warpedProgress = Math.Sqrt(progress);
+        var warpedProgress = Math.Sqrt(progress);
         
         if (warpedProgress < 0.5)
         {
             return 4.0 * warpedProgress * warpedProgress * warpedProgress;
         }
-        else
-        {
-            double factor = -2.0 * warpedProgress + 2.0;
-            return 1.0 - Math.Pow(factor, 3) / 2.0;
-        }
+        var factor = -2.0 * warpedProgress + 2.0;
+        return 1.0 - Math.Pow(factor, 3) / 2.0;
     }
 }

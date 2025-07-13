@@ -23,7 +23,7 @@ public class KanaDialogManager : IKanaDialogManager
         OnDialogDismissed?.Invoke(this, new KanaDialogManagerEventArgs(_activeDialog));
         _activeDialog.OnDismissed?.Invoke(_activeDialog);
         _activeDialog = null;
-            
+        
         return true;
     }
 
@@ -31,7 +31,7 @@ public class KanaDialogManager : IKanaDialogManager
     {
         if (_activeDialog == null) 
             return;
-            
+        
         OnDialogDismissed?.Invoke(this, new KanaDialogManagerEventArgs(_activeDialog));
         _activeDialog.OnDismissed?.Invoke(_activeDialog);
         _activeDialog = null;

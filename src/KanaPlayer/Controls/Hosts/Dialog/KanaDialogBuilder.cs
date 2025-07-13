@@ -11,9 +11,8 @@ namespace KanaPlayer.Controls.Hosts;
 
 public class KanaDialogBuilder
 {
-    public IKanaDialogManager Manager { get; }
-    public IKanaDialog Dialog { get; }
-
+    private IKanaDialogManager Manager { get; }
+    private IKanaDialog Dialog { get; }
     public TaskCompletionSource<bool>? Completion { get; set; }
 
     public KanaDialogBuilder(IKanaDialogManager manager)
@@ -26,20 +25,12 @@ public class KanaDialogBuilder
     public bool TryShow()
         => Manager.TryShowDialog(Dialog);
 
-    /// <summary>
-    /// Tries to open a dialog and 'await's/ blocks until its being closed.
-    /// </summary>
-    /// <returns>'True' or 'False' as DialogResult</returns>
-    /// <exception cref="InvalidOperationException">Will throw if there was an already open dialog, or if the builder wasnt configured to support waiting for it being closed</exception>
     public async Task<bool> TryShowAsync(CancellationToken cancellationToken = default)
     {
         var completion = Completion;
         if (completion is null)
         {
-#if DEBUG
-            System.Diagnostics.Debugger.Break();
-#endif
-            throw new InvalidOperationException($"{nameof(KanaDialogBuilder)} is not configured corretly. Its missing a valid value for {nameof(Completion)}.");
+            throw new InvalidOperationException($"{nameof(KanaDialogBuilder)} is not configured correctly. Its missing a valid value for {nameof(Completion)}.");
         }
 
         cancellationToken.Register(CancellationRequested);
@@ -48,10 +39,6 @@ public class KanaDialogBuilder
         var result = Manager.TryShowDialog(Dialog);
         if (!result)
         {
-#if DEBUG
-            System.Diagnostics.Debugger.Break();
-#endif
-
             Dialog.OnDismissed -= DialogCancellationRequested;
             throw new InvalidOperationException("Opening a new dialog failed. Looks like there is already one open.");
         }
@@ -132,23 +119,16 @@ public class KanaDialogBuilder
         btn.Click += (_, _) =>
         {
             onClicked(Dialog);
-
             if (!dismissOnClick)
                 return;
-
             Manager.TryDismissDialog(Dialog);
         };
 
         Dialog.ActionButtons.Add(btn);
     }
 
-    public class DismissDialog
+    public class DismissDialog(KanaDialogBuilder builder)
     {
-        public KanaDialogBuilder Builder { get; }
-
-        public DismissDialog(KanaDialogBuilder builder)
-        {
-            Builder = builder;
-        }
+        public KanaDialogBuilder Builder { get; } = builder;
     }
 }

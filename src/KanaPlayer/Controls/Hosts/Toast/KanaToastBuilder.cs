@@ -3,14 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Media;
 using KanaPlayer.Services.Theme;
-using Lucide.Avalonia;
 
 namespace KanaPlayer.Controls.Hosts;
 
 public class KanaToastBuilder
 {
-    public IKanaToastManager Manager { get; }
-    public IKanaToast Toast { get; }
+    private IKanaToastManager Manager { get; }
+    private IKanaToast Toast { get; }
 
     public KanaToastBuilder(IKanaToastManager manager)
     {
@@ -70,13 +69,8 @@ public class KanaToastBuilder
         Toast.ActionButtons.Add(btn);
     }
 
-    public class DismissToast
+    public class DismissToast(KanaToastBuilder builder)
     {
-        public KanaToastBuilder Builder { get; }
-
-        public DismissToast(KanaToastBuilder builder)
-        {
-            Builder = builder;
-        }
+        public KanaToastBuilder Builder { get; } = builder;
     }
 }

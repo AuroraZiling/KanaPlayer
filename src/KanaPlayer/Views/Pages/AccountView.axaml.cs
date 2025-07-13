@@ -5,9 +5,9 @@ namespace KanaPlayer.Views.Pages;
 
 public partial class AccountView : NavigablePageBase
 {
-    public AccountView(AccountViewModel accountViewModel) : base("账户")
+    public AccountView() : base("账户")
     {
         InitializeComponent();
-        DataContext = accountViewModel;
+        DataContext = App.GetService<AccountViewModel>();
     }
 }

@@ -10,11 +10,11 @@ public partial class MainView : UserControl
 {
     private readonly MainViewModel _mainViewModel;
 
-    public MainView(MainViewModel mainViewModel, INavigationService navigationService, IServiceProvider serviceProvider)
+    public MainView()
     {
         InitializeComponent();
-        DataContext = _mainViewModel = mainViewModel;
-        navigationService.Initialize(MainNavigationView, serviceProvider);
+        DataContext = _mainViewModel = App.GetService<MainViewModel>();
+        App.GetService<INavigationService>().Initialize(MainNavigationView, App.GetService<IServiceProvider>());
     }
 
     private void AudioSliderThumb_OnDragCompleted(object? sender, VectorEventArgs e)

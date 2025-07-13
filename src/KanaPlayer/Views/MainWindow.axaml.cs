@@ -4,7 +4,6 @@ using Avalonia.Input;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
-using KanaPlayer.Services.TrayMenu;
 using KanaPlayer.ViewModels;
 
 namespace KanaPlayer.Views;
@@ -13,12 +12,13 @@ public partial class MainWindow : Window
 {
     private readonly IConfigurationService<SettingsModel> _configurationService;
 
-    public MainWindow(MainWindowViewModel mainWindowViewModel, MainView mainView, IConfigurationService<SettingsModel> configurationService)
+    public MainWindow()
     {
         InitializeComponent();
-        DataContext = mainWindowViewModel;
-        _configurationService = configurationService;
+        DataContext = App.GetService<MainWindowViewModel>();
+        _configurationService = App.GetService<IConfigurationService<SettingsModel>>();
 
+        var mainView = App.GetService<MainView>();
         mainView.SetValue(Grid.RowProperty, 1);
         MainWindowGrid.Children.Add(mainView);
     }

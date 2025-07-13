@@ -56,12 +56,9 @@
                             <Style Selector="^ Border#PART_DialogBackground">
                                 <Setter Property="Opacity" Value="0" />
                                 <Setter Property="IsHitTestVisible" Value="False" />
-
-
-                                <!--  need to make isvisible to false to make tooltips work !  -->
+                                
+                                <!-- Tooltip Workaround  -->
                                 <Setter Property="IsVisible" Value="False" />
-
-
                             </Style>
                             <Style Selector="^ ContentControl#PART_DialogContent">
                                 <Setter Property="Opacity" Value="0" />

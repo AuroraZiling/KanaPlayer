@@ -12,10 +12,10 @@ namespace KanaPlayer.Views.Pages;
 public partial class HomeView : NavigablePageBase
 {
     private ImplicitAnimationCollection? _implicitAnimations;
-    public HomeView(HomeViewModel homeViewModel) : base("主页", LucideIconKind.House, NavigationPageCategory.Top, 0)
+    public HomeView() : base("主页", LucideIconKind.House, NavigationPageCategory.Top, 0)
     {
         InitializeComponent();
-        DataContext = homeViewModel;
+        DataContext = App.GetService<HomeViewModel>();
     }
 
     private void EnsureImplicitAnimations()

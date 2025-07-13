@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Rendering.Composition;
 using KanaPlayer.Helpers;
+using KanaPlayer.Helpers.Animations;
 
 namespace KanaPlayer.Controls.Hosts;
 
@@ -42,17 +43,16 @@ public class KanaDialogHost : TemplatedControl
             dialogBackground.PointerPressed += (_, _) => BackgroundRequestClose();
             dialogBackground.Loaded += (_, _) =>
             {
-                var v = ElementComposition.GetElementVisual(dialogBackground);
-                CompositionAnimationHelper.MakeOpacityAnimated(v, 400);
+                CompositionAnimationHelper.MakeOpacityAnimated(ElementComposition.GetElementVisual(dialogBackground), 400);
             }; 
         }
     }
 
     private void BackgroundRequestClose()
     {
-        if (Dialog is not IKanaDialog { CanDismissWithBackgroundClick: true } KanaDialog) return;
-        if (!KanaDialog.CanDismissWithBackgroundClick) return;
-        Manager.TryDismissDialog(KanaDialog);
+        if (Dialog is not IKanaDialog { CanDismissWithBackgroundClick: true } kanaDialog) return;
+        if (!kanaDialog.CanDismissWithBackgroundClick) return;
+        Manager.TryDismissDialog(kanaDialog);
     }
 
     private static void OnManagerPropertyChanged(AvaloniaObject sender,
@@ -102,14 +102,9 @@ public class KanaDialogHost : TemplatedControl
     }
 }
 
-public class KanaDialogManagerEventArgs : EventArgs
+public class KanaDialogManagerEventArgs(IKanaDialog dialog) : EventArgs
 {
-    public IKanaDialog Dialog { get; set; }
-
-    public KanaDialogManagerEventArgs(IKanaDialog dialog)
-    {
-        Dialog = dialog;
-    }
+    public IKanaDialog Dialog { get; set; } = dialog;
 }
     
 public delegate void KanaDialogManagerEventHandler(object sender, KanaDialogManagerEventArgs args);

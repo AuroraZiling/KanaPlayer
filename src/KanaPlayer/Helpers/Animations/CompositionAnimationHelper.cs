@@ -1,146 +1,118 @@
 ﻿using System;
 using Avalonia.Rendering.Composition;
-using Avalonia.Rendering.Composition.Animations;
 
-namespace KanaPlayer.Helpers;
+namespace KanaPlayer.Helpers.Animations;
 
-public class CompositionAnimationHelper
-    {
-        public static void MakeScrollable(CompositionVisual compositionVisual, double millis = 250)
-        {
-            if (compositionVisual == null)
-                return;
-        
-            Compositor compositor = compositionVisual.Compositor;
-
-            var animationGroup = compositor.CreateAnimationGroup();
-            Vector3KeyFrameAnimation offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
-            offsetAnimation.Target = "Offset";
-
-            offsetAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-            offsetAnimation.Duration = TimeSpan.FromMilliseconds(millis);
-
-            ImplicitAnimationCollection implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
-            animationGroup.Add(offsetAnimation);
-            implicitAnimationCollection["Offset"] = animationGroup;
-            compositionVisual.ImplicitAnimations = implicitAnimationCollection;
-        }
-        
-            public static void MakeOpacityAnimated(CompositionVisual compositionVisual, double millis = 700)
+public static class CompositionAnimationHelper
+{
+    public static void MakeScrollable(CompositionVisual? compositionVisual, double milliseconds = 250)
     {
         if (compositionVisual == null)
             return;
 
-        Compositor compositor = compositionVisual.Compositor;
-
+        var compositor = compositionVisual.Compositor;
         var animationGroup = compositor.CreateAnimationGroup();
-      
+        var offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
+        offsetAnimation.Target = "Offset";
+
+        offsetAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
+        offsetAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
+
+        var implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
+        animationGroup.Add(offsetAnimation);
+        implicitAnimationCollection["Offset"] = animationGroup;
+        compositionVisual.ImplicitAnimations = implicitAnimationCollection;
+    }
+
+    public static void MakeOpacityAnimated(CompositionVisual? compositionVisual, double milliseconds = 700)
+    {
+        if (compositionVisual == null)
+            return;
+
+        var compositor = compositionVisual.Compositor;
+        var animationGroup = compositor.CreateAnimationGroup();
         
-        ScalarKeyFrameAnimation opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
+        var opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
         opacityAnimation.Target = "Opacity";
         opacityAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        opacityAnimation.Duration = TimeSpan.FromMilliseconds(millis);
+        opacityAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
         
-    
-       
-        Vector3KeyFrameAnimation offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
+        var offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
         offsetAnimation.Target = "Offset";
         offsetAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        offsetAnimation.Duration = TimeSpan.FromMilliseconds(millis);
+        offsetAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
         
-
         animationGroup.Add(offsetAnimation);
         animationGroup.Add(opacityAnimation);
-      
         
-        ImplicitAnimationCollection implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
+        var implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
         implicitAnimationCollection["Opacity"] = animationGroup;
         implicitAnimationCollection["Offset"] = animationGroup;
-
         
         compositionVisual.ImplicitAnimations = implicitAnimationCollection;
-
     }
 
-    public static void MakeSizeAnimated(CompositionVisual compositionVisual, double millis =450)
+    public static void MakeSizeAnimated(CompositionVisual? compositionVisual, double milliseconds = 450)
     {
         if (compositionVisual == null)
             return;
 
-        Compositor compositor = compositionVisual.Compositor;
-
+        var compositor = compositionVisual.Compositor;
         var animationGroup = compositor.CreateAnimationGroup();
-        
-        Vector2KeyFrameAnimation sizeAnimation = compositor.CreateVector2KeyFrameAnimation();
+
+        var sizeAnimation = compositor.CreateVector2KeyFrameAnimation();
         sizeAnimation.Target = "Size";
         sizeAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        sizeAnimation.Duration = TimeSpan.FromMilliseconds(millis);
+        sizeAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
         
-      
-        
-        Vector3KeyFrameAnimation offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
+        var offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
         offsetAnimation.Target = "Offset";
         offsetAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        offsetAnimation.Duration = TimeSpan.FromMilliseconds(millis);
-        
-        
-        
-        animationGroup.Add(sizeAnimation);
+        offsetAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
 
+        animationGroup.Add(sizeAnimation);
         animationGroup.Add(offsetAnimation);
-        
-        ImplicitAnimationCollection implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
+
+        var implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
         implicitAnimationCollection["Size"] = animationGroup;
         implicitAnimationCollection["Offset"] = animationGroup;
-
         
         compositionVisual.ImplicitAnimations = implicitAnimationCollection;
-
     }
-    
-    
-    public static void MakeSizeOpacityAnimated(CompositionVisual compositionVisual, double millis =450)
+
+
+    public static void MakeSizeOpacityAnimated(CompositionVisual? compositionVisual, double milliseconds = 450)
     {
         if (compositionVisual == null)
             return;
 
-        Compositor compositor = compositionVisual.Compositor;
-
+        var compositor = compositionVisual.Compositor;
         var animationGroup = compositor.CreateAnimationGroup();
-        
-        Vector2KeyFrameAnimation sizeAnimation = compositor.CreateVector2KeyFrameAnimation();
+
+        var sizeAnimation = compositor.CreateVector2KeyFrameAnimation();
         sizeAnimation.Target = "Size";
         sizeAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        sizeAnimation.Duration = TimeSpan.FromMilliseconds(millis);
-        
-      
-        
-        Vector3KeyFrameAnimation offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
+        sizeAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
+
+        var offsetAnimation = compositor.CreateVector3KeyFrameAnimation();
         offsetAnimation.Target = "Offset";
         offsetAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        offsetAnimation.Duration = TimeSpan.FromMilliseconds(millis);
+        offsetAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
         
-        
-        ScalarKeyFrameAnimation opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
+        var opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
         opacityAnimation.Target = "Opacity";
         opacityAnimation.InsertExpressionKeyFrame(1.0f, "this.FinalValue");
-        opacityAnimation.Duration = TimeSpan.FromMilliseconds(millis);
-
-        
+        opacityAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
         
         animationGroup.Add(sizeAnimation);
         animationGroup.Add(opacityAnimation);
-
         animationGroup.Add(offsetAnimation);
-        
-        ImplicitAnimationCollection implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
+
+        var implicitAnimationCollection = compositor.CreateImplicitAnimationCollection();
         implicitAnimationCollection["Size"] = animationGroup;
         implicitAnimationCollection["Opacity"] = animationGroup;
         implicitAnimationCollection["Offset"] = animationGroup;
-
         
         compositionVisual.ImplicitAnimations = implicitAnimationCollection;
-
     }
-
-    }
+}
