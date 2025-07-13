@@ -16,9 +16,9 @@ public interface IPlayerManager : INotifyPropertyChanged
     PlaybackMode PlaybackMode { get; set; }
     Task LoadAsync(PlayListItemModel playListItemModel);
     bool CanLoadPrevious { get; }
-    Task LoadPrevious();
+    Task LoadPrevious(bool isManuallyTriggered, bool playWhenLoaded);
     bool CanLoadForward { get; }
-    Task LoadForward();
+    Task LoadForward(bool isManuallyTriggered, bool playWhenLoaded);
     void Play();
     void Pause();
     void Append(PlayListItemModel playListItemModel);

@@ -89,22 +89,10 @@ public class TrayMenuService : ITrayMenuService
     }
 
     public async Task LoadPlayPreviousAsync()
-    {
-        if (_playerManager.CanLoadPrevious)
-        {
-            await _playerManager.LoadPrevious();
-            _playerManager.Play();
-        }
-    }
+        => await _playerManager.LoadPrevious(true, true);
 
     public async Task LoadPlayForwardAsync()
-    {
-        if (_playerManager.CanLoadForward)
-        {
-            await _playerManager.LoadForward();
-            _playerManager.Play();
-        }
-    }
+        => await _playerManager.LoadForward(true, true);
 }
 
 file static class TrayMenuServiceExtensions

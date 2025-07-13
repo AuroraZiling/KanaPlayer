@@ -23,6 +23,10 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             if (args.PropertyName == nameof(IAudioPlayer.Status))
                 OnPropertyChanged(nameof(Status));
         };
+        _audioPlayer.PlaybackStopped += async () =>
+        {
+            await LoadForward(false, true);
+        };
 
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
         Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
@@ -46,10 +50,29 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _audioPlayer.Duration;
 
     [ObservableProperty] public partial double Volume { get; set; }
-    public PlayStatus Status => _audioPlayer.Status;
-    [ObservableProperty] public partial PlaybackMode PlaybackMode { get; set; }
     partial void OnVolumeChanged(double value)
         => _audioPlayer.Volume = value;
+    public PlayStatus Status => _audioPlayer.Status;
+    [ObservableProperty] public partial PlaybackMode PlaybackMode { get; set; }
+    partial void OnPlaybackModeChanged(PlaybackMode value)
+    {
+        switch (value)
+        {
+            case PlaybackMode.Sequential:
+                CanLoadPrevious = CurrentPlayListItem is not null && IndexOf(CurrentPlayListItem) > 0;
+                CanLoadForward = CurrentPlayListItem is not null && IndexOf(CurrentPlayListItem) < PlayList.Count - 1;
+                break;
+            case PlaybackMode.RepeatOne:
+            case PlaybackMode.RepeatAll:
+            case PlaybackMode.Shuffle:
+                CanLoadPrevious = true;
+                CanLoadForward = true;
+                break;
+            case PlaybackMode.MaxValue:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(value), value, null);
+        }
+    }
 
     private readonly ObservableList<PlayListItemModel> _playList = [];
     private readonly Dictionary<string, string> _cookies;
@@ -72,27 +95,79 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         CurrentPlayListItem = playListItemModel;
         if (PlayList.Contains(playListItemModel))
         {
-            CanLoadPrevious = IndexOf(playListItemModel) > 0;
-            CanLoadForward = IndexOf(playListItemModel) < PlayList.Count - 1;
+            CanLoadPrevious = IndexOf(playListItemModel) > 0 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
+            CanLoadForward = IndexOf(playListItemModel) < PlayList.Count - 1 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
         }
     }
 
     [ObservableProperty] public partial bool CanLoadPrevious { get; private set; }
-    public async Task LoadPrevious()
+    public async Task LoadPrevious(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is null) return;
-        var index = IndexOf(CurrentPlayListItem);
-        if (index <= 0) return;
-        await LoadAsync(PlayList[index - 1]);
+        if (CurrentPlayListItem is null || !CanLoadPrevious) return;
+        
+        PlayListItemModel 
+        switch (PlaybackMode)
+        {
+            case PlaybackMode.Sequential:
+            {
+                var index = IndexOf(CurrentPlayListItem);
+                if (index <= 0) return;
+                await LoadAsync(PlayList[index - 1]);
+                break;
+            }
+            case PlaybackMode.Shuffle:
+            {
+                var randomIndex = new Random().Next(PlayList.Count);
+                await LoadAsync(PlayList[randomIndex]);
+                break;
+            }
+            case PlaybackMode.RepeatOne when !isManuallyTriggered:
+                await LoadAsync(CurrentPlayListItem);
+                break;
+            case PlaybackMode.RepeatAll:
+            case PlaybackMode.RepeatOne when isManuallyTriggered:
+            {
+                var index = IndexOf(CurrentPlayListItem);
+                if (index <= 0) index = PlayList.Count;
+                await LoadAsync(PlayList[index - 1]);
+                break;
+            }
+            case PlaybackMode.MaxValue:
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        if (playWhenLoaded)
+            _audioPlayer.Play();
     }
     
     [ObservableProperty] public partial bool CanLoadForward { get; private set; }
-    public async Task LoadForward()
+    public async Task LoadForward(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is null) return;
-        var index = IndexOf(CurrentPlayListItem);
-        if (index < 0 || index >= PlayList.Count - 1) return;
-        await LoadAsync(PlayList[index + 1]);
+        if (CurrentPlayListItem is null || !CanLoadForward) return;
+
+        if (PlaybackMode == PlaybackMode.Sequential)
+        {
+            var index = IndexOf(CurrentPlayListItem);
+            if (index < 0 || index >= PlayList.Count - 1) return;
+            await LoadAsync(PlayList[index + 1]);
+        }else if (PlaybackMode == PlaybackMode.Shuffle)
+        {
+            var randomIndex = new Random().Next(PlayList.Count);
+            await LoadAsync(PlayList[randomIndex]);
+        }else if (PlaybackMode == PlaybackMode.RepeatOne && !isManuallyTriggered)
+        {
+            await LoadAsync(CurrentPlayListItem);
+        }
+        else if (PlaybackMode == PlaybackMode.RepeatAll || (PlaybackMode == PlaybackMode.RepeatOne && isManuallyTriggered))
+        {
+            var index = IndexOf(CurrentPlayListItem);
+            if (index < 0) return;
+            if (index >= PlayList.Count - 1) index = -1;
+            await LoadAsync(PlayList[index + 1]);
+        }
+        
+        if (playWhenLoaded)
+            _audioPlayer.Play();
     }
 
     public void Play()

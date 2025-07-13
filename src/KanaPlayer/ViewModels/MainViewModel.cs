@@ -116,11 +116,8 @@ public partial class MainViewModel : ViewModelBase
     }
     
     [RelayCommand]
-    private async Task LoadPreviousAsync()
-    {
-        await PlayerManager.LoadPrevious();
-        PlayerManager.Play();
-    }
+    private Task LoadPreviousAsync()
+        => PlayerManager.LoadPrevious(true, true);
 
     [RelayCommand]
     private void TogglePlay()
@@ -132,9 +129,6 @@ public partial class MainViewModel : ViewModelBase
     }
     
     [RelayCommand]
-    private async Task LoadForwardAsync()
-    {
-        await PlayerManager.LoadForward();
-        PlayerManager.Play();
-    }
+    private Task LoadForwardAsync()
+        => PlayerManager.LoadForward(true, true);
 }

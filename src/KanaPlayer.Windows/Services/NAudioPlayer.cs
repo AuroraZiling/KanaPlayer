@@ -77,12 +77,14 @@ public partial class NAudioPlayer : ObservableObject, IAudioPlayer
         _outputDevice.PlaybackStopped += OnOutputDeviceOnPlaybackStopped;
 
         Status = PlayStatus.Loaded;
-        return;
+    }
 
-        void OnOutputDeviceOnPlaybackStopped(object? sender, StoppedEventArgs e)
-        {
-            Status = PlayStatus.Stopped;
-        }
+    public event Action? PlaybackStopped;
+    
+    private void OnOutputDeviceOnPlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        Status = PlayStatus.Stopped;
+        PlaybackStopped?.Invoke();
     }
     
     public void Play()

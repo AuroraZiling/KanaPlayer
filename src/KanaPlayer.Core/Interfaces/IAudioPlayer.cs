@@ -24,6 +24,7 @@ public interface IAudioPlayer : INotifyPropertyChanged
     double Volume { get; set; }
 
     void Load(Stream audioStream);
+    event Action? PlaybackStopped;
 
     void Play();
 
