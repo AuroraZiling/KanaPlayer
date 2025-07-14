@@ -36,6 +36,7 @@
         <entry key="src/KanaPlayer/Controls/KanaSettingsCard.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaSettingsGroup.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaTrayIcon.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Controls/KanaView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/KanaWindowTitleBar.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/Navigation/AppTrayIcon.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Controls/ProgressRing.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />

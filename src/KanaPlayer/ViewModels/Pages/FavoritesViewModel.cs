@@ -52,7 +52,6 @@ public partial class FavoritesViewModel : ViewModelBase
     [RelayCommand]
     private void ImportFromBilibili()
     {
-        
         _navigationService.Navigate(App.GetService<FavoritesBilibiliImportView>());
     }
     

@@ -38,42 +38,32 @@ public partial class NavigationService : ObservableObject, INavigationService
     public void Navigate(Type viewType)
     {
         if (PageProvider is null)
-        {
             throw new InvalidOperationException("Navigation service is not initialized");
-        }
 
         var page = PageProvider.GetRequiredService(viewType);
         if (page is NavigablePageBase navigablePage)
-        {
-            if (!_isHandlingBackAndForward)
-            {
-                if (CurrentPage != null)
-                {
-                    _backStack.Push(CurrentPage);
-                }
-                _forwardStack.Clear();
-            }
-            CurrentPage = navigablePage;
-            if (CurrentPage.DataContext is INavigationAware navigationAware)
-            {
-                navigationAware.OnNavigatedTo();
-            }
-            OnPropertyChanged(nameof(CanGoBack));
-            OnPropertyChanged(nameof(CanGoForward));
-        }
+            Navigate(navigablePage);
         else
-        {
             throw new InvalidOperationException("Invalid page type");
-        }
     }
+    
+    [ObservableProperty] public partial double PageProgressBarValue { get; set; }
+    [ObservableProperty] public partial bool IsPageProgressBarVisible { get; set; }
+    [ObservableProperty] public partial bool IsPageProgressBarIndeterminate { get; set; }
+    private void ResetPageProgressBar()
+    {
+        PageProgressBarValue = 0;
+        IsPageProgressBarVisible = false;
+        IsPageProgressBarIndeterminate = false;
+    }
+    
     
     public void Navigate(NavigablePageBase view)
     {
         if (PageProvider is null)
-        {
             throw new InvalidOperationException("Navigation service is not initialized");
-        }
 
+        ResetPageProgressBar();
         if (!_isHandlingBackAndForward)
         {
             if (CurrentPage != null)
@@ -84,13 +74,10 @@ public partial class NavigationService : ObservableObject, INavigationService
         }
         CurrentPage = view;
         if (CurrentPage.DataContext is INavigationAware navigationAware)
-        {
             navigationAware.OnNavigatedTo();
-        }
         OnPropertyChanged(nameof(CanGoBack));
         OnPropertyChanged(nameof(CanGoForward));
     }
-
     [ObservableProperty] public partial NavigablePageBase? CurrentPage { get; private set; }
     private bool _isHandlingBackAndForward;
 

@@ -9,6 +9,9 @@ public interface INavigationService : INotifyPropertyChanged
     void Navigate(Type viewType);
     void Navigate(NavigablePageBase view);
     NavigablePageBase? CurrentPage { get; }
+    double PageProgressBarValue { get; set; }
+    bool IsPageProgressBarVisible { get; set; }
+    bool IsPageProgressBarIndeterminate { get; set; }
     bool CanGoBack { get; }
     bool CanGoForward { get; }
     void GoBack();
