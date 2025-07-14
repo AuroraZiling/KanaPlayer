@@ -4,7 +4,7 @@ using Lucide.Avalonia;
 
 namespace KanaPlayer.Views.Pages;
 
-public partial class DownloadQueueView : NavigablePageBase
+public partial class DownloadQueueView : MainNavigablePageBase
 {
     public DownloadQueueView() : base("下载队列", LucideIconKind.Download, NavigationPageCategory.Tools, 0)
     {

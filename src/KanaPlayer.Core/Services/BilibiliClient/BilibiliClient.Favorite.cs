@@ -1,0 +1,75 @@
+﻿using System.Text.Json;
+using KanaPlayer.Core.Extensions;
+using KanaPlayer.Core.Models.Wrappers;
+
+namespace KanaPlayer.Core.Services;
+
+public partial class BilibiliClient<TSettings>
+{
+    // 从 Bilibili 获取全部收藏夹 / 合集步骤
+    // 1. 获取创建收藏夹列表
+    // 2. 获取收集收藏夹 / 合集列表 -> 归为统一类型的列表
+    // 3. 上述列表合并遍历，获取详细信息
+    
+    public async Task<FavoriteCreatedFoldersMetaModel> GetFavoriteCreatedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies)
+    {
+        var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid={upMid}&type=0&web_location=333.1387";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, endpoint).LoadCookies(cookies);
+        var response = await httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Failed to get favorite created folder meta info: {response.ReasonPhrase}");
+        
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<FavoriteCreatedFoldersMetaModel>(content)
+               ?? throw new HttpRequestException("Failed to get favorite created folder meta info");
+    }
+
+    public async Task<List<FavoriteCollectedItemMetaDataModel>> GetFavoriteCollectedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies)
+    {
+        var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/collected/list?ps=50&up_mid={upMid}&platform=web";
+
+        var allCollected = new List<FavoriteCollectedItemMetaDataModel>();
+        var page = 1;
+        while (true)
+        {
+            var pageModel = await GetPageAsync(page);
+            var pageData = pageModel.EnsureData();
+            if (pageData.List.Count == 0)
+                break;
+
+            allCollected.AddRange(pageData.List);
+            if (!pageData.HasMore)
+                break;
+
+            page++;
+        }
+        return allCollected;
+
+        async Task<FavoriteCollectedMetaModel> GetPageAsync(int pageNumber)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
+            var response = await httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to get favorite collected folders meta info: {response.ReasonPhrase}");
+            
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<FavoriteCollectedMetaModel>(content)
+                   ?? throw new HttpRequestException("Failed to get favorite collected folders meta info");
+        }
+    }
+    
+    public async Task<FavoriteFolderInfoModel> GetFavoriteFolderInfoAsync(ulong folderId, Dictionary<string, string> cookies)
+    {
+        var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/info?media_id={folderId}&type=1";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, endpoint).LoadCookies(cookies);
+        var response = await httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Failed to get favorite created folder info: {response.ReasonPhrase}");
+        
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<FavoriteFolderInfoModel>(content)
+               ?? throw new HttpRequestException("Failed to get favorite created folder info");
+    }
+}

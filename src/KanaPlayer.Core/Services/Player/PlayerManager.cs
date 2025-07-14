@@ -35,10 +35,10 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     }
     
     [field: AllowNull, MaybeNull]
-    public NotifyCollectionChangedSynchronizedViewList<PlayListItemModel> PlayList =>
+    public NotifyCollectionChangedSynchronizedViewList<PlayListItem> PlayList =>
         field ??= _playList.ToNotifyCollectionChangedSlim();
 
-    [ObservableProperty] public partial PlayListItemModel? CurrentPlayListItem { get; private set; }
+    [ObservableProperty] public partial PlayListItem? CurrentPlayListItem { get; private set; }
 
     public TimeSpan PlaybackTime
     {
@@ -74,10 +74,10 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         }
     }
 
-    private readonly ObservableList<PlayListItemModel> _playList = [];
+    private readonly ObservableList<PlayListItem> _playList = [];
     private readonly Dictionary<string, string> _cookies;
 
-    public async Task LoadAsync(PlayListItemModel playListItemModel)
+    public async Task LoadAsync(PlayListItem playListItem)
     {
         CurrentPlayListItem = null;
         
@@ -87,16 +87,16 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         OnPropertyChanged(nameof(CanLoadForward));
         
         _audioPlayer.Pause();
-        ArgumentNullException.ThrowIfNull(playListItemModel);
+        ArgumentNullException.ThrowIfNull(playListItem);
         
         await Task.Run(() =>
-            _audioPlayer.Load(new CachedAudioStream(playListItemModel.AudioUniqueId, _cookies, _bilibiliClient)));
+            _audioPlayer.Load(new CachedAudioStream(playListItem.AudioUniqueId, _cookies, _bilibiliClient)));
         
-        CurrentPlayListItem = playListItemModel;
-        if (PlayList.Contains(playListItemModel))
+        CurrentPlayListItem = playListItem;
+        if (PlayList.Contains(playListItem))
         {
-            CanLoadPrevious = IndexOf(playListItemModel) > 0 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
-            CanLoadForward = IndexOf(playListItemModel) < PlayList.Count - 1 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
+            CanLoadPrevious = IndexOf(playListItem) > 0 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
+            CanLoadForward = IndexOf(playListItem) < PlayList.Count - 1 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne || PlaybackMode == PlaybackMode.Shuffle;
         }
     }
 
@@ -185,14 +185,14 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _audioPlayer.Play();
     public void Pause()
         => _audioPlayer.Pause();
-    public void Append(PlayListItemModel playListItemModel)
-        => _playList.Add(playListItemModel);
-    public void Insert(PlayListItemModel playListItemModel, int index)
-        => _playList.Insert(index, playListItemModel);
-    public void Remove(PlayListItemModel playListItemModel)
-        => _playList.Remove(playListItemModel);
-    public int IndexOf(PlayListItemModel playListItemModel)
-        => _playList.IndexOf(playListItemModel);
+    public void Append(PlayListItem playListItem)
+        => _playList.Add(playListItem);
+    public void Insert(PlayListItem playListItem, int index)
+        => _playList.Insert(index, playListItem);
+    public void Remove(PlayListItem playListItem)
+        => _playList.Remove(playListItem);
+    public int IndexOf(PlayListItem playListItem)
+        => _playList.IndexOf(playListItem);
     public void Clear()
         => _playList.Clear();
 }

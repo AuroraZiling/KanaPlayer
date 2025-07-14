@@ -1,6 +1,6 @@
 ﻿namespace KanaPlayer.Core.Models.PlayerManager;
 
-public record PlayListItemModel(
+public record PlayListItem(
     string Title,
     string CoverUrl,
     string AuthorName,
@@ -8,7 +8,7 @@ public record PlayListItemModel(
     AudioUniqueId AudioUniqueId,
     TimeSpan Duration)
 {
-    public virtual bool Equals(PlayListItemModel? other)
+    public virtual bool Equals(PlayListItem? other)
         => other?.AudioUniqueId.Equals(AudioUniqueId) ?? false;
 
     public override int GetHashCode()

@@ -7,10 +7,17 @@ namespace KanaPlayer.Controls.Navigation;
 
 public static class NavigationServiceExtensions
 {
-    public static IServiceCollection AddPage<TView>(this IServiceCollection services) where TView : NavigablePageBase
+    public static IServiceCollection AddMainPage<TView>(this IServiceCollection services) where TView : MainNavigablePageBase
     {
         services.AddSingleton<TView>();
-        services.AddSingleton<NavigablePageBase>(x => x.GetRequiredService<TView>());
+        services.AddSingleton<MainNavigablePageBase>(x => x.GetRequiredService<TView>());
+        return services;
+    }
+    
+    public static IServiceCollection AddPage<TView>(this IServiceCollection services) where TView : NavigablePageBase
+    {
+        services.AddTransient<TView>();
+        services.AddTransient<NavigablePageBase>(x => x.GetRequiredService<TView>());
         return services;
     }
 }
@@ -58,6 +65,30 @@ public partial class NavigationService : ObservableObject, INavigationService
         {
             throw new InvalidOperationException("Invalid page type");
         }
+    }
+    
+    public void Navigate(NavigablePageBase view)
+    {
+        if (PageProvider is null)
+        {
+            throw new InvalidOperationException("Navigation service is not initialized");
+        }
+
+        if (!_isHandlingBackAndForward)
+        {
+            if (CurrentPage != null)
+            {
+                _backStack.Push(CurrentPage);
+            }
+            _forwardStack.Clear();
+        }
+        CurrentPage = view;
+        if (CurrentPage.DataContext is INavigationAware navigationAware)
+        {
+            navigationAware.OnNavigatedTo();
+        }
+        OnPropertyChanged(nameof(CanGoBack));
+        OnPropertyChanged(nameof(CanGoForward));
     }
 
     [ObservableProperty] public partial NavigablePageBase? CurrentPage { get; private set; }

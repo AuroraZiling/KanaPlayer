@@ -83,6 +83,44 @@ public partial class BilibiliClient<TSettings>
             throw new HttpRequestException($"Failed to get audio stream: {audioResponse.ReasonPhrase}");
         return await audioResponse.Content.ReadAsStreamAsync();
     }
+    
+    public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList)
+    {
+        const int supposedMediaCountPerPage = 50;
+        var endpoint = $"https://api.bilibili.com/x/space/fav/season/list?season_id={collectionId}&web_location=0.0&ps={supposedMediaCountPerPage}";
+        
+        var templatePage = await GetPageAsync(1);
+        var templatePageData = templatePage.EnsureData();
+        var totalMediaCount = templatePageData.Info.MediaCount;
+        
+        var allCollected = new List<CollectionDataMediaModel>();
+        allCollected.AddRange(templatePageData.Medias);
+        
+        if(totalMediaCount > supposedMediaCountPerPage && fetchCompleteMediaList)
+        {
+            var totalPageCount = totalMediaCount / supposedMediaCountPerPage + 1;
+            for (var page = 2; page <= totalPageCount; page++)
+            {
+                var pageData = await GetPageAsync(page);
+                allCollected.AddRange(pageData.EnsureData().Medias);
+            }
+        }
+
+        templatePage.EnsureData().Medias = allCollected;
+        return templatePage;
+
+        async Task<CollectionModel> GetPageAsync(int pageNumber)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
+            var response = await httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to get collection: {response.ReasonPhrase}");
+            
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<CollectionModel>(content)
+                   ?? throw new HttpRequestException("Failed to get collection");
+        }
+    }
 
     [GeneratedRegex(@"<script>window\.__playinfo__=(.*?)</script>", RegexOptions.Singleline)]
     private static partial Regex ExtractPlayInfoJsonRegex();

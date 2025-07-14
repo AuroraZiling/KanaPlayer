@@ -11,8 +11,10 @@ using KanaPlayer.Services.Theme;
 using KanaPlayer.Services.TrayMenu;
 using KanaPlayer.ViewModels;
 using KanaPlayer.ViewModels.Pages;
+using KanaPlayer.ViewModels.Pages.SubPages;
 using KanaPlayer.Views;
 using KanaPlayer.Views.Pages;
+using KanaPlayer.Views.Pages.SubPages;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace KanaPlayer.Services;
@@ -29,18 +31,21 @@ public static class ServiceExtensions
         services.AddSingleton<MainView>();
 
         // Navigation - Top
-        services.AddPage<HomeView>();
-        services.AddPage<PlayListView>();
+        services.AddMainPage<HomeView>();
+        services.AddMainPage<PlayListView>();
 
         // Navigation - Account Features
-        services.AddPage<FavoritesView>();
+        services.AddMainPage<FavoritesView>();
 
         // Navigation - Tools
-        services.AddPage<DownloadQueueView>();
+        services.AddMainPage<DownloadQueueView>();
 
         // Navigation - TitleBar
-        services.AddPage<AccountView>();
-        services.AddPage<SettingsView>();
+        services.AddMainPage<AccountView>();
+        services.AddMainPage<SettingsView>();
+        
+        // SubPages
+        services.AddPage<FavoritesBilibiliImportView>();
 
         return services;
     }
@@ -63,6 +68,9 @@ public static class ServiceExtensions
         // Navigation - TitleBar
         services.AddSingleton<AccountViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        
+        // SubPages
+        services.AddTransient<FavoritesBilibiliImportViewModel>();
 
         return services;
     }

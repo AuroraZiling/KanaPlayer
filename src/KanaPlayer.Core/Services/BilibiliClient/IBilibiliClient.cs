@@ -28,13 +28,23 @@ public interface IBilibiliClient : INotifyPropertyChanged
 
     #endregion
 
-    #region Music
+    #region Audio
 
     Task<AudioInfoModel> GetAudioInfoAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
 
     Task<string> GetAudioUrlAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
     Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId,
                                      Dictionary<string, string> cookies);
+
+    Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList);
+
+    #endregion
+
+    #region Favorite
+
+    Task<FavoriteCreatedFoldersMetaModel> GetFavoriteCreatedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
+    Task<List<FavoriteCollectedItemMetaDataModel>> GetFavoriteCollectedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
+    Task<FavoriteFolderInfoModel> GetFavoriteFolderInfoAsync(ulong folderId, Dictionary<string, string> cookies);
 
     #endregion
 }

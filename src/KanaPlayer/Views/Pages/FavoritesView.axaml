@@ -3,6 +3,41 @@
     x:DataType="pages:FavoritesViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Button Content="test" Command="{Binding TestCommand}"></Button>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
+    xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+    xmlns:converters="clr-namespace:KanaPlayer.Converters">
+    
+    <UserControl.Resources>
+        <converters:TimestampHumanizerConverter x:Key="TimestampHumanizerConverter" />
+    </UserControl.Resources>
+    
+    <StackPanel>
+        <Panel>
+            <TextBlock Text="收藏夹" Classes="h1" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+            
+            <Button Classes="ghost" HorizontalAlignment="Right" VerticalAlignment="Center" Content="从 bilibili 导入" Command="{Binding ImportFromBilibiliCommand}"></Button>
+        </Panel>
+        
+        <ListBox Cursor="Hand" SelectedIndex="{Binding SelectedFavoriteFolderIndex}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolders}" Background="{DynamicResource KanaAccentColor20}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type favorites:FavoriteFolderItem}">
+                    <Grid ColumnDefinitions="50, *, *, *, *, 100">
+                        <LucideIcon Grid.Column="0" Kind="FolderHeart"></LucideIcon>
+                        <TextBlock Grid.Column="1" Text="{Binding Info.Title}"></TextBlock>
+                        <TextBlock Grid.Column="2" Text="{Binding Info.Owner.Name}"></TextBlock>
+                        <TextBlock Grid.Column="3" Text="{Binding Info.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}}"></TextBlock>
+                        <TextBlock Grid.Column="4" Text="{Binding Info.ModifiedTimestamp, Converter={StaticResource TimestampHumanizerConverter}}"></TextBlock>
+                        <TextBlock Grid.Column="5" Text="{Binding Info.MediaCount}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding VisitSelectedFavoriteFolderCommand}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+        </ListBox>
+    </StackPanel>
 </UserControl>

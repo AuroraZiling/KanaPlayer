@@ -3,7 +3,7 @@ using KanaPlayer.ViewModels.Pages;
 
 namespace KanaPlayer.Views.Pages;
 
-public partial class AccountView : NavigablePageBase
+public partial class AccountView : MainNavigablePageBase
 {
     public AccountView() : base("账户")
     {

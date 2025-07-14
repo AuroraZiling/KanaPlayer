@@ -7,7 +7,7 @@ namespace KanaPlayer.Converters;
 public class TimestampHumanizerConverter: IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        value is ulong timestamp
+        value is long timestamp
             ? DateTimeOffset.FromUnixTimeSeconds((long)timestamp).DateTime.Date.ToString("yyyy-MM-dd")
             : value;
 

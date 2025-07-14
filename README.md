@@ -59,6 +59,8 @@ KanaPlayer 是一个基于 Bilibili API 的音频播放器，旨在提供一个�
 
 ## 开始使用 / Getting Started
 
+**KanaPlayer 不会将您的任何信息上传到其他服务器，仅与Bilibili API交互，所有的数据都保存在本地。**
+
 ### 环境 / Environment
 
 KanaPlayer 依赖 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download/dotnet/9.0)，推荐安装。

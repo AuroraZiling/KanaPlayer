@@ -42,8 +42,7 @@ public class KanaToastBuilder
             _                            => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
-
-
+    
     public void SetDismissAfter(TimeSpan delay, bool interruptWhileHover = true)
     {
         Toast.InterruptDismissTimerWhileHover = interruptWhileHover;

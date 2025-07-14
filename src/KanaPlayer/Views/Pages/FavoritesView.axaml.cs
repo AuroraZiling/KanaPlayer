@@ -4,7 +4,7 @@ using Lucide.Avalonia;
 
 namespace KanaPlayer.Views.Pages;
 
-public partial class FavoritesView : NavigablePageBase
+public partial class FavoritesView : MainNavigablePageBase
 {
     public FavoritesView() : base("收藏夹", LucideIconKind.Star, NavigationPageCategory.AccountFeatures, 0)
     {

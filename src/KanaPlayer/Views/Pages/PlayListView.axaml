@@ -11,7 +11,7 @@
         
         <ListBox Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type playerManager:PlayListItemModel}">
+                <DataTemplate DataType="{x:Type playerManager:PlayListItem}">
                     <Grid ColumnDefinitions="60, *, *, 100">
                         <TextBlock Grid.Column="0" Text="序号"></TextBlock>
                         <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>

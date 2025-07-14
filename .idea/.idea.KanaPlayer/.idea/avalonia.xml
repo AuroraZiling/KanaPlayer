@@ -52,6 +52,7 @@
         <entry key="src/KanaPlayer/Views/Pages/HomeView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/PlayListView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/Pages/SettingsView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
+        <entry key="src/KanaPlayer/Views/Pages/SubPages/FavoritesBilibiliImportView.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
         <entry key="src/KanaPlayer/Views/SplashWindow.axaml" value="src/KanaPlayer.Windows/KanaPlayer.Windows.csproj" />
       </map>
     </option>

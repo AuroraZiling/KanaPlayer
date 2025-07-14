@@ -22,7 +22,7 @@ public class KanaNavigationView : TemplatedControl
             var topNavigationSideBarItems = new List<NavigationSideBarItem>();
             var accountFeaturesNavigationSideBarItems = new List<NavigationSideBarItem>();
             var toolsNavigationSideBarItems = new List<NavigationSideBarItem>();
-            foreach (var page in pageProvider.GetServices<NavigablePageBase>())
+            foreach (var page in pageProvider.GetServices<MainNavigablePageBase>())
             {
                 if (!page.OnSideBar) continue;
                 switch (page.Category)

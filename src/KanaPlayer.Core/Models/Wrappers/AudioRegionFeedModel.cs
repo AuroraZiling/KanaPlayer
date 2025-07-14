@@ -17,7 +17,7 @@ public record AudioRegionFeedDataInfoModel
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("cover")] string Cover,
     [property: JsonPropertyName("duration")] ulong DurationSeconds,
-    [property: JsonPropertyName("pubdate")] ulong PublishTimestamp,
+    [property: JsonPropertyName("pubdate")] long PublishTimestamp,
     [property: JsonPropertyName("stat")] AudioRegionFeedDataStatisticsModel Statistics,
     [property: JsonPropertyName("author")] AudioRegionFeedDataAuthorModel Author
 );

@@ -45,7 +45,7 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         bilibiliClient.TryGetCookies(out var cookies);
         var audioInfo = await bilibiliClient.GetAudioInfoAsync(new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid), cookies);
         var audioInfoData = audioInfo.EnsureData();
-        await playerManager.LoadAsync(new PlayListItemModel(
+        await playerManager.LoadAsync(new PlayListItem(
             audioInfoData.Title,
             audioInfoData.CoverUrl,
             audioInfoData.Owner.Name,

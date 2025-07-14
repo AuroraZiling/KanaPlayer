@@ -45,7 +45,7 @@ public partial class PlayListViewModel : ViewModelBase
             var audioUniqueId = new AudioUniqueId(bvid);
             var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, _bilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>());
             var audioInfoData = audioInfo.EnsureData();
-            PlayerManager.Append(new PlayListItemModel(
+            PlayerManager.Append(new PlayListItem(
                 audioInfoData.Title,
                 audioInfoData.CoverUrl,
                 audioInfoData.Owner.Name,

@@ -4,7 +4,7 @@ using Lucide.Avalonia;
 
 namespace KanaPlayer.Views.Pages;
 
-public partial class PlayListView : NavigablePageBase
+public partial class PlayListView : MainNavigablePageBase
 {
     public PlayListView() : base("播放列表", LucideIconKind.ListMusic, NavigationPageCategory.Top, 1)
     {

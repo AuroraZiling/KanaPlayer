@@ -9,7 +9,7 @@ using Lucide.Avalonia;
 
 namespace KanaPlayer.Views.Pages;
 
-public partial class HomeView : NavigablePageBase
+public partial class HomeView : MainNavigablePageBase
 {
     private ImplicitAnimationCollection? _implicitAnimations;
     public HomeView() : base("主页", LucideIconKind.House, NavigationPageCategory.Top, 0)
