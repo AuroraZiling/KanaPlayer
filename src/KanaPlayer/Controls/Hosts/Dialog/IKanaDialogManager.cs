@@ -1,6 +1,8 @@
-﻿namespace KanaPlayer.Controls.Hosts;
+﻿using System.ComponentModel;
 
-public interface IKanaDialogManager
+namespace KanaPlayer.Controls.Hosts;
+
+public interface IKanaDialogManager: INotifyPropertyChanged
 {
     event KanaDialogManagerEventHandler? OnDialogShown;
     event KanaDialogManagerEventHandler? OnDialogDismissed;

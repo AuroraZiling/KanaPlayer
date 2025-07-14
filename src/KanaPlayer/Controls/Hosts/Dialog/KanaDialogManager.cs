@@ -1,6 +1,11 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace KanaPlayer.Controls.Hosts;
 
-public class KanaDialogManager : IKanaDialogManager
+public class KanaDialogManager : ObservableObject, IKanaDialogManager
 {
     public event KanaDialogManagerEventHandler? OnDialogShown;
     public event KanaDialogManagerEventHandler? OnDialogDismissed;

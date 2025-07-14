@@ -18,15 +18,13 @@ public partial class MainWindow : Window
         DataContext = App.GetService<MainWindowViewModel>();
         _configurationService = App.GetService<IConfigurationService<SettingsModel>>();
 
-        var mainView = App.GetService<MainView>();
-        mainView.SetValue(Grid.RowProperty, 1);
-        MainWindowGrid.Children.Add(mainView);
+        MainBorder.Child = App.GetService<MainView>();
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (e.GetCurrentPoint(this).Position.Y <= 50)
+        if (e.GetCurrentPoint(this).Position.Y <= 60)
             BeginMoveDrag(e);
     }
 

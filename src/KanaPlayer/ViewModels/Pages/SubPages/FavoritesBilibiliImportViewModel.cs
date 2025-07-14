@@ -5,15 +5,18 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
+using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models.Favorites;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
+using KanaPlayer.ViewModels.Dialogs;
+using KanaPlayer.Views.Dialogs;
 
 namespace KanaPlayer.ViewModels.Pages.SubPages;
 
 public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliClient, IConfigurationService<SettingsModel> configurationService,
-                                                      INavigationService navigationService)
+                                                      INavigationService navigationService, IKanaDialogManager kanaDialogManager)
     : ViewModelBase, INavigationAware
 {
     private static List<FavoriteFolderImportItem> CachedFavoriteFolderImportItems { get; set; } = [];
@@ -30,7 +33,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
         {
             navigationService.IsPageProgressBarVisible = true;
             navigationService.IsPageProgressBarIndeterminate = true;
-            
+
             CachedFavoriteFolderImportItems = [];
             if (bilibiliClient.TryGetCookies(out var cookies) && configurationService.Settings.CommonSettings.Account is not null)
             {
@@ -114,11 +117,21 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                     }
                 }
             }
-            
+
             navigationService.IsPageProgressBarVisible = false;
         }
         else
             FavoriteFolderImportItems = new ObservableCollection<FavoriteFolderImportItem>(CachedFavoriteFolderImportItems);
+    }
+
+    [RelayCommand]
+    private void Import(object? selectedImportItem)
+    {
+        var importItem = selectedImportItem.NotNull<FavoriteFolderImportItem>();
+        kanaDialogManager.CreateDialog()
+                         .WithView(new FavoritesBilibiliImportDialog())
+                         .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog))
+                         .TryShow();
     }
 
     public void OnNavigatedTo()

@@ -19,8 +19,7 @@
                             </Border>
                             <Grid RowDefinitions="Auto,Auto,*,Auto"
                                   ColumnDefinitions="*"
-                                  Margin="30,30,30,5"
-                                  IsVisible="{Binding !IsViewModelOnly, RelativeSource={RelativeSource TemplatedParent}}">
+                                  Margin="30,30,30,5">
                                 <Border Grid.Row="0" Margin="0,10,0,0"
                                         IsVisible="{TemplateBinding IconColor, Converter={x:Static ObjectConverters.IsNotNull}}">
                                 </Border>
@@ -52,8 +51,6 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Grid>
-                            <ContentControl Content="{TemplateBinding ViewModel}" Margin="15"
-                                            IsVisible="{TemplateBinding IsViewModelOnly}" />
                         </Panel>
                     </Border>
                     <Border CornerRadius="50" HorizontalAlignment="Center"

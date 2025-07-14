@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 
 namespace KanaPlayer.Controls;
@@ -30,8 +32,7 @@ public class KanaWindowTitleBar : TemplatedControl
         get => GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
     }
-
-
+    
     private void EnableWindowsSnapLayout(Button maximize)
     {
         if (TopLevel.GetTopLevel(this) is not Window window) return;

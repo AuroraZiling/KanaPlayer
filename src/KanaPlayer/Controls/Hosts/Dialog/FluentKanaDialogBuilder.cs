@@ -35,10 +35,16 @@ public static class FluentKanaDialogBuilder
         builder.SetShowCardBackground(show);
         return builder;
     }
-
-    public static KanaDialogBuilder WithViewModel(this KanaDialogBuilder builder, Func<IKanaDialog, object> viewModel, bool isViewModelOnly = true)
+    
+    public static KanaDialogBuilder WithView(this KanaDialogBuilder builder, object view)
     {
-        builder.SetViewModel(viewModel, isViewModelOnly);
+        builder.SetView(view);
+        return builder;
+    }
+
+    public static KanaDialogBuilder WithViewModel(this KanaDialogBuilder builder, Func<IKanaDialog, object> viewModel)
+    {
+        builder.SetViewModel(viewModel);
         return builder;
     }
 

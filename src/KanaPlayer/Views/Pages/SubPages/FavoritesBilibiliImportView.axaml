@@ -1,11 +1,10 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:subPages="clr-namespace:KanaPlayer.ViewModels.Pages.SubPages"
-                   xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
-                   xmlns:converters="clr-namespace:KanaPlayer.Converters"
-                   xmlns:controls="clr-namespace:KanaPlayer.Controls"
-                   x:DataType="subPages:FavoritesBilibiliImportViewModel"
-                   x:Class="KanaPlayer.Views.Pages.SubPages.FavoritesBilibiliImportView">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:subPages="clr-namespace:KanaPlayer.ViewModels.Pages.SubPages"
+             xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
+             xmlns:converters="clr-namespace:KanaPlayer.Converters"
+             x:DataType="subPages:FavoritesBilibiliImportViewModel"
+             x:Class="KanaPlayer.Views.Pages.SubPages.FavoritesBilibiliImportView">
 
     <UserControl.Resources>
         <converters:TimestampHumanizerConverter x:Key="TimestampHumanizerConverter" />
@@ -13,12 +12,19 @@
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto, *">
-        <TextBlock Grid.Row="0" Text="从 Bilibili 导入" Classes="h1" VerticalAlignment="Center"></TextBlock>
-        <Button Grid.Row="0" HorizontalAlignment="Right" Content="刷新"
-                Command="{Binding LoadBilibiliFavoriteFoldersCommand}" CommandParameter="{x:True}">
+        <StackPanel Orientation="Horizontal" Spacing="7" Grid.Row="0" HorizontalAlignment="Left">
+            <TextBlock Text="从 Bilibili 导入" Classes="h1" VerticalAlignment="Center"></TextBlock>
+            <Button HorizontalAlignment="Right" Content="刷新"
+                    Command="{Binding LoadBilibiliFavoriteFoldersCommand}" CommandParameter="{x:True}">
+            </Button>
+        </StackPanel>
+        <Button Grid.Row="0" HorizontalAlignment="Right" Classes="accent" Content="继续"
+                IsEnabled="{Binding #ImportItemList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Command="{Binding ImportCommand}" CommandParameter="{Binding #ImportItemList.SelectedItem}">
         </Button>
 
-        <ListBox Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedFavoriteFolderImportItemIndex}"
+        <ListBox x:Name="ImportItemList" Grid.Row="1" Cursor="Hand"
+                 SelectedIndex="{Binding SelectedFavoriteFolderImportItemIndex}"
                  Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolderImportItems}"
                  Background="{DynamicResource KanaAccentColor20}">
             <ListBox.Styles>

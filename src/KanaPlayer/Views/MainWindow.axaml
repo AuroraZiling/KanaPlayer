@@ -19,19 +19,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:hosts="clr-namespace:KanaPlayer.Controls.Hosts">
 
-    <VisualLayerManager>
+    <VisualLayerManager
+        Margin="{Binding #KanaWindow.OffScreenMargin}">
         <VisualLayerManager.ChromeOverlayLayer>
             <hosts:KanaToastHost Manager="{Binding ToastManager}" />
-            <hosts:KanaDialogHost Manager="{Binding DialogManager}" />
-        </VisualLayerManager.ChromeOverlayLayer>
-
-        <Grid
-            Margin="{Binding #KanaWindow.OffScreenMargin}"
-            Name="MainWindowGrid"
-            RowDefinitions="60, *">
+            <hosts:KanaDialogHost x:Name="KanaDialogHost" Manager="{Binding DialogManager}" />
             <controls:KanaWindowTitleBar
                 CloseButtonClick="KanaWindowTitleBar_OnCloseButtonClick"
-                Grid.Row="0"
+                Height="60" VerticalAlignment="Top"
                 Icon="avares://KanaPlayer/Assets/kana-logo.ico"
                 MaximizeButtonClick="KanaWindowTitleBar_OnMaximizeButtonClick"
                 MinimizeButtonClick="KanaWindowTitleBar_OnMinimizeButtonClick"
@@ -41,6 +36,7 @@
                     <StackPanel
                         Margin="0,0,20,0"
                         Orientation="Horizontal"
+                        IsEnabled="{Binding !#KanaDialogHost.IsDialogOpen}"
                         Spacing="7">
                         <StackPanel.Styles>
                             <Style Selector="ToggleButton.KanaWindowTitleBarRightButton">
@@ -95,6 +91,10 @@
                     </StackPanel>
                 </controls:KanaWindowTitleBar.RightControl>
             </controls:KanaWindowTitleBar>
-        </Grid>
+        </VisualLayerManager.ChromeOverlayLayer>
+
+        <Border
+            x:Name="MainBorder" Margin="0, 60, 0, 0">
+        </Border>
     </VisualLayerManager>
 </Window>

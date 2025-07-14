@@ -67,18 +67,14 @@ public class KanaDialogBuilder
     public void SetContent(object content)
         => Dialog.Content = content;
 
-    public void SetViewModel(Func<IKanaDialog, object> viewModel, bool isViewModelOnly)
+    public void SetView(object view)
     {
-        if (isViewModelOnly)
-        {
-            Dialog.ViewModel = viewModel(Dialog);
-            Dialog.IsViewModelOnly = true;
-        }
-        else
-        {
-            Dialog.Content = viewModel(Dialog);
-            Dialog.IsViewModelOnly = false;
-        }
+        Dialog.Content = view;
+    }
+
+    public void SetViewModel(Func<IKanaDialog, object> viewModel)
+    {
+        Dialog.ViewModel = viewModel(Dialog);
     }
 
     public void SetType(NotificationType notificationType)

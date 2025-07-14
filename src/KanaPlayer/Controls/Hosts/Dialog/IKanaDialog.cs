@@ -11,7 +11,6 @@ public interface IKanaDialog
     string? Title { get; set; }
     object? Content { get; set; }
     object? Icon { get; set; }
-    bool IsViewModelOnly { get; set; }
     IBrush? IconColor { get; set; }
     ObservableCollection<object> ActionButtons { get; }
     Action<IKanaDialog>? OnDismissed { get; set; }

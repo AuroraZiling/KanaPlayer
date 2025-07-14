@@ -32,14 +32,6 @@ namespace KanaPlayer.Controls.Hosts
             set => SetValue(ContentProperty, value);
         }
 
-        public static readonly StyledProperty<bool> IsViewModelOnlyProperty = AvaloniaProperty.Register<KanaDialog, bool>(nameof(IsViewModelOnly));
-
-        public bool IsViewModelOnly
-        {
-            get => GetValue(IsViewModelOnlyProperty);
-            set => SetValue(IsViewModelOnlyProperty, value);
-        }
-
         public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<KanaDialog, object?>(nameof(Icon));
 
         public object? Icon
@@ -91,7 +83,6 @@ namespace KanaPlayer.Controls.Hosts
             ViewModel = null;
             Title = null;
             Content = null;
-            IsViewModelOnly = false;
         }
     }
 }

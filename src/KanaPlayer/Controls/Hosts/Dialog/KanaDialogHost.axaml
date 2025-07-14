@@ -8,12 +8,12 @@
             <ControlTemplate>
                 <Panel>
                     <Border
-                        Background="{DynamicResource KanaDialogBackground}"
                         HorizontalAlignment="Stretch"
                         IsVisible="False"
                         Name="PART_DialogBackground"
-                        Opacity="0"
-                        VerticalAlignment="Stretch" />
+                        Background="Black"
+                        VerticalAlignment="Stretch">
+                    </Border>
                     <ContentControl
                         ClipToBounds="False"
                         Content="{TemplateBinding Dialog}"
