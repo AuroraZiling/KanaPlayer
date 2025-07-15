@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 
@@ -36,7 +37,7 @@ public interface IBilibiliClient : INotifyPropertyChanged
     Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId,
                                      Dictionary<string, string> cookies);
 
-    Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList);
+    Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList, IProgress<int>? fetchedCountProgress = null);
 
     #endregion
 
@@ -45,6 +46,7 @@ public interface IBilibiliClient : INotifyPropertyChanged
     Task<FavoriteCreatedFoldersMetaModel> GetFavoriteCreatedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
     Task<List<FavoriteCollectedItemMetaDataModel>> GetFavoriteCollectedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
     Task<FavoriteFolderInfoModel> GetFavoriteFolderInfoAsync(ulong folderId, Dictionary<string, string> cookies);
+    Task<FavoriteFolderDetailModel> GetFavoriteFolderDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null);
 
     #endregion
 }

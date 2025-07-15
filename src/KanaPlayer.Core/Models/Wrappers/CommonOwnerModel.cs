@@ -2,7 +2,7 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class FavoriteFolderOwnerInfoModel
+public class CommonOwnerModel
 {
     [JsonPropertyName("mid")] public required ulong Mid { get; set; }
     [JsonPropertyName("name")] public required string Name { get; set; }

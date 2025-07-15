@@ -2,12 +2,11 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class CollectionModel : CommonApiModel<CollectionDataModel>;
+public class FavoriteFolderDetailModel: CommonApiModel<FavoriteFolderDetailDataModel>;
 
-public class CollectionDataModel
+public class FavoriteFolderDetailDataModel
 {
     [JsonPropertyName("info")] public required CollectionFolderCommonInfoModel Info { get; set; }
-    
-    // 存在分页设计，请在 API 中指定是否需要获取完整
     [JsonPropertyName("medias")] public required List<CollectionFolderCommonMediaModel> Medias { get; set; }
+    [JsonPropertyName("has_more")] public required bool HasMore { get; set; }
 }

@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
       <PackageReference Include="ObservableCollections" />
     </ItemGroup>

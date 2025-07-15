@@ -1,29 +1,36 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Extensions;
+using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Favorites;
+using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.ViewModels.Dialogs;
 using KanaPlayer.Views.Dialogs;
+using KanaPlayer.Views.Pages;
 
 namespace KanaPlayer.ViewModels.Pages.SubPages;
 
 public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliClient, IConfigurationService<SettingsModel> configurationService,
-                                                      INavigationService navigationService, IKanaDialogManager kanaDialogManager)
+                                                      IKanaToastManager kanaToastManager,
+                                                      INavigationService navigationService, IKanaDialogManager kanaDialogManager, IFavoritesManager favoritesManager)
     : ViewModelBase, INavigationAware
 {
-    private static List<FavoriteFolderImportItem> CachedFavoriteFolderImportItems { get; set; } = [];
+    private static List<FavoriteFolderItem> CachedFavoriteFolderImportItems { get; set; } = [];
 
-    [ObservableProperty] public partial ObservableCollection<FavoriteFolderImportItem>? FavoriteFolderImportItems { get; set; }
+    [ObservableProperty] public partial ObservableCollection<FavoriteFolderItem>? FavoriteFolderImportItems { get; set; }
     [ObservableProperty] public partial int SelectedFavoriteFolderImportItemIndex { get; set; } = -1;
-    [ObservableProperty] public partial bool IsLoading { get; set; }
 
     [RelayCommand]
     private async Task LoadBilibiliFavoriteFolders(bool needRefresh)
@@ -46,13 +53,13 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                 {
                     var favoriteFolderInfo = await bilibiliClient.GetFavoriteFolderInfoAsync(favoriteCreatedFolderMetaData.Id, cookies);
                     var infoData = favoriteFolderInfo.EnsureData();
-                    var model = new FavoriteFolderImportItem
+                    var model = new FavoriteFolderItem
                     {
                         Id = favoriteCreatedFolderMetaData.Id,
                         Title = infoData.Title,
                         CoverUrl = infoData.CoverUrl,
                         Description = infoData.Description,
-                        Owner = new FavoriteFolderOwnerInfoItem
+                        Owner = new CommonOwnerModel
                         {
                             Mid = infoData.Owner.Mid,
                             Name = infoData.Owner.Name
@@ -73,13 +80,13 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                     {
                         var favoriteFolderInfo = await bilibiliClient.GetFavoriteFolderInfoAsync(favoriteCollectedFolderMetaData.Id, cookies);
                         var infoData = favoriteFolderInfo.EnsureData();
-                        var model = new FavoriteFolderImportItem
+                        var model = new FavoriteFolderItem
                         {
                             Id = favoriteCollectedFolderMetaData.Id,
                             Title = infoData.Title,
                             CoverUrl = infoData.CoverUrl,
                             Description = infoData.Description,
-                            Owner = new FavoriteFolderOwnerInfoItem
+                            Owner = new CommonOwnerModel
                             {
                                 Mid = infoData.Owner.Mid,
                                 Name = infoData.Owner.Name
@@ -96,13 +103,13 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                     {
                         var collection = await bilibiliClient.GetCollectionAsync(favoriteCollectedFolderMetaData.Id, cookies, false);
                         var collectionInfo = collection.EnsureData().Info;
-                        var model = new FavoriteFolderImportItem
+                        var model = new FavoriteFolderItem
                         {
                             Id = favoriteCollectedFolderMetaData.Id,
                             Title = collectionInfo.Title,
                             CoverUrl = collectionInfo.CoverUrl,
                             Description = collectionInfo.Description,
-                            Owner = new FavoriteFolderOwnerInfoItem
+                            Owner = new CommonOwnerModel
                             {
                                 Mid = collectionInfo.Owner.Mid,
                                 Name = collectionInfo.Owner.Name
@@ -121,15 +128,23 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
             navigationService.IsPageProgressBarVisible = false;
         }
         else
-            FavoriteFolderImportItems = new ObservableCollection<FavoriteFolderImportItem>(CachedFavoriteFolderImportItems);
+            FavoriteFolderImportItems = new ObservableCollection<FavoriteFolderItem>(CachedFavoriteFolderImportItems);
     }
 
     [RelayCommand]
     private void Import(object? selectedImportItem)
     {
+        var importItem = selectedImportItem.NotNull<FavoriteFolderItem>();
+        if (favoritesManager.IsFolderExists(new FavoriteUniqueId(importItem.Id, importItem.FavoriteType)))
+        {
+            kanaToastManager.CreateToast().WithType(NotificationType.Error).WithTitle("导入失败").WithContent("该收藏夹已存在于本地收藏中").Queue();
+            return;
+        }
+
         kanaDialogManager.CreateDialog()
                          .WithView(new FavoritesBilibiliImportDialog())
-                         .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog, selectedImportItem.NotNull<FavoriteFolderImportItem>()))
+                         .WithViewModel(dialog =>
+                             new FavoritesBilibiliImportDialogViewModel(dialog, importItem, bilibiliClient, favoritesManager, kanaToastManager, navigationService))
                          .TryShow();
     }
 

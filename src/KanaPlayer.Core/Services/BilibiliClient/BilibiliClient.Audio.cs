@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
 using KanaPlayer.Core.Extensions;
-using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Wrappers;
 
 namespace KanaPlayer.Core.Services;
@@ -83,26 +83,30 @@ public partial class BilibiliClient<TSettings>
             throw new HttpRequestException($"Failed to get audio stream: {audioResponse.ReasonPhrase}");
         return await audioResponse.Content.ReadAsStreamAsync();
     }
-    
-    public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList)
+
+    public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList,
+                                                          IProgress<int>? fetchedCountProgress = null)
     {
         const int supposedMediaCountPerPage = 50;
         var endpoint = $"https://api.bilibili.com/x/space/fav/season/list?season_id={collectionId}&web_location=0.0&ps={supposedMediaCountPerPage}";
-        
+
         var templatePage = await GetPageAsync(1);
         var templatePageData = templatePage.EnsureData();
         var totalMediaCount = templatePageData.Info.MediaCount;
-        
-        var allCollected = new List<CollectionDataMediaModel>();
+        fetchedCountProgress?.Report(templatePageData.Medias.Count);
+
+        var allCollected = new List<CollectionFolderCommonMediaModel>();
         allCollected.AddRange(templatePageData.Medias);
-        
-        if(totalMediaCount > supposedMediaCountPerPage && fetchCompleteMediaList)
+
+        if (totalMediaCount > supposedMediaCountPerPage && fetchCompleteMediaList)
         {
             var totalPageCount = totalMediaCount / supposedMediaCountPerPage + 1;
             for (var page = 2; page <= totalPageCount; page++)
             {
-                var pageData = await GetPageAsync(page);
-                allCollected.AddRange(pageData.EnsureData().Medias);
+                var pageModel = await GetPageAsync(page);
+                var pageData = pageModel.EnsureData();
+                fetchedCountProgress?.Report(pageData.Medias.Count);
+                allCollected.AddRange(pageData.Medias);
             }
         }
 
@@ -115,7 +119,7 @@ public partial class BilibiliClient<TSettings>
             var response = await httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
                 throw new HttpRequestException($"Failed to get collection: {response.ReasonPhrase}");
-            
+
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<CollectionModel>(content)
                    ?? throw new HttpRequestException("Failed to get collection");

@@ -19,7 +19,7 @@ public record AudioRegionFeedDataInfoModel
     [property: JsonPropertyName("duration")] ulong DurationSeconds,
     [property: JsonPropertyName("pubdate")] long PublishTimestamp,
     [property: JsonPropertyName("stat")] AudioRegionFeedDataStatisticsModel Statistics,
-    [property: JsonPropertyName("author")] AudioRegionFeedDataAuthorModel Author
+    [property: JsonPropertyName("author")] CommonOwnerModel Owner
 );
 
 public record AudioRegionFeedDataStatisticsModel
@@ -27,10 +27,4 @@ public record AudioRegionFeedDataStatisticsModel
     [property: JsonPropertyName("view")] ulong ViewCount,
     [property: JsonPropertyName("like")] ulong LikeCount,
     [property: JsonPropertyName("danmaku")] ulong DanmakuCount
-);
-
-public record AudioRegionFeedDataAuthorModel
-(
-    [property: JsonPropertyName("mid")] ulong Mid,
-    [property: JsonPropertyName("name")] string Name
 );

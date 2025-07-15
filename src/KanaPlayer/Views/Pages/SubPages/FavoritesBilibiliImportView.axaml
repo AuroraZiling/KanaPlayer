@@ -33,7 +33,7 @@
                 </Style>
             </ListBox.Styles>
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type favorites:FavoriteFolderImportItem}">
+                <DataTemplate DataType="{x:Type favorites:FavoriteFolderItem}">
                     <Grid ColumnDefinitions="50, *, *, *, *, 100">
                         <LucideIcon Grid.Column="0"
                                     Kind="{Binding FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}">

@@ -15,6 +15,7 @@ using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.Services;
 using KanaPlayer.Services.Theme;
@@ -61,6 +62,11 @@ public partial class App : Application
             desktop.MainWindow = splashWindow;
             splashWindow.RunAsync(async () =>
             {
+                await Task.Run(() =>
+                {
+                    GetService<MainDbContext>().Database.EnsureCreated();
+                });
+                
                 // First Authenticate Attempt
                 await GetService<IBilibiliClient>().AuthenticateAsync();
 

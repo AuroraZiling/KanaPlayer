@@ -137,8 +137,8 @@
                                             Spacing="3">
                                     <LucideIcon Kind="UserRound"></LucideIcon>
                                     <TextBlock>
-                                        <controls:InlineHyperlink Text="{Binding Author.Name}"
-                                                                  CommandParameter="{Binding Author.Mid}"
+                                        <controls:InlineHyperlink Text="{Binding Owner.Name}"
+                                                                  CommandParameter="{Binding Owner.Mid}"
                                                                   Command="{Binding ((viewModels:HomeViewModel)DataContext).OpenAuthorSpaceUrlCommand, RelativeSource={RelativeSource AncestorType=pages:HomeView}, FallbackValue={x:Null}}">
                                         </controls:InlineHyperlink>
                                     </TextBlock>

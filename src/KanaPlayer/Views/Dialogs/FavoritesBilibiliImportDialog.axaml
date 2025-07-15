@@ -15,30 +15,28 @@
             <TextBlock Text="正在导入" FontSize="22" FontWeight="DemiBold"></TextBlock>
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Border Height="90" ClipToBounds="True" CornerRadius="15">
-                    <Image asyncImageLoader:ImageLoader.Source="{Binding ImportItem.CoverUrl}" Height="90" />
+                    <Image asyncImageLoader:ImageLoader.Source="{Binding Item.CoverUrl}" Height="90" />
                 </Border>
                 <Grid ColumnDefinitions="Auto, *" RowDefinitions="*, *, *">
-                    <LucideIcon Grid.Row="0" Grid.Column="0" Size="20" Kind="{Binding ImportItem.FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"></LucideIcon>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding ImportItem.Title}" VerticalAlignment="Center"></TextBlock>
+                    <LucideIcon Grid.Row="0" Grid.Column="0" Size="20" Kind="{Binding Item.FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"></LucideIcon>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding Item.Title}" VerticalAlignment="Center"></TextBlock>
                     
                     <LucideIcon Grid.Row="1" Grid.Column="0" Kind="UserRound" Size="22"></LucideIcon>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding ImportItem.Owner.Name}" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding Item.Owner.Name}" VerticalAlignment="Center"></TextBlock>
                     
                     <LucideIcon Grid.Row="2" Grid.Column="0" Kind="Timer" Size="22"></LucideIcon>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding ImportItem.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}}" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding Item.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}}" VerticalAlignment="Center"></TextBlock>
                 </Grid>
             </StackPanel>
             
-            <ProgressBar Maximum="{Binding ImportItem.MediaCount}" Minimum="0" Value="{Binding ImportedMediaCount}"></ProgressBar>
+            <ProgressBar Maximum="{Binding Item.MediaCount}" Minimum="0" Value="{Binding ImportedMediaCount}"></ProgressBar>
             <Grid ColumnDefinitions="*, *">
                 <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
                     <TextBlock Text="{Binding ImportedMediaCount, StringFormat='已导入 {0} '}" VerticalAlignment="Center"></TextBlock>
-                    <TextBlock Text="{Binding ImportItem.MediaCount, StringFormat='/ {0} 条'}" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Text="{Binding Item.MediaCount, StringFormat='/ {0} 条'}" VerticalAlignment="Center"></TextBlock>
                 </StackPanel>
                 <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding ImportingMediaTitle}"></TextBlock>
             </Grid>
         </StackPanel>
-        
-        <Button Grid.Row="1" Content="测试用关闭" Command="{Binding CloseCommand}"></Button>
     </Grid>
 </UserControl>

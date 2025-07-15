@@ -5,7 +5,9 @@ using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
+using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.Services.TrayMenu;
@@ -83,6 +85,10 @@ public static class ServiceExtensions
         services.AddSingleton<ITrayMenuService, TrayMenuService>();
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();
         services.AddSingleton<IPlayerManager, PlayerManager<SettingsModel>>();
+        services.AddDbContext<MainDbContext>(ServiceLifetime.Singleton);
+        
+        services.AddSingleton<IFavoritesManager>(x => x.GetRequiredService<MainDbContext>());
+        
         services.AddSingleton<IBilibiliClient, BilibiliClient<SettingsModel>>();
         services.AddKeyedSingleton<HttpClient, HttpClient>("bilibili", (_, _) =>
             new HttpClient(new HttpClientHandler

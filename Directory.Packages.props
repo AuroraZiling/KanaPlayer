@@ -14,17 +14,19 @@
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.7" />
     <PackageVersion Include="NAudio" Version="2.2.1" />
-    <PackageVersion Include="ObservableCollections" Version="3.3.3" />
+    <PackageVersion Include="ObservableCollections" Version="3.3.4" />
     <PackageVersion Include="QRCoder" Version="1.6.0" />
     <!-- Avalonia-related packages -->
     <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
-    <PackageVersion Include="Lucide.Avalonia" Version="0.1.33" />
+    <PackageVersion Include="Lucide.Avalonia" Version="0.1.37" />
     <!-- Other packages -->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageVersion Include="Xaml.Behaviors" Version="11.3.2" />
   </ItemGroup>
 </Project>

@@ -72,4 +72,47 @@ public partial class BilibiliClient<TSettings>
         return JsonSerializer.Deserialize<FavoriteFolderInfoModel>(content)
                ?? throw new HttpRequestException("Failed to get favorite created folder info");
     }
+    
+    public async Task<FavoriteFolderDetailModel> GetFavoriteFolderDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null)
+    {
+        var endpoint = $"https://api.bilibili.com/x/v3/fav/resource/list?media_id={folderId}&tid=0&ps=40&platform=web";
+
+        var templatePage = await GetPageAsync(1);
+        var templatePageData = templatePage.EnsureData();
+        var hasMore = templatePageData.HasMore;
+        fetchedCountProgress?.Report(templatePageData.Medias.Count);
+
+        var allCollected = new List<CollectionFolderCommonMediaModel>();
+        allCollected.AddRange(templatePageData.Medias);
+        
+        if (hasMore)
+        {
+            var page = 2;
+            while (true)
+            {
+                var pageModel = await GetPageAsync(page);
+                var pageData = pageModel.EnsureData();
+                fetchedCountProgress?.Report(pageData.Medias.Count);
+                allCollected.AddRange(pageData.Medias);
+                if (!pageData.HasMore)
+                    break;
+                page++;
+            }
+        }
+        
+        templatePage.EnsureData().Medias = allCollected;
+        return templatePage;
+
+        async Task<FavoriteFolderDetailModel> GetPageAsync(int pageNumber)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
+            var response = await httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to get favorite folder detail: {response.ReasonPhrase}");
+            
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<FavoriteFolderDetailModel>(content)
+                   ?? throw new HttpRequestException("Failed to get favorite folder detail");
+        }
+    }
 }

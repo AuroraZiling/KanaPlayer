@@ -12,7 +12,7 @@ public static class FluentKanaToastBuilder
     public static KanaToastBuilder CreateSimpleInfoToast(this IKanaToastManager manager)
     {
         return new KanaToastBuilder(manager)
-            .OfType(NotificationType.Information)
+            .WithType(NotificationType.Information)
             .Dismiss().After(TimeSpan.FromSeconds(3))
             .Dismiss().ByClicking();
     }
@@ -35,7 +35,7 @@ public static class FluentKanaToastBuilder
         return builder;
     }
 
-    public static KanaToastBuilder OfType(this KanaToastBuilder builder, NotificationType type)
+    public static KanaToastBuilder WithType(this KanaToastBuilder builder, NotificationType type)
     {
         builder.SetType(type);
         return builder;
