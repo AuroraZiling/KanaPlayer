@@ -21,6 +21,8 @@
     <PackageVersion Include="NAudio" Version="2.2.1" />
     <PackageVersion Include="ObservableCollections" Version="3.3.4" />
     <PackageVersion Include="QRCoder" Version="1.6.0" />
+    <PackageVersion Include="Sdcb.FFmpeg" Version="7.0.0" />
+    <PackageVersion Include="Sdcb.FFmpeg.runtime.windows-x64" Version="7.1.0" />
     <!-- Avalonia-related packages -->
     <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
     <PackageVersion Include="Lucide.Avalonia" Version="0.1.37" />

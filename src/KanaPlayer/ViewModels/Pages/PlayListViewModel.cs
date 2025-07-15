@@ -13,7 +13,19 @@ namespace KanaPlayer.ViewModels.Pages;
 public partial class PlayListViewModel : ViewModelBase
 {
     [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
-    readonly List<string> _bvId = ["BV1NANWzTEyS", "BV1F8EDz6EFg", "BV1e5jGzJEKC", "BV1g4moYBE4M", "BV1ioPAeKEuT", "BV1ShaUeZEWL", "BV1Xz421z7WQ"];
+    readonly List<string> _bvId = [
+        "BV1NANWzTEyS",
+        "BV1F8EDz6EFg",
+        "BV1e5jGzJEKC",
+        "BV1g4moYBE4M",
+        "BV1ioPAeKEuT",
+        "BV1ShaUeZEWL",
+        "BV1Xz421z7WQ",
+        "BV1vX9qY6EwV",
+        "BV1fCQoYhE8q",
+        "BV1pgPaecENk",
+        "BV17qobY8EVo",
+    ];
 
     [RelayCommand]
     private async Task PlaySelectedItemAsync()

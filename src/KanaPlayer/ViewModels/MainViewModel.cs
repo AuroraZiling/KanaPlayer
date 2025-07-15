@@ -42,6 +42,8 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    public double BufferedProgress => PlayerManager.BufferedProgress;
+
     public bool IsSeeking
     {
         get;
@@ -73,11 +75,12 @@ public partial class MainViewModel : ViewModelBase
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
         trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
 
-        _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, delegate
+        _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(0.1), DispatcherPriority.Normal, delegate
         {
             OnPropertyChanged(nameof(Progress));
             OnPropertyChanged(nameof(PlaybackTime));
             OnPropertyChanged(nameof(Duration));
+            OnPropertyChanged(nameof(BufferedProgress));
         });
     }
 

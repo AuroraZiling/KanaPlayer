@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
@@ -49,6 +51,15 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     public TimeSpan Duration
         => _audioPlayer.Duration;
 
+    public double BufferedProgress
+    {
+        get
+        {
+            if (_cachedAudioStream is null) return 0;
+            return (double)_cachedAudioStream.BufferedLength / _cachedAudioStream.Length;
+        }
+    }
+
     [ObservableProperty] public partial double Volume { get; set; }
     partial void OnVolumeChanged(double value)
         => _audioPlayer.Volume = value;
@@ -74,11 +85,14 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         }
     }
 
+    private CachedAudioStream? _cachedAudioStream;
+
     private readonly ObservableList<PlayListItem> _playList = [];
     private readonly Dictionary<string, string> _cookies;
 
     public async Task LoadAsync(PlayListItem playListItem)
     {
+        _cachedAudioStream = null;
         CurrentPlayListItem = null;
         
         CanLoadPrevious = false;
@@ -90,7 +104,9 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         ArgumentNullException.ThrowIfNull(playListItem);
         
         await Task.Run(() =>
-            _audioPlayer.Load(new CachedAudioStream(playListItem.AudioUniqueId, _cookies, _bilibiliClient)));
+        {
+            _audioPlayer.Load(_cachedAudioStream = new CachedAudioStream(playListItem.AudioUniqueId, _cookies, _bilibiliClient));
+        });
         
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
@@ -197,46 +213,109 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _playList.Clear();
 }
 
-file class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient)
-    : Stream
+public class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient) : Stream
 {
-    public override void Flush()
-    {
-    }
+    private bool isInitialized;
 
-    private Stream? _stream;
+    private readonly List<byte> data = [];
 
-    [MemberNotNull(nameof(_stream))]
     private void EnsureInitialized()
     {
-        // This method should initialize the stream with the cached audio data.
-        // For example, it could load the audio data from a file or a database.
-        // The implementation is omitted for brevity.
-        if (_stream is not null) return;
-        var cachedAudioFilePath = Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, $"{audioUniqueId.Bvid}_p{audioUniqueId.Page}");
-        if (File.Exists(cachedAudioFilePath))
-            _stream = File.OpenRead(cachedAudioFilePath);
-        else
+        if (isInitialized) return;
+        isInitialized = true;
+
+        try
         {
-            _stream = bilibiliClient.GetAudioStreamAsync(audioUniqueId, cookies)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
-            using var cacheFileStream = File.Create(cachedAudioFilePath);
-            _stream.CopyTo(cacheFileStream);
+            var cacheFileInfo = new FileInfo(Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, $"{audioUniqueId.Bvid}_p{audioUniqueId.Page}"));
+            if (cacheFileInfo.Exists)
+            {
+                using var stream = cacheFileInfo.OpenRead();
+                _length = stream.Length;
+                data.Capacity = (int)stream.Length;
+                stream.ReadExactly(CollectionsMarshal.AsSpan(data));
+            }
+            else
+            {
+                using var upStream = bilibiliClient.GetAudioStreamAsync(audioUniqueId, cookies).ConfigureAwait(false).GetAwaiter().GetResult();
+                _length = upStream.Length;
+
+                using var cacheFileStream = cacheFileInfo.Create();
+
+                var buffer = ArrayPool<byte>.Shared.Rent(81920);
+                try
+                {
+                    int bytesRead;
+                    while ((bytesRead = upStream.Read(buffer.AsMemory(0, 81920).Span)) > 0)
+                    {
+                        cacheFileStream.Write(buffer.AsMemory(0, bytesRead).Span);
+                        data.AddRange(buffer.AsSpan(0, bytesRead));
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
         }
     }
 
     public override int Read(byte[] buffer, int offset, int count)
     {
         EnsureInitialized();
-        return _stream.Read(buffer, offset, count);
+
+        if (Position >= Length)
+            return 0;
+
+        var bytesToRead = (int)Math.Min(count, Length - Position);
+        var bytesRead = 0;
+
+        while (bytesRead < bytesToRead)
+        {
+            var remaining = bytesToRead - bytesRead;
+            var readCount = Math.Min(remaining, data.Count - (int)Position);
+            if (readCount <= 0)
+            {
+                // wait for more data if the stream is not fully loaded
+                Thread.Sleep(100);
+            }
+
+            CollectionsMarshal.AsSpan(data).Slice((int)Position, readCount).CopyTo(buffer.AsSpan(offset + bytesRead));
+            bytesRead += readCount;
+            Position += readCount;
+        }
+
+        return bytesRead;
     }
 
     public override long Seek(long offset, SeekOrigin origin)
     {
         EnsureInitialized();
-        return _stream.Seek(offset, origin);
+
+        switch (origin)
+        {
+            case SeekOrigin.Begin:
+                Position = offset;
+                break;
+            case SeekOrigin.Current:
+                Position += offset;
+                break;
+            case SeekOrigin.End:
+                Position = Length + offset;
+                break;
+        }
+
+        if (Position < 0 || Position > Length)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Position is out of bounds.");
+
+        return Position;
+    }
+
+    public override void Flush()
+    {
     }
 
     public override void SetLength(long value)
@@ -254,21 +333,30 @@ file class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, str
         get
         {
             EnsureInitialized();
-            return _stream.Length;
+            return _length;
         }
     }
+
+    private long _length;
 
     public override long Position
     {
         get
         {
             EnsureInitialized();
-            return _stream.Position;
+            return field;
         }
         set
         {
             EnsureInitialized();
-            _stream.Position = value;
+            if (value < 0 || value > Length)
+                throw new ArgumentOutOfRangeException(nameof(value), "Position is out of bounds.");
+            field = value;
         }
     }
+
+    /// <summary>
+    /// If the stream is downloaded from the network, this property indicates the length of the buffered data.
+    /// </summary>
+    public int BufferedLength => data.Count;
 }

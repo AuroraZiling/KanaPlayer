@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <InvariantGlobalization>true</InvariantGlobalization>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     
     <PropertyGroup>
@@ -20,6 +21,8 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="NAudio" />
+        <PackageReference Include="Sdcb.FFmpeg" />
+        <PackageReference Include="Sdcb.FFmpeg.runtime.windows-x64" />
     </ItemGroup>
 
     <ItemGroup>

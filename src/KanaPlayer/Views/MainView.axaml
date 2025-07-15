@@ -8,15 +8,16 @@
     xmlns:vm="clr-namespace:KanaPlayer.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:KanaPlayer.Converters"
-    xmlns:interfaces="clr-namespace:KanaPlayer.Core.Interfaces;assembly=KanaPlayer.Core">
+    xmlns:interfaces="clr-namespace:KanaPlayer.Core.Interfaces;assembly=KanaPlayer.Core"
+    xmlns:views="clr-namespace:KanaPlayer.Views">
 
     <UserControl.Resources>
-        <converters:VolumeToIconKindConverter x:Key="VolumeToIconKindConverter" />
-        <converters:PlaybackModeToIconKindConverter x:Key="PlaybackModeToIconKindConverter" />
+        <converters:VolumeToIconKindConverter x:Key="VolumeToIconKindConverter"/>
+        <converters:PlaybackModeToIconKindConverter x:Key="PlaybackModeToIconKindConverter"/>
     </UserControl.Resources>
 
     <Grid RowDefinitions="*, 72" ClipToBounds="False">
-        <controls:KanaNavigationView Grid.Row="0" Name="MainNavigationView" />
+        <controls:KanaNavigationView Grid.Row="0" Name="MainNavigationView"/>
 
         <Panel ClipToBounds="False" Grid.Row="1">
             <Border Background="{DynamicResource KanaAccentColor20}">
@@ -24,7 +25,7 @@
                     <DropShadowEffect
                         OffsetX="0"
                         OffsetY="-7"
-                        Opacity="0.1" />
+                        Opacity="0.1"/>
                 </Border.Effect>
             </Border>
             <Grid ColumnDefinitions="*, 550, *" Margin="12">
@@ -35,18 +36,18 @@
                     <Border ClipToBounds="True" CornerRadius="6">
                         <Image x:Name="CoverImage"
                                RenderOptions.BitmapInterpolationMode="LowQuality"
-                               asyncImageLoader:ImageLoader.Source="{Binding PlayerManager.CurrentPlayListItem.CoverUrl, FallbackValue={x:Null}}" />
+                               asyncImageLoader:ImageLoader.Source="{Binding PlayerManager.CurrentPlayListItem.CoverUrl, FallbackValue={x:Null}}"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="16"
                                    TextTrimming="CharacterEllipsis"
                                    HorizontalAlignment="Left"
                                    Width="{Binding $parent[StackPanel;1].Bounds.Width}"
-                                   Text="{Binding PlayerManager.CurrentPlayListItem.Title, FallbackValue={x:Null}}" />
+                                   Text="{Binding PlayerManager.CurrentPlayListItem.Title, FallbackValue={x:Null}}"/>
                         <TextBlock Classes="Caption"
                                    HorizontalAlignment="Left"
                                    Width="{Binding $parent[StackPanel;1].Bounds.Width}"
-                                   Text="{Binding PlayerManager.CurrentPlayListItem.AuthorName, FallbackValue={x:Null}}" />
+                                   Text="{Binding PlayerManager.CurrentPlayListItem.AuthorName, FallbackValue={x:Null}}"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" Spacing="15">
@@ -54,17 +55,17 @@
                             Command="{Binding SwitchPlaybackModesCommand}" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center"
                                     Kind="{Binding PlayerManager.PlaybackMode, Converter={StaticResource PlaybackModeToIconKindConverter}}"
-                                    Size="18" />
+                                    Size="18"/>
                     </Button>
                     <Button
                         Command="{Binding LoadPreviousCommand}"
                         IsEnabled="{Binding PlayerManager.CanLoadPrevious}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
-                        <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipBack" Size="18" />
+                        <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipBack" Size="18"/>
                     </Button>
                     <controls:ProgressRing BorderThickness="3" IsIndeterminate="True" Background="Transparent"
                                            IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
-                                           Width="40" Height="40" />
+                                           Width="40" Height="40"/>
                     <Button
                         IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
                         Classes="accent" CornerRadius="50" Width="40" Height="40" Command="{Binding TogglePlayCommand}"
@@ -73,10 +74,10 @@
                             <LucideIcon
                                 IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Playing}}"
                                 Foreground="{DynamicResource KanaAccentColor20}" Kind="Play" Size="22"
-                                Margin="2, 0,0 ,0" />
+                                Margin="2, 0,0 ,0"/>
                             <LucideIcon
                                 IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static interfaces:PlayStatus.Playing}}"
-                                Foreground="{DynamicResource KanaAccentColor20}" Kind="Pause" Size="22" />
+                                Foreground="{DynamicResource KanaAccentColor20}" Kind="Pause" Size="22"/>
                         </Panel>
                     </Button>
                     <Button
@@ -84,7 +85,7 @@
                         IsEnabled="{Binding PlayerManager.CanLoadForward}"
                         Classes="ghost" CornerRadius="50" Width="36" Height="36" Padding="0">
                         <LucideIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="SkipForward"
-                                    Size="18" />
+                                    Size="18"/>
                     </Button>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right" Margin="0, 0, 30, 0" Grid.Column="2" Orientation="Horizontal"
@@ -99,8 +100,9 @@
                     </Slider>
                 </StackPanel>
             </Grid>
-            
-            <StackPanel TextElement.Foreground="{DynamicResource KanaAccentColor}" VerticalAlignment="Center" HorizontalAlignment="Center"
+
+            <StackPanel TextElement.Foreground="{DynamicResource KanaAccentColor}" VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
                         Margin="400, 0, 0, 0"
                         IsVisible="{Binding PlayerManager.Status, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static interfaces:PlayStatus.Loading}}"
                         Orientation="Horizontal" Spacing="3">
@@ -112,7 +114,94 @@
             <Slider Thumb.DragCompleted="AudioSliderThumb_OnDragCompleted"
                     Thumb.DragStarted="AudioSliderThumb_OnDragStarted" Minimum="0" Maximum="1"
                     Value="{Binding Progress, Mode=TwoWay}" HorizontalAlignment="Stretch"
-                    Margin="0, -24, 0, 0" VerticalAlignment="Top" />
+                    Margin="-8, -16, -8, 0" VerticalAlignment="Top">
+                <Slider.Template>
+                    <ControlTemplate>
+                        <DataValidationErrors>
+                            <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}">
+                                <Grid x:Name="SliderContainer"
+                                      Margin="{TemplateBinding Padding}">
+                                    <Grid.Styles>
+                                        <Style Selector="TickBar">
+                                            <Setter Property="ReservedSpace" Value="{Binding #PART_Track.Thumb.Bounds}"/>
+                                        </Style>
+                                    </Grid.Styles>
+                                    <Panel
+                                        MinHeight="{DynamicResource SliderHorizontalHeight}">
+
+                                        <Panel.Styles>
+                                            <Style Selector="RepeatButton">
+                                                <Setter Property="Height" Value="4"/>
+                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="{TemplateBinding Background}"/>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+
+                                            <Style Selector="Track:pointerover RepeatButton">
+                                                <Setter Property="Height" Value="8"/>
+                                            </Style>
+                                        </Panel.Styles>
+
+                                        <Border
+                                            x:Name="PART_BufferedProgressBorder"
+                                            Background="{TemplateBinding Foreground}"
+                                            Opacity="0.5"
+                                            RenderTransformOrigin="0,0.5"
+                                            Height="{Binding Bounds.Height, ElementName=PART_IncreaseButton}">
+                                            <Border.RenderTransform>
+                                                <ScaleTransform ScaleX="{Binding ((vm:MainViewModel)DataContext).BufferedProgress, FallbackValue=0, RelativeSource={RelativeSource AncestorType=views:MainView}}" ScaleY="1"/>
+                                            </Border.RenderTransform>
+                                        </Border>
+
+                                        <Track
+                                            Name="PART_Track"
+                                            Minimum="{TemplateBinding Minimum}"
+                                            Maximum="{TemplateBinding Maximum}"
+                                            Value="{TemplateBinding Value, Mode=TwoWay}"
+                                            IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                                            Orientation="Horizontal">
+                                            <Track.DecreaseButton>
+                                                <RepeatButton
+                                                    Name="PART_DecreaseButton"
+                                                    Background="{TemplateBinding Foreground}"
+                                                    CornerRadius="0"
+                                                    Opacity="0.7"
+                                                    Focusable="False"/>
+                                            </Track.DecreaseButton>
+                                            <Track.IncreaseButton>
+                                                <RepeatButton
+                                                    Name="PART_IncreaseButton"
+                                                    Background="{TemplateBinding Background}"
+                                                    Opacity="0.7"
+                                                    CornerRadius="0"
+                                                    Focusable="False"/>
+                                            </Track.IncreaseButton>
+                                            <Thumb
+                                                Name="PART_Thumb"
+                                                Width="{DynamicResource SliderHorizontalThumbWidth}"
+                                                Height="{DynamicResource SliderHorizontalThumbHeight}"
+                                                Margin="0"
+                                                Padding="0"
+                                                Background="{DynamicResource SliderThumbBackground}"
+                                                BorderThickness="0"
+                                                Theme="{StaticResource FluentSliderThumbTheme}"
+                                                DataContext="{TemplateBinding Value}"/>
+                                        </Track>
+                                    </Panel>
+                                </Grid>
+                            </Border>
+                        </DataValidationErrors>
+                    </ControlTemplate>
+                </Slider.Template>
+            </Slider>
         </Panel>
     </Grid>
 </UserControl>

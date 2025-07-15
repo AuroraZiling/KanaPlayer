@@ -34,8 +34,8 @@ public interface IBilibiliClient : INotifyPropertyChanged
     Task<AudioInfoModel> GetAudioInfoAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
 
     Task<string> GetAudioUrlAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
-    Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId,
-                                     Dictionary<string, string> cookies);
+
+    Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
 
     Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList, IProgress<int>? fetchedCountProgress = null);
 

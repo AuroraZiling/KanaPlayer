@@ -9,6 +9,7 @@ public interface IPlayerManager : INotifyPropertyChanged
 {
     NotifyCollectionChangedSynchronizedViewList<PlayListItem> PlayList { get; }
     double Volume { get; set; }
+    double BufferedProgress { get; }
     PlayStatus Status { get; }
     TimeSpan PlaybackTime { get; set; }
     TimeSpan Duration { get; }
