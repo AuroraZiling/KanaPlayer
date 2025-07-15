@@ -11,13 +11,7 @@ public static class FluentKanaDialogBuilder
 
     public static KanaDialogBuilder CreateDialog(this IKanaDialogManager dialogManager)
         => new(dialogManager);
-
-    public static KanaDialogBuilder OfType(this KanaDialogBuilder builder, NotificationType type)
-    {
-        builder.SetType(type);
-        return builder;
-    }
-
+    
     public static KanaDialogBuilder WithTitle(this KanaDialogBuilder builder, string title)
     {
         builder.SetTitle(title);

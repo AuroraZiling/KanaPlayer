@@ -127,10 +127,9 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
     [RelayCommand]
     private void Import(object? selectedImportItem)
     {
-        var importItem = selectedImportItem.NotNull<FavoriteFolderImportItem>();
         kanaDialogManager.CreateDialog()
                          .WithView(new FavoritesBilibiliImportDialog())
-                         .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog))
+                         .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog, selectedImportItem.NotNull<FavoriteFolderImportItem>()))
                          .TryShow();
     }
 

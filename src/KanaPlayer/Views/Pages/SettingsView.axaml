@@ -73,6 +73,7 @@
         <TabItem Header="常规">
             <ScrollViewer>
                 <StackPanel Spacing="15">
+                    <Button Content="测试用按钮" Command="{Binding TestCommand}"></Button>
                     <controls:KanaSettingsGroup Header="播放器">
                         <StackPanel Spacing="5">
                             <TextBlock Text="关闭按钮行为" Classes="h6"></TextBlock>

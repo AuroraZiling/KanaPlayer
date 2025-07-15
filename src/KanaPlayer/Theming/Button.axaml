@@ -116,7 +116,7 @@
             </Style>
 
             <Style Selector="^:disabled /template/ Border">
-                <Setter Property="Background" Value="{DynamicResource KanaAccentColor}" />
+                <Setter Property="Background" Value="{DynamicResource KanaAccentColor60}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
                 <Style Selector="^ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="Foreground" Value="{DynamicResource KanaAccentColor20}" />

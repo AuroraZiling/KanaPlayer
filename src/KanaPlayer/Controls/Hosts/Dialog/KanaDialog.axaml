@@ -4,40 +4,28 @@
                     xmlns:dialogs="clr-namespace:KanaPlayer.Converters">
     
     <ControlTheme TargetType="hosts:KanaDialog" x:Key="KanaDialogTheme">
-        <Setter Property="ClipToBounds" Value="False" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
-                    <Border Padding="0" 
-                            Margin="0,55,0,0"
+                    <Border Padding="0"
                             ClipToBounds="True" 
                             MinWidth="450"
-                            CornerRadius="25">
+                            CornerRadius="15">
                         <Panel>
                             <Border IsVisible="{TemplateBinding ShowCardBackground}" CornerRadius="25"
                                     Background="{DynamicResource KanaAccentColor30}">
                             </Border>
-                            <Grid RowDefinitions="Auto,Auto,*,Auto"
+                            <Grid RowDefinitions="Auto,*,Auto"
                                   ColumnDefinitions="*"
                                   Margin="30,30,30,5">
-                                <Border Grid.Row="0" Margin="0,10,0,0"
-                                        IsVisible="{TemplateBinding IconColor, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                </Border>
-                                <TextBlock Grid.Row="1" Margin="0,24,0,0"
+                                <TextBlock Grid.Row="0" Margin="0,24,0,0"
                                            IsVisible="{TemplateBinding Title,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                            HorizontalAlignment="Center" FontSize="22" FontWeight="DemiBold"
                                            Text="{TemplateBinding Title}" />
-                                <ContentControl Grid.Row="2" Margin="0,24,0,0"
-                                                MaxWidth="{TemplateBinding Content, Converter={x:Static dialogs:DialogContentMaxWidthValueConverter.Instance}}"
+                                <ContentControl Grid.Row="1" MaxWidth="{TemplateBinding Content, Converter={x:Static dialogs:DialogContentMaxWidthValueConverter.Instance}}"
                                                 Content="{TemplateBinding Content}">
-                                    <ContentControl.Styles>
-                                        <Style Selector="TextBlock">
-                                            <Setter Property="FontSize" Value="14" />
-                                            <Setter Property="TextWrapping" Value="Wrap" />
-                                        </Style>
-                                    </ContentControl.Styles>
                                 </ContentControl>
-                                <ItemsControl Grid.Row="3" Margin="0,26,0,0"
+                                <ItemsControl Grid.Row="2" Margin="0,26,0,0"
                                               ItemsSource="{TemplateBinding ActionButtons}">
                                     <ItemsControl.Styles>
                                         <Style Selector="Button">
@@ -51,24 +39,6 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Grid>
-                        </Panel>
-                    </Border>
-                    <Border CornerRadius="50" HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Margin="-15,-15,0,0" Width="100" Height="100">
-                        <Panel>
-                            <Border Width="90" HorizontalAlignment="Center"
-                                    Height="100"
-                                    IsVisible="{TemplateBinding IconColor, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    BoxShadow="0 0 4 1 #101010"
-                                    CornerRadius="50" />
-                            <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"
-                                     Fill="{TemplateBinding IconColor}" />
-                            <PathIcon HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Data="{TemplateBinding Icon}"
-                                      Foreground="White"
-                                      Width="28"
-                                      Height="28" />
                         </Panel>
                     </Border>
                 </Panel>

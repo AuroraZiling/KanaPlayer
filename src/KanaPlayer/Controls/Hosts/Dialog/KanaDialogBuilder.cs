@@ -75,26 +75,9 @@ public class KanaDialogBuilder
     public void SetViewModel(Func<IKanaDialog, object> viewModel)
     {
         Dialog.ViewModel = viewModel(Dialog);
-    }
-
-    public void SetType(NotificationType notificationType)
-    {
-        Dialog.Icon = notificationType switch
-        {
-            NotificationType.Information => new LucideIcon {Kind = LucideIconKind.Info},
-            NotificationType.Success     => new LucideIcon {Kind = LucideIconKind.Check},
-            NotificationType.Warning     => new LucideIcon {Kind = LucideIconKind.OctagonAlert},
-            NotificationType.Error       => new LucideIcon {Kind = LucideIconKind.CircleAlert},
-            _                            => throw new ArgumentOutOfRangeException(nameof(notificationType), notificationType, null)
-        };
-        Dialog.IconColor = notificationType switch
-        {
-            NotificationType.Information => new SolidColorBrush(ThemeService.KanaNotificationInformationColor),
-            NotificationType.Success     => new SolidColorBrush(ThemeService.KanaNotificationSuccessColor),
-            NotificationType.Warning     => new SolidColorBrush(ThemeService.KanaNotificationWarningColor),
-            NotificationType.Error       => new SolidColorBrush(ThemeService.KanaNotificationErrorColor),
-            _                            => throw new ArgumentOutOfRangeException(nameof(notificationType), notificationType, null)
-        };
+        
+        if(Dialog.Content is Control control)
+            control.DataContext = Dialog.ViewModel;
     }
 
     public void SetCanDismissWithBackgroundClick(bool canDismissWithBackgroundClick)

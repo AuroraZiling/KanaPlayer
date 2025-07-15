@@ -17,8 +17,6 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = App.GetService<MainWindowViewModel>();
         _configurationService = App.GetService<IConfigurationService<SettingsModel>>();
-
-        MainBorder.Child = App.GetService<MainView>();
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

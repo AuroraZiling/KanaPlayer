@@ -1,15 +1,45 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Core.Helpers;
+using KanaPlayer.Core.Models.Favorites;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
+using KanaPlayer.ViewModels.Dialogs;
+using KanaPlayer.Views.Dialogs;
 
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService): ViewModelBase
 {
+    [RelayCommand]
+    private void Test()
+    {
+        var kanaDialogManager = App.GetService<IKanaDialogManager>();
+        var fakeImportItem = new FavoriteFolderImportItem
+        {
+            Id = 3463008729,
+            Title = "叮咚鸡精选集",
+            CoverUrl = "http://i1.hdslb.com/bfs/archive/82c1f7360650a26215467bfe83227f24e588e218.jpg",
+            Description = "大狗大狗叫叫叫",
+            Owner = new FavoriteFolderOwnerInfoItem
+            {
+                Mid = 12879829,
+                Name = "DearVa",
+            },
+            FavoriteType = FavoriteType.Folder | FavoriteType.Collected,
+            CreatedTimestamp = 1744221085,
+            ModifiedTimestamp = 1744221085,
+            MediaCount = 7
+        };
+        kanaDialogManager.CreateDialog()
+                         .WithView(new FavoritesBilibiliImportDialog())
+                         .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog, fakeImportItem))
+                         .TryShow();
+    }
+    
     #region General
 
     // Close Button Behavior

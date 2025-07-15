@@ -10,8 +10,6 @@ public interface IKanaDialog
     object? ViewModel { get; set; }
     string? Title { get; set; }
     object? Content { get; set; }
-    object? Icon { get; set; }
-    IBrush? IconColor { get; set; }
     ObservableCollection<object> ActionButtons { get; }
     Action<IKanaDialog>? OnDismissed { get; set; }
     bool CanDismissWithBackgroundClick { get; set; }
