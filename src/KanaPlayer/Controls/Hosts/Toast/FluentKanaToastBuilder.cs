@@ -7,14 +7,17 @@ public static class FluentKanaToastBuilder
 {
     #region Content
     
-    public static KanaToastBuilder CreateToast(this IKanaToastManager manager) => new(manager);
+    public static KanaToastBuilder CreateToast(this IKanaToastManager manager)
+    {
+        return new KanaToastBuilder(manager)
+               .Dismiss().After(TimeSpan.FromSeconds(3))
+               .Dismiss().ByClicking();
+    }
 
     public static KanaToastBuilder CreateSimpleInfoToast(this IKanaToastManager manager)
     {
-        return new KanaToastBuilder(manager)
-            .WithType(NotificationType.Information)
-            .Dismiss().After(TimeSpan.FromSeconds(3))
-            .Dismiss().ByClicking();
+        return CreateToast(manager)
+               .WithType(NotificationType.Information);
     }
 
     public static KanaToastBuilder WithTitle(this KanaToastBuilder builder, string title)

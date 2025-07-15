@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Models.Database;
+using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Views.Pages.SubPages;
 
@@ -17,7 +18,15 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     }
     
     [ObservableProperty] public partial ObservableCollection<LocalFavoriteFolderItem> FavoriteFolders { get; set; } = [];
-    [ObservableProperty] public partial int SelectedFavoriteFolderIndex { get; set; } = -1;
+    [ObservableProperty] public partial LocalFavoriteFolderItem? SelectedFavoriteFolder { get; set; }
+    partial void OnSelectedFavoriteFolderChanged(LocalFavoriteFolderItem? folderItem)
+    {
+        if(folderItem is null)
+            return;
+        FavoriteFolderItems = new ObservableCollection<CachedAudioMetadata>(favoritesManager.GetCachedAudioMetadataList(folderItem));
+    }
+    [ObservableProperty] public partial ObservableCollection<CachedAudioMetadata> FavoriteFolderItems { get; set; } = [];
+    [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
 
     [RelayCommand]
     private void ImportFromBilibili()

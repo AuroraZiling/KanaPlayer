@@ -19,6 +19,14 @@ public partial class MainDbContext : IFavoritesManager
            .OrderByDescending(item => item.CreatedTimestamp)
            .ToList();
 
+    public List<CachedAudioMetadata> GetCachedAudioMetadataList(LocalFavoriteFolderItem item)
+        => LocalFavoriteFolderItemSet
+           .Include(folder => folder.CachedAudioMetadataSet)
+           .Where(folder => folder.UniqueId.Equals(item.UniqueId))
+           .SelectMany(folder => folder.CachedAudioMetadataSet)
+           .OrderByDescending(metadata => metadata.PublishTimestamp)
+           .ToList();
+
     public bool IsFolderExists(FavoriteUniqueId favoriteUniqueId)
         => LocalFavoriteFolderItemSet
             .Any(item => item.UniqueId.Equals(favoriteUniqueId));

@@ -6,33 +6,104 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
     xmlns:converters="clr-namespace:KanaPlayer.Converters"
-    xmlns:database="clr-namespace:KanaPlayer.Core.Models.Database;assembly=KanaPlayer.Core">
-    
+    xmlns:database="clr-namespace:KanaPlayer.Core.Models.Database;assembly=KanaPlayer.Core"
+    xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core">
+
     <UserControl.Resources>
         <converters:TimestampHumanizerConverter x:Key="TimestampHumanizerConverter" />
         <converters:FavoriteTypeToIconKindConverter x:Key="FavoriteTypeToIconKindConverter" />
+        <converters:DurationHumanizerConverter x:Key="DurationHumanizerConverter" />
     </UserControl.Resources>
-    
+
     <Grid RowDefinitions="Auto, *" ColumnDefinitions="250, *">
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="收藏夹" Classes="h1" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Classes="ghost" HorizontalAlignment="Right" VerticalAlignment="Center" Content="从 bilibili 导入" Command="{Binding ImportFromBilibiliCommand}"></Button>
-        
-        <ListBox Grid.Column="0" Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedFavoriteFolderIndex}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolders}" Background="{DynamicResource KanaAccentColor20}">
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="收藏夹" Classes="h1" VerticalAlignment="Center"
+                   HorizontalAlignment="Left">
+        </TextBlock>
+        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Classes="ghost" HorizontalAlignment="Right"
+                VerticalAlignment="Center" Content="从 bilibili 导入" Command="{Binding ImportFromBilibiliCommand}">
+        </Button>
+
+        <ListBox Grid.Column="0" Grid.Row="1" Cursor="Hand" SelectedItem="{Binding SelectedFavoriteFolder}"
+                 Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolders}"
+                 Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type database:LocalFavoriteFolderItem}">
                     <Grid ColumnDefinitions="Auto, *, Auto">
-                        <LucideIcon Grid.Column="0" Kind="{Binding FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}" Size="22"></LucideIcon>
-                        <TextBlock Grid.Column="1" Margin="6, 0, 0, 0" Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                        <TextBlock Grid.Column="2" Text="{Binding MediaCount}" VerticalAlignment="Center" HorizontalAlignment="Right"></TextBlock>
+                        <LucideIcon Grid.Column="0"
+                                    Kind="{Binding FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"
+                                    Size="22">
+                        </LucideIcon>
+                        <TextBlock Grid.Column="1" Margin="10, 0, 0, 0" Text="{Binding Title}"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left">
+                        </TextBlock>
+                        <TextBlock Grid.Column="2" Text="{Binding MediaCount}" VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" Margin="0, 0, 6, 0">
+                        </TextBlock>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            
-            <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="DoubleTapped">
-                    <InvokeCommandAction Command="{Binding VisitSelectedFavoriteFolderCommand}" />
-                </EventTriggerBehavior>
-            </Interaction.Behaviors>
         </ListBox>
+
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="100, *" Margin="10, 30, 0, 0">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
+                <Border Height="100" ClipToBounds="True" CornerRadius="15">
+                    <Image
+                        asyncImageLoader:ImageLoader.Source="{Binding SelectedFavoriteFolder.CoverUrl, FallbackValue={x:Null}}"
+                        Height="100" />
+                </Border>
+                <StackPanel Margin="6, 0, 0, 0" Spacing="5" VerticalAlignment="Center">
+                    <TextBlock FontSize="24"
+                               Text="{Binding SelectedFavoriteFolder.Title, FallbackValue={x:Null}}"
+                               VerticalAlignment="Center">
+                    </TextBlock>
+
+                    <StackPanel Orientation="Horizontal">
+                        <LucideIcon Kind="UserRound" Size="22"></LucideIcon>
+                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                   Text="{Binding SelectedFavoriteFolder.OwnerName, FallbackValue={x:Null}}"
+                                   VerticalAlignment="Center">
+                        </TextBlock>
+                        <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                        <LucideIcon Kind="ListMusic" Size="22"></LucideIcon>
+                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                   Text="{Binding SelectedFavoriteFolder.MediaCount, FallbackValue={x:Null}}"
+                                   VerticalAlignment="Center">
+                        </TextBlock>
+                        <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                        <LucideIcon Kind="Timer" Size="22"></LucideIcon>
+                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                   Text="{Binding SelectedFavoriteFolder.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock
+                        IsVisible="{Binding SelectedFavoriteFolder.Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue={x:Null}}"
+                        MaxWidth="350" TextTrimming="CharacterEllipsis"
+                        Text="{Binding SelectedFavoriteFolder.Description, FallbackValue={x:Null}}">
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+
+            <ListBox Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}"
+                     Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolderItems}"
+                     Background="{DynamicResource KanaAccentColor20}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type database:CachedAudioMetadata}">
+                        <Grid ColumnDefinitions="60, *, *, 100">
+                            <TextBlock Grid.Column="0" Text="序号"></TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
+                            <TextBlock Grid.Column="2" Text="{Binding OwnerName}"></TextBlock>
+                            <TextBlock Grid.Column="3" Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}"></TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <!-- -->
+                <!-- <Interaction.Behaviors> -->
+                <!--     <EventTriggerBehavior EventName="DoubleTapped"> -->
+                <!--         <InvokeCommandAction Command="{Binding PlaySelectedItemCommand}" /> -->
+                <!--     </EventTriggerBehavior> -->
+                <!-- </Interaction.Behaviors> -->
+            </ListBox>
+        </Grid>
     </Grid>
 </UserControl>
