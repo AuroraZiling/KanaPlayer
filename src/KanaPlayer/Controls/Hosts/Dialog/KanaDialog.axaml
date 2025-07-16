@@ -2,13 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:hosts="clr-namespace:KanaPlayer.Controls.Hosts"
                     xmlns:dialogs="clr-namespace:KanaPlayer.Converters">
-    
+
     <ControlTheme TargetType="hosts:KanaDialog" x:Key="KanaDialogTheme">
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
                     <Border Padding="0"
-                            ClipToBounds="True" 
+                            ClipToBounds="True"
                             MinWidth="450"
                             CornerRadius="15">
                         <Panel>
@@ -18,11 +18,12 @@
                             <Grid RowDefinitions="Auto,*,Auto"
                                   ColumnDefinitions="*"
                                   Margin="30,30,30,5">
-                                <TextBlock Grid.Row="0" Margin="0,24,0,0"
+                                <TextBlock Grid.Row="0"
                                            IsVisible="{TemplateBinding Title,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                           HorizontalAlignment="Center" FontSize="22" FontWeight="DemiBold"
+                                           HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"
                                            Text="{TemplateBinding Title}" />
-                                <ContentControl Grid.Row="1" MaxWidth="{TemplateBinding Content, Converter={x:Static dialogs:DialogContentMaxWidthValueConverter.Instance}}"
+                                <ContentControl Margin="0, 24, 0, 0" Grid.Row="1"
+                                                MaxWidth="{TemplateBinding Content, Converter={x:Static dialogs:DialogContentMaxWidthValueConverter.Instance}}"
                                                 Content="{TemplateBinding Content}">
                                 </ContentControl>
                                 <ItemsControl Grid.Row="2" Margin="0,26,0,0"
@@ -45,7 +46,7 @@
             </ControlTemplate>
         </Setter>
     </ControlTheme>
-    
+
     <ControlTheme TargetType="hosts:KanaDialog"
                   BasedOn="{StaticResource KanaDialogTheme}"
                   x:Key="{x:Type hosts:KanaDialog}" />

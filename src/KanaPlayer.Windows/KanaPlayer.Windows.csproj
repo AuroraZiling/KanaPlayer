@@ -16,10 +16,6 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="Avalonia.Diagnostics">
-            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="NAudio" />
         <PackageReference Include="Sdcb.FFmpeg" />
         <PackageReference Include="Sdcb.FFmpeg.runtime.windows-x64" />

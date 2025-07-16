@@ -31,6 +31,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        this.AttachDeveloperTools();
 
         ImageLoader.AsyncImageLoader = new DiskCachedWebImageLoader(AppHelper.ApplicationImageCachesFolderPath);
     }

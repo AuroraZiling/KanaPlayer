@@ -6,10 +6,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core">
     
-    <StackPanel>
-        <TextBlock Text="播放列表" Classes="h1" VerticalAlignment="Center"></TextBlock>
+    <Grid RowDefinitions="Auto, *">
+        <TextBlock Grid.Row="0" Text="播放列表" Classes="h1" VerticalAlignment="Center"></TextBlock>
         
-        <ListBox Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
+        <ListBox Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type playerManager:PlayListItem}">
                     <Grid ColumnDefinitions="60, *, *, 100">
@@ -27,5 +27,5 @@
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
         </ListBox>
-    </StackPanel>
+    </Grid>
 </UserControl>

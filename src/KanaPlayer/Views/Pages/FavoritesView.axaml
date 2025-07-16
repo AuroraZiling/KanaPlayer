@@ -4,11 +4,10 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
     xmlns:converters="clr-namespace:KanaPlayer.Converters"
     xmlns:database="clr-namespace:KanaPlayer.Core.Models.Database;assembly=KanaPlayer.Core"
     xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
-    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core">
+    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching">
 
     <UserControl.Resources>
         <converters:TimestampHumanizerConverter x:Key="TimestampHumanizerConverter" />
@@ -45,12 +44,13 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="100, *" Margin="10, 30, 0, 0">
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="150, *" Margin="10, 30, 0, 0"
+              IsVisible="{Binding SelectedFavoriteFolder, Converter={x:Static ObjectConverters.IsNotNull}}">
             <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
-                <Border Height="100" ClipToBounds="True" CornerRadius="15">
+                <Border ClipToBounds="True" CornerRadius="15">
                     <Image
                         asyncImageLoader:ImageLoader.Source="{Binding SelectedFavoriteFolder.CoverUrl, FallbackValue={x:Null}}"
-                        Height="100" />
+                        Height="150" />
                 </Border>
                 <StackPanel Margin="6, 0, 0, 0" Spacing="5" VerticalAlignment="Center">
                     <TextBlock FontSize="24"
@@ -81,6 +81,12 @@
                         MaxWidth="350" TextTrimming="CharacterEllipsis"
                         Text="{Binding SelectedFavoriteFolder.Description, FallbackValue={x:Null}}">
                     </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Button Content="播放全部" attaching:Icon.LucideIconKind="Play" Command="{Binding PlayAllCommand}"></Button>
+                        <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
+                                Command="{Binding AddToPlayListCommand}">
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
 
@@ -93,7 +99,9 @@
                             <TextBlock Grid.Column="0" Text="序号"></TextBlock>
                             <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
                             <TextBlock Grid.Column="2" Text="{Binding OwnerName}"></TextBlock>
-                            <TextBlock Grid.Column="3" Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}"></TextBlock>
+                            <TextBlock Grid.Column="3"
+                                       Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}">
+                            </TextBlock>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

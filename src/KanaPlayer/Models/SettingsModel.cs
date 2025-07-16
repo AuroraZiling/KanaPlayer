@@ -11,6 +11,17 @@ public class SettingsModel : SettingsBase
 
 public class UiSettings
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]  
+    [JsonPropertyName("Behaviors")] public UiBehaviorSettings Behaviors { get; set; } = new();
+}
+
+public class UiBehaviorSettings
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public CloseBehaviors CloseBehavior { get; set; } = CloseBehaviors.Close;
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public FavoritesDoubleTappedPlayListItemBehaviors FavoritesDoubleTappedPlayListItemBehavior { get; set; } =
+        FavoritesDoubleTappedPlayListItemBehaviors.ReplaceCurrentPlayList;
+
+    public bool IsFavoritesPlayAllReplaceWarningEnabled { get; set; } = true;
 }

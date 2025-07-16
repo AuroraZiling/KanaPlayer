@@ -49,15 +49,36 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         //                  .TryShow();
     }
     
-    #region General
+    #region Behaviors
 
     // Close Button Behavior
     [ObservableProperty] public partial CloseBehaviors SelectedCloseBehavior { get; set; } = 
-        configurationService.Settings.UiSettings.CloseBehavior;
+        configurationService.Settings.UiSettings.Behaviors.CloseBehavior;
 
     partial void OnSelectedCloseBehaviorChanged(CloseBehaviors value)
     {
-        configurationService.Settings.UiSettings.CloseBehavior = value;
+        configurationService.Settings.UiSettings.Behaviors.CloseBehavior = value;
+        configurationService.Save();
+    }
+    
+    // Favorites - Play All Button Warning
+    [ObservableProperty] public partial bool IsFavoritesPlayAllReplaceWarningEnabled { get; set; } = 
+        configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled;
+    
+    partial void OnIsFavoritesPlayAllReplaceWarningEnabledChanged(bool value)
+    {
+        configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled = value;
+        configurationService.Save();
+    }
+    
+    // Favorites - DoubleTapped PlayListItem Behavior
+    [ObservableProperty] public partial FavoritesDoubleTappedPlayListItemBehaviors DoubleTappedPlayListItemBehaviors { get; set; } = 
+        configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;
+
+    [RelayCommand]
+    private void ChangeDoubleTappedPlayListItemBehaviors(FavoritesDoubleTappedPlayListItemBehaviors value)
+    {
+        configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior = value;
         configurationService.Save();
     }
 

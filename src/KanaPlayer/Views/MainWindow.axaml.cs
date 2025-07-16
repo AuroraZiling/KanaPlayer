@@ -36,7 +36,7 @@ public partial class MainWindow : Window
 
     private void KanaWindowTitleBar_OnCloseButtonClick(object? sender, EventArgs e)
     {
-        switch (_configurationService.Settings.UiSettings.CloseBehavior)
+        switch (_configurationService.Settings.UiSettings.Behaviors.CloseBehavior)
         {
             case CloseBehaviors.Minimize:
                 WindowState = WindowState.Minimized;
