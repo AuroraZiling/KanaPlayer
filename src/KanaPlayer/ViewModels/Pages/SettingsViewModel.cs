@@ -3,12 +3,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
 
 namespace KanaPlayer.ViewModels.Pages;
 
-public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService): ViewModelBase
+public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, MainDbContext mainDbContext): ViewModelBase
 {
     [RelayCommand]
     private void Test()
@@ -101,13 +102,21 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     
     // Manual Cache Cleanup
     [RelayCommand]
-    private static void CleanupCache(string cacheType)
-        => App.CleanupCache(cacheType switch
+    private void CleanupCache(string cacheType)
+    {
+        if (cacheType == "audio")
+        {
+            mainDbContext.CachedAudioMetadataSet.RemoveRange(mainDbContext.CachedAudioMetadataSet);
+            mainDbContext.SaveChanges();
+        }
+        
+        App.CleanupCache(cacheType switch
         {
             "audio" => AppHelper.ApplicationAudioCachesFolderPath,
             "image" => AppHelper.ApplicationImageCachesFolderPath,
-            _ => throw new ArgumentException("Invalid cache type specified.")
+            _       => throw new ArgumentException("Invalid cache type specified.")
         }, 0);
+    }
 
     #endregion
 }

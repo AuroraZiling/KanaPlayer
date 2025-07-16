@@ -4,6 +4,7 @@ using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Core.Models.Favorites;
+using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services.Favorites;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,11 @@ namespace KanaPlayer.Database;
 
 public partial class MainDbContext : IFavoritesManager
 {
+    public CachedAudioMetadata? GetCachedAudioMetadataByUniqueId(AudioUniqueId uniqueId)
+        => CachedAudioMetadataSet
+           .Include(metadata => metadata.LocalFavoriteFolderItemSet)
+           .FirstOrDefault(metadata => metadata.UniqueId.Equals(uniqueId));
+
     public List<LocalFavoriteFolderItem> GetLocalFavoriteFolders()
         => LocalFavoriteFolderItemSet
            .Include(item => item.CachedAudioMetadataSet)

@@ -47,4 +47,7 @@ public class CommonBehaviorHistorySettings
     
     [JsonConverter(typeof(JsonStringEnumConverter))]  
     public PlaybackMode PlaybackMode { get; set; } = PlaybackMode.Sequential;
+    public AudioUniqueId? LastPlayAudioUniqueId { get; set; }
+    
+    public List<AudioUniqueId> LastPlayList { get; set; } = [];
 }

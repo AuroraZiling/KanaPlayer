@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto, *">
         <TextBlock Grid.Row="0" Text="播放列表" Classes="h1" VerticalAlignment="Center"></TextBlock>
         
-        <ListBox Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
+        <ListBox Grid.Row="1" Cursor="Hand" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type playerManager:PlayListItem}">
                     <Grid ColumnDefinitions="60, *, *, 100">

@@ -47,9 +47,19 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         bilibiliClient.TryGetCookies(out var cookies);
 
         var uniqueId = new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid);
-        var audioInfo = await bilibiliClient.GetAudioInfoAsync(uniqueId, cookies);
-        var audioInfoData = audioInfo.EnsureData();
-        favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
+        var cachedAudioMetadata = favoritesManager.GetCachedAudioMetadataByUniqueId(uniqueId);
+
+        AudioInfoDataModel audioInfoData;
+        if (cachedAudioMetadata is null)
+        {
+            var audioInfo = await bilibiliClient.GetAudioInfoAsync(uniqueId, cookies);
+            audioInfoData = audioInfo.EnsureData();
+            favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
+        }
+        else
+        {
+            audioInfoData = new AudioInfoDataModel(cachedAudioMetadata);
+        }
 
         Task.Run(async () =>
         {

@@ -7,6 +7,7 @@ namespace KanaPlayer.Core.Services.Favorites;
 
 public interface IFavoritesManager
 {
+    CachedAudioMetadata? GetCachedAudioMetadataByUniqueId(AudioUniqueId uniqueId);
     List<LocalFavoriteFolderItem> GetLocalFavoriteFolders();
     List<CachedAudioMetadata> GetCachedAudioMetadataList(LocalFavoriteFolderItem item);
     bool IsFolderExists(FavoriteUniqueId favoriteUniqueId);

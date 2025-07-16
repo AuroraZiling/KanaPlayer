@@ -1,13 +1,18 @@
 ﻿using System.Buffers;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models;
+using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services.Configuration;
+using KanaPlayer.Core.Services.Favorites;
 using ObservableCollections;
 
 namespace KanaPlayer.Core.Services.Player;
@@ -16,11 +21,21 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 {
     private readonly IAudioPlayer _audioPlayer;
     private readonly IBilibiliClient _bilibiliClient;
-    public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient)
+    private readonly IConfigurationService<TSettings> _configurationService;
+    private readonly IFavoritesManager _favoritesManager;
+    public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient, IFavoritesManager favoritesManager)
     {
+        _configurationService = configurationService;
         _audioPlayer = audioPlayer;
         _bilibiliClient = bilibiliClient;
+        _favoritesManager = favoritesManager;
 
+        _bilibiliClient.TryGetCookies(out _cookies);
+
+        PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
+        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+
+        InitializePlayListCommand.Execute(null);
         _audioPlayer.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IAudioPlayer.Status))
@@ -30,18 +45,61 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         {
             await LoadForward(false, true);
         };
+    }
+    
+    [RelayCommand]
+    private async Task InitializePlayListAsync()
+    {
+        foreach (var audioUniqueId in _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList)
+            _playList.Add(await GetPlayListItemByAudioUniqueId(audioUniqueId));
+        
+        if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is { } uniqueId)
+            await LoadAsync(await GetPlayListItemByAudioUniqueId(uniqueId));
 
-        PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
-        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
-
-        _bilibiliClient.TryGetCookies(out _cookies);
+        _playList.CollectionChanged += (in args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.NewItem.AudioUniqueId);
+            }
+            _configurationService.Save();
+        };
+        
+        async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
+        {
+            var cachedAudioMetadata = _favoritesManager.GetCachedAudioMetadataByUniqueId(audioUniqueId);
+            PlayListItem playListItem;
+            if (cachedAudioMetadata is not null)
+            {
+                playListItem = new PlayListItem(cachedAudioMetadata);
+            }
+            else
+            {
+                var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, _cookies);
+                var audioInfoData = audioInfo.EnsureData(); 
+                playListItem = new PlayListItem(audioInfoData);
+                _favoritesManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
+            }
+            return playListItem;
+        }
     }
     
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<PlayListItem> PlayList =>
         field ??= _playList.ToNotifyCollectionChangedSlim();
 
+    private readonly ObservableList<PlayListItem> _playList = [];
+
     [ObservableProperty] public partial PlayListItem? CurrentPlayListItem { get; private set; }
+    partial void OnCurrentPlayListItemChanged(PlayListItem? value)
+    {
+        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = value?.AudioUniqueId;
+        _configurationService.Save();
+    }
 
     public TimeSpan PlaybackTime
     {
@@ -88,8 +146,6 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
     private CachedAudioStream? _cachedAudioStream;
     private CancellationTokenSource? _loadCancellationTokenSource;
-
-    private readonly ObservableList<PlayListItem> _playList = [];
     private readonly Dictionary<string, string> _cookies;
 
     public Task LoadFirstAsync()
@@ -217,7 +273,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             return;
         _playList.Add(playListItem);
         
-        if(_playList.Count == 1)
+        if(CurrentPlayListItem is null)
             await LoadFirstAsync();
     }
     public void Insert(PlayListItem playListItem, int index)
