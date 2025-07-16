@@ -1,7 +1,5 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 
 namespace KanaPlayer.Controls.Hosts;
 
@@ -75,8 +73,8 @@ public static class FluentKanaDialogBuilder
     {
         builder.Completion = new TaskCompletionSource<bool>();
 
-        builder.AddActionButton(yesButtonContent, dialog => builder.Completion.SetResult(true), true, classes);
-        builder.AddActionButton(noButtonContent, dialog => builder.Completion.SetResult(false), true, classes);
+        builder.AddActionButton(yesButtonContent, _ => builder.Completion.SetResult(true), true, classes);
+        builder.AddActionButton(noButtonContent, _ => builder.Completion.SetResult(false), true, classes);
 
         return builder;
     }
@@ -84,7 +82,7 @@ public static class FluentKanaDialogBuilder
     public static KanaDialogBuilder WithOkResult(this KanaDialogBuilder builder, object? okButtonContent, params string[] classes)
     {
         builder.Completion = new TaskCompletionSource<bool>();
-        builder.AddActionButton(okButtonContent, dialog => builder.Completion.SetResult(true), true, classes);
+        builder.AddActionButton(okButtonContent, _ => builder.Completion.SetResult(true), true, classes);
         return builder;
     }
 

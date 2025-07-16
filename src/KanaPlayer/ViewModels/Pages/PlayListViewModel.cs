@@ -14,17 +14,17 @@ public partial class PlayListViewModel : ViewModelBase
 {
     [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
     readonly List<string> _bvId = [
-        "BV1NANWzTEyS",
-        "BV1F8EDz6EFg",
-        "BV1e5jGzJEKC",
-        "BV1g4moYBE4M",
-        "BV1ioPAeKEuT",
-        "BV1ShaUeZEWL",
-        "BV1Xz421z7WQ",
-        "BV1vX9qY6EwV",
-        "BV1fCQoYhE8q",
-        "BV1pgPaecENk",
-        "BV17qobY8EVo",
+        // "BV1NANWzTEyS",
+        // "BV1F8EDz6EFg",
+        // "BV1e5jGzJEKC",
+        // "BV1g4moYBE4M",
+        // "BV1ioPAeKEuT",
+        // "BV1ShaUeZEWL",
+        // "BV1Xz421z7WQ",
+        // "BV1vX9qY6EwV",
+        // "BV1fCQoYhE8q",
+        // "BV1pgPaecENk",
+        // "BV17qobY8EVo",
     ];
 
     [RelayCommand]
@@ -58,7 +58,7 @@ public partial class PlayListViewModel : ViewModelBase
             var audioUniqueId = new AudioUniqueId(bvid);
             var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, _bilibiliClient.TryGetCookies(out var cookies) ? cookies : new Dictionary<string, string>());
             var audioInfoData = audioInfo.EnsureData();
-            PlayerManager.Append(new PlayListItem(
+            PlayerManager.AppendAsync(new PlayListItem(
                 audioInfoData.Title,
                 audioInfoData.CoverUrl,
                 audioInfoData.Owner.Name,

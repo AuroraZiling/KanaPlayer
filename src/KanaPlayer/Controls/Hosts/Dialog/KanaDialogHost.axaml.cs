@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Rendering.Composition;
-using KanaPlayer.Helpers;
 using KanaPlayer.Helpers.Animations;
 
 namespace KanaPlayer.Controls.Hosts;

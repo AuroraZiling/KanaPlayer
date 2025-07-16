@@ -1,16 +1,8 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Interfaces;
 using NAudio.Wave;
-using Sdcb.FFmpeg.Codecs;
-using Sdcb.FFmpeg.Formats;
-using Sdcb.FFmpeg.Raw;
-using Sdcb.FFmpeg.Swscales;
-using Sdcb.FFmpeg.Toolboxs.Extensions;
-using Sdcb.FFmpeg.Utils;
 
 namespace KanaPlayer.Windows.Services;
 

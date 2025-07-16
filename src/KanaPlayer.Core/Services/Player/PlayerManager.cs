@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -88,7 +87,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     }
 
     private CachedAudioStream? _cachedAudioStream;
-    private CancellationTokenSource? loadCancellationTokenSource;
+    private CancellationTokenSource? _loadCancellationTokenSource;
 
     private readonly ObservableList<PlayListItem> _playList = [];
     private readonly Dictionary<string, string> _cookies;
@@ -102,7 +101,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     
     public async Task LoadAsync(PlayListItem playListItem)
     {
-        if (loadCancellationTokenSource is not null) await loadCancellationTokenSource.CancelAsync();
+        if (_loadCancellationTokenSource is not null) await _loadCancellationTokenSource.CancelAsync();
         
         _cachedAudioStream = null;
         CurrentPlayListItem = null;
@@ -116,8 +115,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItem);
 
-        loadCancellationTokenSource = new CancellationTokenSource();
-        await _audioPlayer.LoadAsync(async () => _cachedAudioStream = await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, _cookies, _bilibiliClient, loadCancellationTokenSource.Token));
+        _loadCancellationTokenSource = new CancellationTokenSource();
+        await _audioPlayer.LoadAsync(async () => _cachedAudioStream = await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, _cookies, _bilibiliClient, _loadCancellationTokenSource.Token));
         
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
@@ -212,8 +211,15 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _audioPlayer.Play();
     public void Pause()
         => _audioPlayer.Pause();
-    public void Append(PlayListItem playListItem)
-        => _playList.Add(playListItem);
+    public async Task AppendAsync(PlayListItem playListItem)
+    {
+        if(_playList.Contains(playListItem))
+            return;
+        _playList.Add(playListItem);
+        
+        if(_playList.Count == 1)
+            await LoadFirstAsync();
+    }
     public void Insert(PlayListItem playListItem, int index)
         => _playList.Insert(index, playListItem);
     public void Remove(PlayListItem playListItem)

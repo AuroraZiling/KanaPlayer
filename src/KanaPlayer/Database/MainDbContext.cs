@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.IO;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Database;

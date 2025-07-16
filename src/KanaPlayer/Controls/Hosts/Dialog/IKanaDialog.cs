@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Avalonia.Media;
 
 namespace KanaPlayer.Controls.Hosts;
 

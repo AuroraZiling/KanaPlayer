@@ -1,7 +1,5 @@
 ﻿using System;
 using Avalonia.Markup.Xaml;
-using KanaPlayer.Controls;
-using KanaPlayer.Core.Extensions;
 
 namespace KanaPlayer.MarkupExtensions;
 

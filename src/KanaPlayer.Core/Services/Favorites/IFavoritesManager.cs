@@ -1,7 +1,6 @@
 ﻿using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Core.Models.Favorites;
-using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 
 namespace KanaPlayer.Core.Services.Favorites;

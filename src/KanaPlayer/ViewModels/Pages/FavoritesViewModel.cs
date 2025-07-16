@@ -61,7 +61,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
         playerManager.Clear();
         foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
         {
-            playerManager.Append(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+            playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                 cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
         }
         await playerManager.LoadFirstAsync();
@@ -73,6 +73,12 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     {
         if (SelectedFavoriteFolder is null || SelectedPlayListItemIndex < 0)
             return;
+        
+        foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+        {
+            playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+                cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
+        }
     }
 
     public void OnNavigatedTo()

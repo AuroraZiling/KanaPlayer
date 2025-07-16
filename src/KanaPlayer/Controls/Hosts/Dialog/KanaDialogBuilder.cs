@@ -2,10 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
-using Avalonia.Media;
-using KanaPlayer.Services.Theme;
-using Lucide.Avalonia;
 
 namespace KanaPlayer.Controls.Hosts;
 

@@ -11,7 +11,6 @@ using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
-using KanaPlayer.Services.TrayMenu;
 using ObservableCollections;
 
 namespace KanaPlayer.ViewModels.Pages;

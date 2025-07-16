@@ -8,7 +8,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using KanaPlayer.Helpers;
 using KanaPlayer.Helpers.Animations;
 using KanaPlayer.Services.Theme;
 

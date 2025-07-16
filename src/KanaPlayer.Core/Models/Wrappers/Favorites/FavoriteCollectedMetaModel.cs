@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using KanaPlayer.Core.Models.Favorites;
 
 namespace KanaPlayer.Core.Models.Wrappers;
 

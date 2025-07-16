@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,11 +13,9 @@ using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
-using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.ViewModels.Dialogs;
 using KanaPlayer.Views.Dialogs;
-using KanaPlayer.Views.Pages;
 
 namespace KanaPlayer.ViewModels.Pages.SubPages;
 
