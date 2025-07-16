@@ -4,10 +4,17 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core">
+    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core"
+    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching">
     
     <Grid RowDefinitions="Auto, *">
-        <TextBlock Grid.Row="0" Text="播放列表" Classes="h1" VerticalAlignment="Center"></TextBlock>
+        <StackPanel Grid.Row="0" Spacing="20" Orientation="Horizontal" VerticalAlignment="Center"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="播放列表" Classes="h1"></TextBlock>
+            <Button Content="清空" Command="{Binding ClearCommand}" attaching:Icon.LucideIconKind="Trash"
+                    CornerRadius="10">
+            </Button>
+        </StackPanel>
         
         <ListBox Grid.Row="1" Cursor="Hand" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>

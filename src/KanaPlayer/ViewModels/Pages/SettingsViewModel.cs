@@ -9,7 +9,7 @@ using KanaPlayer.Models.SettingTypes;
 
 namespace KanaPlayer.ViewModels.Pages;
 
-public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, MainDbContext mainDbContext): ViewModelBase
+public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, MainDbContext mainDbContext) : ViewModelBase
 {
     [RelayCommand]
     private void Test()
@@ -40,11 +40,11 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         //                  .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog, fakeImportItem, bilibiliClient, mainDbContext, kanaToastManager, navigationService))
         //                  .TryShow();
     }
-    
+
     #region Behaviors
 
     // Close Button Behavior
-    [ObservableProperty] public partial CloseBehaviors SelectedCloseBehavior { get; set; } = 
+    [ObservableProperty] public partial CloseBehaviors SelectedCloseBehavior { get; set; } =
         configurationService.Settings.UiSettings.Behaviors.CloseBehavior;
 
     partial void OnSelectedCloseBehaviorChanged(CloseBehaviors value)
@@ -52,19 +52,19 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         configurationService.Settings.UiSettings.Behaviors.CloseBehavior = value;
         configurationService.Save();
     }
-    
+
     // Favorites - Play All Button Warning
-    [ObservableProperty] public partial bool IsFavoritesPlayAllReplaceWarningEnabled { get; set; } = 
+    [ObservableProperty] public partial bool IsFavoritesPlayAllReplaceWarningEnabled { get; set; } =
         configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled;
-    
+
     partial void OnIsFavoritesPlayAllReplaceWarningEnabledChanged(bool value)
     {
         configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled = value;
         configurationService.Save();
     }
-    
+
     // Favorites - DoubleTapped PlayListItem Behavior
-    [ObservableProperty] public partial FavoritesDoubleTappedPlayListItemBehaviors DoubleTappedPlayListItemBehaviors { get; set; } = 
+    [ObservableProperty] public partial FavoritesDoubleTappedPlayListItemBehaviors DoubleTappedPlayListItemBehaviors { get; set; } =
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;
 
     [RelayCommand]
@@ -79,7 +79,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     #region Cache
 
     // Maximum Audio Cache Size (256MB - 10240MB)
-    [ObservableProperty]   
+    [ObservableProperty]
     public partial int MaximumAudioCacheSizeInMb { get; set; } =
         configurationService.Settings.CommonSettings.AudioCache.MaximumCacheSizeInMb;
 
@@ -90,7 +90,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     }
 
     // Maximum Image Cache Size (128MB - 5120MB)
-    [ObservableProperty]    
+    [ObservableProperty]
     public partial int MaximumImageCacheSizeInMb { get; set; } =
         configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb;
 
@@ -99,24 +99,16 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb = value;
         configurationService.Save();
     }
-    
+
     // Manual Cache Cleanup
     [RelayCommand]
     private void CleanupCache(string cacheType)
-    {
-        if (cacheType == "audio")
-        {
-            mainDbContext.CachedAudioMetadataSet.RemoveRange(mainDbContext.CachedAudioMetadataSet);
-            mainDbContext.SaveChanges();
-        }
-        
-        App.CleanupCache(cacheType switch
+        => App.CleanupCache(cacheType switch
         {
             "audio" => AppHelper.ApplicationAudioCachesFolderPath,
             "image" => AppHelper.ApplicationImageCachesFolderPath,
             _       => throw new ArgumentException("Invalid cache type specified.")
         }, 0);
-    }
 
     #endregion
 }

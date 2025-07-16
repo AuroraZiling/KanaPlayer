@@ -61,7 +61,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
         playerManager.Clear();
         foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
         {
-            playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+            await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                 cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
         }
         await playerManager.LoadFirstAsync();

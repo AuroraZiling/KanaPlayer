@@ -21,6 +21,10 @@ public partial class PlayListViewModel : ViewModelBase
         PlayerManager.Play();
     }
 
+    [RelayCommand]
+    private void Clear()
+        => PlayerManager.Clear();
+
     public IPlayerManager PlayerManager { get; }
     private readonly IConfigurationService<SettingsModel> _configurationService;
     public PlayListViewModel(IPlayerManager playerManager, IConfigurationService<SettingsModel> configurationService)

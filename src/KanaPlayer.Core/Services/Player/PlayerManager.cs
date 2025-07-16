@@ -60,11 +60,21 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
+                foreach (var argsNewItem in args.NewItems)
+                {
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
+                }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
-                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.NewItem.AudioUniqueId);
+                foreach (var argsNewItem in args.NewItems)
+                {
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsNewItem.AudioUniqueId);
+                }
+            }
+            else if(args.Action == NotifyCollectionChangedAction.Reset)
+            {
+                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
             }
             _configurationService.Save();
         };
