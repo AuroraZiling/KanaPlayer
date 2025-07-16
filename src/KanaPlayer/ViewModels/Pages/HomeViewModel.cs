@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Navigation;
+using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
@@ -51,15 +52,18 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         var audioInfoData = audioInfo.EnsureData();
         favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
 
-        await playerManager.LoadAsync(new PlayListItem(
-            audioInfoData.Title,
-            audioInfoData.CoverUrl,
-            audioInfoData.Owner.Name,
-            audioInfoData.Owner.Mid,
-            uniqueId,
-            TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
-        ));
-        playerManager.Play();
+        Task.Run(async () =>
+        {
+            await playerManager.LoadAsync(new PlayListItem(
+                audioInfoData.Title,
+                audioInfoData.CoverUrl,
+                audioInfoData.Owner.Name,
+                audioInfoData.Owner.Mid,
+                uniqueId,
+                TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
+            ));
+            playerManager.Play();
+        }).Detach();
     }
 
     [RelayCommand]

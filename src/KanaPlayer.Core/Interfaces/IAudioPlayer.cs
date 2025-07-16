@@ -23,9 +23,12 @@ public interface IAudioPlayer : INotifyPropertyChanged
     
     double Volume { get; set; }
 
-    void Load(Stream audioStream);
     event Action? PlaybackStopped;
+    
+    void Load(Stream audioStream);
 
+    Task LoadAsync(Func<Task<Stream>> asyncAudioStreamFactory);
+    
     void Play();
 
     void Pause();

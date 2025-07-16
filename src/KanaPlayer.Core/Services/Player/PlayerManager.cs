@@ -1,7 +1,9 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
+using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models;
@@ -86,15 +88,26 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     }
 
     private CachedAudioStream? _cachedAudioStream;
+    private CancellationTokenSource? loadCancellationTokenSource;
 
     private readonly ObservableList<PlayListItem> _playList = [];
     private readonly Dictionary<string, string> _cookies;
 
+    public Task LoadFirstAsync()
+    {
+        if (PlayList.Count == 0)
+            throw new InvalidOperationException("PlayList is empty.");
+        return LoadAsync(PlayList[0]);
+    }
+    
     public async Task LoadAsync(PlayListItem playListItem)
     {
+        if (loadCancellationTokenSource is not null) await loadCancellationTokenSource.CancelAsync();
+        
         _cachedAudioStream = null;
         CurrentPlayListItem = null;
-        
+
+        PlaybackTime = TimeSpan.Zero;
         CanLoadPrevious = false;
         CanLoadForward = false;
         OnPropertyChanged(nameof(CanLoadPrevious));
@@ -102,11 +115,9 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         
         _audioPlayer.Pause();
         ArgumentNullException.ThrowIfNull(playListItem);
-        
-        await Task.Run(() =>
-        {
-            _audioPlayer.Load(_cachedAudioStream = new CachedAudioStream(playListItem.AudioUniqueId, _cookies, _bilibiliClient));
-        });
+
+        loadCancellationTokenSource = new CancellationTokenSource();
+        await _audioPlayer.LoadAsync(async () => _cachedAudioStream = await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, _cookies, _bilibiliClient, loadCancellationTokenSource.Token));
         
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
@@ -213,77 +224,71 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _playList.Clear();
 }
 
-public class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient) : Stream
+public class CachedAudioStream : Stream
 {
-    private bool isInitialized;
+    private readonly List<byte> _data;
 
-    private readonly List<byte> data = [];
-
-    private void EnsureInitialized()
+    public static async Task<CachedAudioStream> CreateAsync(
+        AudioUniqueId audioUniqueId, Dictionary<string, string> cookies, IBilibiliClient bilibiliClient, CancellationToken cancellationToken)
     {
-        if (isInitialized) return;
-        isInitialized = true;
-
-        try
+        var cacheFileInfo = new FileInfo(Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, $"{audioUniqueId.Bvid}_p{audioUniqueId.Page}"));
+        Stream upStream;
+        Stream? cacheFileStream = null;
+        if (cacheFileInfo.Exists)
         {
-            var cacheFileInfo = new FileInfo(Path.Combine(AppHelper.ApplicationAudioCachesFolderPath, $"{audioUniqueId.Bvid}_p{audioUniqueId.Page}"));
-            if (cacheFileInfo.Exists)
-            {
-                using var stream = cacheFileInfo.OpenRead();
-                _length = stream.Length;
-                data.Capacity = (int)stream.Length;
-                stream.ReadExactly(CollectionsMarshal.AsSpan(data));
-            }
-            else
-            {
-                using var upStream = bilibiliClient.GetAudioStreamAsync(audioUniqueId, cookies).ConfigureAwait(false).GetAwaiter().GetResult();
-                _length = upStream.Length;
-
-                using var cacheFileStream = cacheFileInfo.Create();
-
-                var buffer = ArrayPool<byte>.Shared.Rent(81920);
-                try
-                {
-                    int bytesRead;
-                    while ((bytesRead = upStream.Read(buffer.AsMemory(0, 81920).Span)) > 0)
-                    {
-                        cacheFileStream.Write(buffer.AsMemory(0, bytesRead).Span);
-                        data.AddRange(buffer.AsSpan(0, bytesRead));
-                    }
-                }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
-            }
+            upStream = cacheFileInfo.OpenRead();
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine(ex);
+            upStream = await bilibiliClient.GetAudioStreamAsync(audioUniqueId, cookies).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            cacheFileStream = cacheFileInfo.Create();
+        }
+        var data = new List<byte>((int)upStream.Length);
+        Task.Run(LoadAsync, cancellationToken).Detach();
+        return new CachedAudioStream(data);
+
+        async Task LoadAsync()
+        {
+            var buffer = ArrayPool<byte>.Shared.Rent(8192);
+            try
+            {
+                int bytesRead;
+                while ((bytesRead = await upStream.ReadAsync(buffer.AsMemory(0, 8192), cancellationToken)) > 0)
+                {
+                    if (cacheFileStream is not null) await cacheFileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+                    data.AddRange(buffer.AsSpan(0, bytesRead));
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+                await upStream.DisposeAsync();
+                if (cacheFileStream is not null) await cacheFileStream.DisposeAsync();
+            }
         }
     }
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        EnsureInitialized();
-
         if (Position >= Length)
             return 0;
 
-        var bytesToRead = (int)Math.Min(count, Length - Position);
+        var bytesToRead = Math.Min(count, (int)(Length - Position));
         var bytesRead = 0;
 
         while (bytesRead < bytesToRead)
         {
             var remaining = bytesToRead - bytesRead;
-            var readCount = Math.Min(remaining, data.Count - (int)Position);
+            var readCount = Math.Min(remaining, _data.Count - (int)Position);
             if (readCount <= 0)
             {
                 // wait for more data if the stream is not fully loaded
                 Thread.Sleep(100);
+                continue;
             }
 
-            CollectionsMarshal.AsSpan(data).Slice((int)Position, readCount).CopyTo(buffer.AsSpan(offset + bytesRead));
+            CollectionsMarshal.AsSpan(_data).Slice((int)Position, readCount).CopyTo(buffer.AsSpan(offset + bytesRead));
             bytesRead += readCount;
             Position += readCount;
         }
@@ -293,8 +298,6 @@ public class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, s
 
     public override long Seek(long offset, SeekOrigin origin)
     {
-        EnsureInitialized();
-
         switch (origin)
         {
             case SeekOrigin.Begin:
@@ -328,35 +331,17 @@ public class CachedAudioStream(AudioUniqueId audioUniqueId, Dictionary<string, s
     public override bool CanSeek => true;
     public override bool CanWrite => false;
 
-    public override long Length
+    public override long Length => _data.Capacity;
+    
+    private CachedAudioStream(List<byte> data)
     {
-        get
-        {
-            EnsureInitialized();
-            return _length;
-        }
+        _data = data;
     }
 
-    private long _length;
-
-    public override long Position
-    {
-        get
-        {
-            EnsureInitialized();
-            return field;
-        }
-        set
-        {
-            EnsureInitialized();
-            if (value < 0 || value > Length)
-                throw new ArgumentOutOfRangeException(nameof(value), "Position is out of bounds.");
-            field = value;
-        }
-    }
+    public override long Position { get; set; }
 
     /// <summary>
     /// If the stream is downloaded from the network, this property indicates the length of the buffered data.
     /// </summary>
-    public int BufferedLength => data.Count;
+    public int BufferedLength => _data.Count;
 }

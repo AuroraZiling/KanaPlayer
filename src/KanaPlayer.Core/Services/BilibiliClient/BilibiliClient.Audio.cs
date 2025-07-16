@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Utils;
 
 namespace KanaPlayer.Core.Services;
 
@@ -77,11 +78,13 @@ public partial class BilibiliClient<TSettings>
             {
                 { "Referer", $"https://www.bilibili.com/video/{audioUniqueId.Bvid}" }
             }
-        });
+        }, HttpCompletionOption.ResponseHeadersRead);
 
         if (!audioResponse.IsSuccessStatusCode)
             throw new HttpRequestException($"Failed to get audio stream: {audioResponse.ReasonPhrase}");
-        return await audioResponse.Content.ReadAsStreamAsync();
+        
+        return new HttpResultStream(await audioResponse.Content.ReadAsStreamAsync(),
+            audioResponse.Content.Headers.ContentLength ?? throw new Exception("Audio stream not found in PlayInfo JSON."));
     }
 
     public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList,

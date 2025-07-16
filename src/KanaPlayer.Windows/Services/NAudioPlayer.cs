@@ -52,6 +52,7 @@ public partial class NAudioPlayer : ObservableObject, IAudioPlayer
 
     private WaveOutEvent? _outputDevice;
     private StreamMediaFoundationReader? _reader;
+    private Stream? _audioStream;
 
     private readonly DispatcherTimer _progressTimer = new()
     {
@@ -75,8 +76,30 @@ public partial class NAudioPlayer : ObservableObject, IAudioPlayer
             _outputDevice.Dispose();
         }
         _reader?.Dispose();
+        _audioStream?.Dispose();
+        
         Status = PlayStatus.Loading;
-        _reader = new StreamMediaFoundationReader(audioStream);
+        _reader = new StreamMediaFoundationReader(_audioStream = audioStream);
+        _outputDevice = new WaveOutEvent();
+        _outputDevice.Init(_reader);
+        _outputDevice.Volume = (float)Volume;
+        _outputDevice.PlaybackStopped += OnOutputDeviceOnPlaybackStopped;
+        Status = PlayStatus.Loaded;
+    }
+    
+    public async Task LoadAsync(Func<Task<Stream>> asyncAudioStreamFactory)
+    {
+        if (_outputDevice is not null)
+        {
+            _outputDevice.PlaybackStopped -= OnOutputDeviceOnPlaybackStopped;
+            _outputDevice.Dispose();
+        }
+        if (_reader is not null) await _reader.DisposeAsync();
+        if (_audioStream is not null) await _audioStream.DisposeAsync();
+        
+        Status = PlayStatus.Loading;
+        var stream = await asyncAudioStreamFactory();
+        _reader = new StreamMediaFoundationReader(_audioStream = stream);
         _outputDevice = new WaveOutEvent();
         _outputDevice.Init(_reader);
         _outputDevice.Volume = (float)Volume;
