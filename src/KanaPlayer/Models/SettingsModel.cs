@@ -20,8 +20,12 @@ public class UiBehaviorSettings
     public CloseBehaviors CloseBehavior { get; set; } = CloseBehaviors.Close;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public FavoritesDoubleTappedPlayListItemBehaviors FavoritesDoubleTappedPlayListItemBehavior { get; set; } =
-        FavoritesDoubleTappedPlayListItemBehaviors.ReplaceCurrentPlayList;
+    public FavoritesAddBehaviors FavoritesDoubleTappedPlayListItemBehavior { get; set; } =
+        FavoritesAddBehaviors.ReplaceCurrentPlayList;
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public FavoritesAddBehaviors FavoritesAddAllBehavior { get; set; } =
+        FavoritesAddBehaviors.AddToEndOfPlayList;
 
     public bool IsFavoritesPlayAllReplaceWarningEnabled { get; set; } = true;
 }

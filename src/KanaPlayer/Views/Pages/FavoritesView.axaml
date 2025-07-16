@@ -84,13 +84,13 @@
                     <StackPanel Orientation="Horizontal" Spacing="7">
                         <Button Content="播放全部" attaching:Icon.LucideIconKind="Play" Command="{Binding PlayAllCommand}"></Button>
                         <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
-                                Command="{Binding AddToPlayListCommand}">
+                                Command="{Binding AddAllToPlayListCommand}">
                         </Button>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
 
-            <ListBox Grid.Row="1" Cursor="Hand" SelectedIndex="{Binding SelectedPlayListItemIndex, Mode=TwoWay}"
+            <ListBox Grid.Row="1" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}"
                      Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolderItems}"
                      Background="{DynamicResource KanaAccentColor20}">
                 <ListBox.ItemTemplate>
@@ -105,12 +105,12 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-                <!-- -->
-                <!-- <Interaction.Behaviors> -->
-                <!--     <EventTriggerBehavior EventName="DoubleTapped"> -->
-                <!--         <InvokeCommandAction Command="{Binding PlaySelectedItemCommand}" /> -->
-                <!--     </EventTriggerBehavior> -->
-                <!-- </Interaction.Behaviors> -->
+                
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="DoubleTapped">
+                        <InvokeCommandAction Command="{Binding DoubleTappedSelectedItemCommand}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
             </ListBox>
         </Grid>
     </Grid>

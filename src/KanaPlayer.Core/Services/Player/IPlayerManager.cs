@@ -24,7 +24,8 @@ public interface IPlayerManager : INotifyPropertyChanged
     void Play();
     void Pause();
     Task AppendAsync(PlayListItem playListItem);
-    void Insert(PlayListItem playListItem, int index);
+    Task InsertAfterCurrentPlayItemAsync(PlayListItem playListItem);
+    Task InsertAfterCurrentPlayItemRangeAsync(IEnumerable<PlayListItem> playListItems);
     void Remove(PlayListItem playListItem);
     int IndexOf(PlayListItem playListItem);
     void Clear();

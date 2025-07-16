@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
+using KanaPlayer.Models.SettingTypes;
 using KanaPlayer.Views.Pages.SubPages;
 
 namespace KanaPlayer.ViewModels.Pages;
@@ -34,7 +36,43 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
         FavoriteFolderItems = new ObservableCollection<CachedAudioMetadata>(favoritesManager.GetCachedAudioMetadataList(value));
     }
     [ObservableProperty] public partial ObservableCollection<CachedAudioMetadata> FavoriteFolderItems { get; set; } = [];
-    [ObservableProperty] public partial int SelectedPlayListItemIndex { get; set; }
+    [ObservableProperty] public partial CachedAudioMetadata? SelectedPlayListItem { get; set; }
+
+    [RelayCommand]
+    private async Task DoubleTappedSelectedItemAsync()
+    {
+        if (SelectedFavoriteFolder is null || SelectedPlayListItem is null)
+            return;
+
+        var behavior = configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;
+        var selectedPlayListItem = new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl, SelectedPlayListItem.OwnerName,
+            SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds));
+        switch (behavior)
+        {
+            case FavoritesAddBehaviors.ReplaceCurrentPlayList:
+            {
+                playerManager.Clear();
+                foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+                {
+                    await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+                        cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
+                }
+                break;
+            }
+            case FavoritesAddBehaviors.AddToNextInPlayList:
+                await playerManager.InsertAfterCurrentPlayItemAsync(new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl, SelectedPlayListItem.OwnerName,
+                    SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds)));
+                break;
+            case FavoritesAddBehaviors.AddToEndOfPlayList:
+                await playerManager.AppendAsync(new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl, SelectedPlayListItem.OwnerName,
+                    SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds)));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        await playerManager.LoadAsync(selectedPlayListItem);
+        playerManager.Play();
+    }
 
     [RelayCommand]
     private void ImportFromBilibili()
@@ -45,7 +83,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     [RelayCommand]
     private async Task PlayAllAsync()
     {
-        if (SelectedFavoriteFolder is null || SelectedPlayListItemIndex < 0)
+        if (SelectedFavoriteFolder is null)
             return;
 
         if (configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled)
@@ -69,15 +107,31 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     }
 
     [RelayCommand]
-    private void AddToPlayList()
+    private void AddAllToPlayList()
     {
-        if (SelectedFavoriteFolder is null || SelectedPlayListItemIndex < 0)
+        if (SelectedFavoriteFolder is null)
             return;
-        
-        foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+
+        var behavior = configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior;
+        switch (behavior)
         {
-            playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
-                cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
+            case FavoritesAddBehaviors.AddToNextInPlayList:
+                playerManager.InsertAfterCurrentPlayItemRangeAsync(favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder).Select(cachedAudioMetadata =>
+                    new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+                        cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
+                break;
+            case FavoritesAddBehaviors.AddToEndOfPlayList:
+            {
+                foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+                {
+                    playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
+                        cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
+                }
+                break;
+            }
+            case FavoritesAddBehaviors.ReplaceCurrentPlayList:
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 

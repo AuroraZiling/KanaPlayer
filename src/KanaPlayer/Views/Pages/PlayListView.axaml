@@ -16,7 +16,7 @@
             </Button>
         </StackPanel>
         
-        <ListBox Grid.Row="1" Cursor="Hand" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
+        <ListBox Grid.Row="1" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}" Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding PlayerManager.PlayList}" Background="{DynamicResource KanaAccentColor20}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type playerManager:PlayListItem}">
                     <Grid ColumnDefinitions="60, *, *, 100">

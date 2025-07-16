@@ -60,17 +60,17 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (var argsNewItem in args.NewItems)
-                {
+                if(args.NewItems.Length == 0)
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
+                foreach (var argsNewItem in args.NewItems) 
                     _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
-                }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
+                if(args.NewItems.Length == 0)
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.NewItem.AudioUniqueId);
                 foreach (var argsNewItem in args.NewItems)
-                {
                     _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsNewItem.AudioUniqueId);
-                }
             }
             else if(args.Action == NotifyCollectionChangedAction.Reset)
             {
@@ -286,8 +286,42 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         if(CurrentPlayListItem is null)
             await LoadFirstAsync();
     }
-    public void Insert(PlayListItem playListItem, int index)
-        => _playList.Insert(index, playListItem);
+    public async Task InsertAfterCurrentPlayItemAsync(PlayListItem playListItem)
+    {
+        if (CurrentPlayListItem is null)
+        {
+            await AppendAsync(playListItem);
+            return;
+        }
+
+        var index = IndexOf(CurrentPlayListItem) + 1;
+        if (index < 0 || index > _playList.Count)
+            throw new ArgumentOutOfRangeException(nameof(CurrentPlayListItem), "Current play item is not in the play list.");
+
+        if (_playList.Contains(playListItem))
+            Remove(playListItem);
+        _playList.Insert(index, playListItem);
+    }
+    public async Task InsertAfterCurrentPlayItemRangeAsync(IEnumerable<PlayListItem> playListItems)
+    {
+        if (CurrentPlayListItem is null)
+        {
+            foreach (var playListItem in playListItems)
+                await AppendAsync(playListItem);
+            return;
+        }
+
+        var index = IndexOf(CurrentPlayListItem) + 1;
+        if (index < 0 || index > _playList.Count)
+            throw new ArgumentOutOfRangeException(nameof(CurrentPlayListItem), "Current play item is not in the play list.");
+
+        foreach (var playListItem in playListItems)
+        {
+            if (_playList.Contains(playListItem))
+                Remove(playListItem);
+            _playList.Insert(index++, playListItem);
+        }
+    }
     public void Remove(PlayListItem playListItem)
         => _playList.Remove(playListItem);
     public int IndexOf(PlayListItem playListItem)

@@ -98,25 +98,41 @@
                                           OffContent="不会警告" OnContent="将会弹窗警告">
                             </ToggleSwitch>
                         </StackPanel>
-                        <StackPanel Spacing="5" Margin="0, 10, 0, 0">
+                        <StackPanel Spacing="5" Margin="0, 16, 0, 0">
+                            <TextBlock Text="添加列表行为" Classes="h6"></TextBlock>
+                            <TextBlock Text="按下 添加到播放列表 按钮后行为"></TextBlock>
+                            <RadioButton
+                                Command="{Binding ChangeFavoritesAddAllBehaviorsCommand}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
+                                Content="将收藏夹添加到播放列表末尾" GroupName="AddAllBehaviorGroup">
+                            </RadioButton>
+                            <RadioButton
+                                Command="{Binding ChangeFavoritesAddAllBehaviorsCommand}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
+                                Content="将收藏夹添加到播放列表中当前播放歌曲的下一首" GroupName="AddAllBehaviorGroup">
+                            </RadioButton>
+                        </StackPanel>
+                        <StackPanel Spacing="5" Margin="0, 16, 0, 0">
                             <TextBlock Text="双击播放单曲行为" Classes="h6"></TextBlock>
                             <TextBlock Text="双击收藏夹中单曲播放的行为"></TextBlock>
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
-                                CommandParameter="{x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.ReplaceCurrentPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.ReplaceCurrentPlayList}}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.ReplaceCurrentPlayList}"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.ReplaceCurrentPlayList}}"
                                 Content="将所在收藏夹替换播放列表" GroupName="DoubleTappedPlayListItemBehaviorGroup">
                             </RadioButton>
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
-                                CommandParameter="{x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.AddToNextInPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.AddToNextInPlayList}}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
                                 Content="将选中单曲添加到播放列表中当前播放歌曲的下一首" GroupName="DoubleTappedPlayListItemBehaviorGroup">
                             </RadioButton>
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
-                                CommandParameter="{x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.AddToEndOfPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesDoubleTappedPlayListItemBehaviors.AddToEndOfPlayList}}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
                                 Content="将选中单曲添加到播放列表的末尾" GroupName="DoubleTappedPlayListItemBehaviorGroup">
                             </RadioButton>
                         </StackPanel>

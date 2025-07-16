@@ -64,13 +64,24 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     }
 
     // Favorites - DoubleTapped PlayListItem Behavior
-    [ObservableProperty] public partial FavoritesDoubleTappedPlayListItemBehaviors DoubleTappedPlayListItemBehaviors { get; set; } =
+    [ObservableProperty] public partial FavoritesAddBehaviors DoubleTappedPlayListItemBehaviors { get; set; } =
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;
 
     [RelayCommand]
-    private void ChangeDoubleTappedPlayListItemBehaviors(FavoritesDoubleTappedPlayListItemBehaviors value)
+    private void ChangeDoubleTappedPlayListItemBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior = value;
+        configurationService.Save();
+    }
+
+    // Favorites - Add All Behavior
+    [ObservableProperty] public partial FavoritesAddBehaviors FavoritesAddAllBehaviors { get; set; } =
+        configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior;
+
+    [RelayCommand]
+    private void ChangeFavoritesAddAllBehaviors(FavoritesAddBehaviors value)
+    {
+        configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior = value;
         configurationService.Save();
     }
 

@@ -1,6 +1,6 @@
 ﻿namespace KanaPlayer.Models.SettingTypes;
 
-public enum FavoritesDoubleTappedPlayListItemBehaviors
+public enum FavoritesAddBehaviors
 {
     ReplaceCurrentPlayList,
     AddToNextInPlayList,
