@@ -6,7 +6,6 @@ public enum PlayStatus
 {
     Stopped,
     Loading,
-    Loaded,
     Playing,
     Paused
 }

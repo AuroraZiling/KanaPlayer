@@ -39,9 +39,9 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             if (args.PropertyName == nameof(IAudioPlayer.Status))
                 OnPropertyChanged(nameof(Status));
         };
-        _audioPlayer.PlaybackStopped += async () =>
+        _audioPlayer.PlaybackStopped += () =>
         {
-            await LoadForward(false, true);
+            Task.Run(() => LoadForward(false, true));
         };
     }
     

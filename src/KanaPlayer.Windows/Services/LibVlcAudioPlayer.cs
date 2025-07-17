@@ -17,10 +17,20 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
     public LibVlcAudioPlayer()
     {
         LibVLCSharp.Shared.Core.Initialize();
-        libVlc = new LibVLC();
+        libVlc = new LibVLC(
+            "--intf=dummy",
+            "--no-audio-time-stretch",
+            "--no-video",
+            "--aout=directsound",
+            "--audio-resampler=soxr",
+            "--live-caching=0",
+            "--network-caching=0",
+            "--file-caching=0",
+            "--clock-jitter=0",
+            "--clock-synchro=0");
         _mediaPlayer = new MediaPlayer(libVlc)
         {
-            EnableHardwareDecoding = true,
+            EnableHardwareDecoding = false,
             FileCaching = 0,
             NetworkCaching = 0,
         };
@@ -44,11 +54,14 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
     {
         get
         {
+            if (Status is not (PlayStatus.Playing or PlayStatus.Paused))
+                return 0.0;
             if (_mediaPlayer.Length <= 0) return 0.0;
             return (double)_mediaPlayer.Time / _mediaPlayer.Length;
         }
         set
         {
+            if (Status is not (PlayStatus.Playing or PlayStatus.Paused)) return;
             if (_mediaPlayer is not { Length: > 0, IsSeekable: true }) return;
             var targetTime = (long)(_mediaPlayer.Length * Math.Clamp(value, 0.0, 1.0));
             _mediaPlayer.Time = targetTime;
@@ -91,7 +104,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
             _currentMedia = new Media(libVlc, _streamMediaInput);
 
             _mediaPlayer.Media = _currentMedia;
-            Status = PlayStatus.Loaded;
+            Status = PlayStatus.Paused;
         }
         catch (Exception ex)
         {
@@ -105,7 +118,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
         try
         {
             Status = PlayStatus.Loading;
-            var stream = await asyncAudioStreamFactory();
+            var stream = await asyncAudioStreamFactory().ConfigureAwait(false);
             Load(stream);
         }
         catch (Exception ex)
