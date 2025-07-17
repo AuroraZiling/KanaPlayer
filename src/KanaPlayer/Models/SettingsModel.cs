@@ -20,6 +20,10 @@ public class UiBehaviorSettings
     public CloseBehaviors CloseBehavior { get; set; } = CloseBehaviors.Close;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
+    public FavoritesAddBehaviors HomeAddBehavior { get; set; } =
+        FavoritesAddBehaviors.AddToNextAndPlayInPlayList;
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public FavoritesAddBehaviors FavoritesDoubleTappedPlayListItemBehavior { get; set; } =
         FavoritesAddBehaviors.ReplaceCurrentPlayList;
 

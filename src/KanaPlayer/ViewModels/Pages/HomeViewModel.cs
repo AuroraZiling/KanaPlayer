@@ -9,14 +9,18 @@ using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
+using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
+using KanaPlayer.Models;
+using KanaPlayer.Models.SettingTypes;
 using ObservableCollections;
 
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManager playerManager,
-                                   ILauncher launcher, IFavoritesManager favoritesManager) : ViewModelBase, INavigationAware
+                                   ILauncher launcher, IFavoritesManager favoritesManager, IConfigurationService<SettingsModel> configurationService)
+    : ViewModelBase, INavigationAware
 {
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<AudioRegionFeedDataInfoModel> MusicRegionFeeds
@@ -60,19 +64,35 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         {
             audioInfoData = new AudioInfoDataModel(cachedAudioMetadata);
         }
-
-        Task.Run(async () =>
+        
+        var playItem = new PlayListItem(
+            audioInfoData.Title,
+            audioInfoData.CoverUrl,
+            audioInfoData.Owner.Name,
+            audioInfoData.Owner.Mid,
+            uniqueId,
+            TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
+        );
+        switch (configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior)
         {
-            await playerManager.LoadAsync(new PlayListItem(
-                audioInfoData.Title,
-                audioInfoData.CoverUrl,
-                audioInfoData.Owner.Name,
-                audioInfoData.Owner.Mid,
-                uniqueId,
-                TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
-            ));
-            playerManager.Play();
-        }).Detach();
+            case FavoritesAddBehaviors.AddToNextInPlayList:
+                await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
+                break;
+            case FavoritesAddBehaviors.AddToEndOfPlayList:
+                await playerManager.AppendAsync(playItem);
+                break;
+            case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
+                await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
+                Task.Run(async () =>
+                {
+                    await playerManager.LoadAsync(playItem);
+                    playerManager.Play();
+                }).Detach();
+                break;
+            case FavoritesAddBehaviors.ReplaceCurrentPlayList:
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     [RelayCommand]

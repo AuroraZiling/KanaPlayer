@@ -56,23 +56,31 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
         _playList.CollectionChanged += (in args) =>
         {
-            if (args.Action == NotifyCollectionChangedAction.Add)
+            switch (args.Action)
             {
-                if(args.NewItems.Length == 0)
+                case NotifyCollectionChangedAction.Add when args.IsSingleItem:
+                {
                     _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
-                foreach (var argsNewItem in args.NewItems) 
-                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                if(args.NewItems.Length == 0)
-                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.NewItem.AudioUniqueId);
-                foreach (var argsNewItem in args.NewItems)
-                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsNewItem.AudioUniqueId);
-            }
-            else if(args.Action == NotifyCollectionChangedAction.Reset)
-            {
-                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
+                    break;
+                }
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var argsNewItem in args.NewItems) 
+                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Remove when args.IsSingleItem:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.OldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var argsOldItem in args.OldItems) 
+                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsOldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
             _configurationService.Save();
         };

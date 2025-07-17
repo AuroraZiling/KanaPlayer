@@ -65,6 +65,17 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
         configurationService.Save();
     }
 
+    // Home - Add Behavior
+    [ObservableProperty] public partial FavoritesAddBehaviors HomeAddBehaviors { get; set; } =
+        configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior;
+
+    [RelayCommand]
+    private void ChangeHomeAddBehaviors(FavoritesAddBehaviors value)
+    {
+        configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior = value;
+        configurationService.Save();
+    }
+
     // Favorites - DoubleTapped PlayListItem Behavior
     [ObservableProperty] public partial FavoritesAddBehaviors DoubleTappedPlayListItemBehaviors { get; set; } =
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;

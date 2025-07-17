@@ -74,7 +74,7 @@
         <TabItem Header="行为">
             <ScrollViewer>
                 <StackPanel Spacing="15">
-                    <Button Content="测试用按钮" Command="{Binding TestCommand}"></Button>
+                    <!-- <Button Content="测试用按钮" Command="{Binding TestCommand}"></Button> -->
                     <controls:KanaSettingsGroup Header="播放器">
                         <StackPanel Spacing="5">
                             <TextBlock Text="关闭按钮行为" Classes="h6"></TextBlock>
@@ -88,6 +88,30 @@
                                 <ComboBoxItem Content="隐藏至托盘菜单" />
                                 <ComboBoxItem Content="关闭" />
                             </ComboBox>
+                        </StackPanel>
+                    </controls:KanaSettingsGroup>
+                    <controls:KanaSettingsGroup Header="首页">
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="播放行为" Classes="h6"></TextBlock>
+                            <TextBlock Text="点击首页任意音频的行为"></TextBlock>
+                            <RadioButton
+                                Command="{Binding ChangeHomeAddBehaviorsCommand}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
+                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首" GroupName="HomeAddBehaviorGroup">
+                            </RadioButton>
+                            <RadioButton
+                                Command="{Binding ChangeHomeAddBehaviorsCommand}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextAndPlayInPlayList}"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextAndPlayInPlayList}}"
+                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首并立即播放" GroupName="HomeAddBehaviorGroup">
+                            </RadioButton>
+                            <RadioButton
+                                Command="{Binding ChangeHomeAddBehaviorsCommand}"
+                                CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
+                                Content="将选中单曲添加到播放列表末尾" GroupName="HomeAddBehaviorGroup">
+                            </RadioButton>
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                     <controls:KanaSettingsGroup Header="收藏夹">
