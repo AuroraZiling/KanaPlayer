@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Helpers;
@@ -9,7 +11,7 @@ using KanaPlayer.Models.SettingTypes;
 
 namespace KanaPlayer.ViewModels.Pages;
 
-public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, MainDbContext mainDbContext) : ViewModelBase
+public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, ILauncher launcher) : ViewModelBase
 {
     [RelayCommand]
     private void Test()
@@ -120,6 +122,29 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
             "image" => AppHelper.ApplicationImageCachesFolderPath,
             _       => throw new ArgumentException("Invalid cache type specified.")
         }, 0);
+
+    #endregion
+
+    #region About
+
+    [RelayCommand]
+    private void RevealFolder(string folderType)
+    {
+        var folderPath = folderType switch
+        {
+            "app" => AppHelper.ApplicationFolderPath,
+            "data" => AppHelper.ApplicationDataFolderPath,
+            _       => throw new ArgumentException("Invalid folder type specified.")
+        };
+        launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(folderPath))
+            .ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine($"Failed to open folder: {task.Exception?.Message}");
+                }
+            });
+    }
 
     #endregion
 }

@@ -14,7 +14,7 @@ public partial class MainDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var dbPath = Path.Combine(AppHelper.ApplicationFolderPath, "Main.db");
+        var dbPath = Path.Combine(AppHelper.ApplicationDataFolderPath, "Main.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 

@@ -184,5 +184,19 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        <TabItem Header="关于">
+            <ScrollViewer>
+                <StackPanel Spacing="20">
+                    <controls:KanaSettingsGroup Header="目录">
+                        <StackPanel Spacing="5">
+                            <Button attaching:Icon.LucideIconKind="Folder" Content="KanaPlayer 软件目录"
+                                    Command="{Binding RevealFolderCommand}" CommandParameter="app" />
+                            <Button attaching:Icon.LucideIconKind="Folder" Content="KanaPlayer 数据目录"
+                                    Command="{Binding RevealFolderCommand}" CommandParameter="data" />
+                        </StackPanel>
+                    </controls:KanaSettingsGroup>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
     </TabControl>
 </UserControl>

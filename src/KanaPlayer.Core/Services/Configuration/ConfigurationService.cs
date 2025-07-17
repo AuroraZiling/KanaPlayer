@@ -16,8 +16,7 @@ public class ConfigurationService<TSettings> : IConfigurationService<TSettings>
     [MemberNotNull(nameof(Settings))]
     private void Load()
     {
-        Directory.CreateDirectory(AppHelper.ApplicationFolderPath);
-        Directory.CreateDirectory(AppHelper.ApplicationFavoritesFolderPath);
+        Directory.CreateDirectory(AppHelper.ApplicationDataFolderPath);
         Directory.CreateDirectory(AppHelper.ApplicationAudioCachesFolderPath);
         Directory.CreateDirectory(AppHelper.ApplicationImageCachesFolderPath);
         

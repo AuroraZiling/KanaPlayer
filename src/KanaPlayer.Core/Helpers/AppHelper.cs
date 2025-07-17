@@ -3,13 +3,13 @@
 public static class AppHelper
 {
     public static string ApplicationFolderPath { get; } =
-        Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory, "KanaPlayer");
-    public static string ApplicationFavoritesFolderPath { get; } =
-        Path.Combine(ApplicationFolderPath, "Favorites");
+        Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory;
+    public static string ApplicationDataFolderPath { get; } =
+        Path.Combine(ApplicationFolderPath, "KanaPlayer");
     public static string ApplicationImageCachesFolderPath { get; } =
-        Path.Combine(ApplicationFolderPath, "ImageCaches");
+        Path.Combine(ApplicationDataFolderPath, "ImageCaches");
     public static string ApplicationAudioCachesFolderPath { get; } =
-        Path.Combine(ApplicationFolderPath, "AudioCaches");
+        Path.Combine(ApplicationDataFolderPath, "AudioCaches");
     public static string SettingsFilePath { get; } =
-        Path.Combine(ApplicationFolderPath, "settings.json");
+        Path.Combine(ApplicationDataFolderPath, "settings.json");
 }
