@@ -95,21 +95,22 @@ public partial class BilibiliClient<TSettings>
 
         var templatePage = await GetPageAsync(1);
         var templatePageData = templatePage.EnsureData();
-        var totalMediaCount = templatePageData.Info.MediaCount;
+        var totalMediaCount = templatePageData.Medias.Count;
         fetchedCountProgress?.Report(templatePageData.Medias.Count);
 
         var allCollected = new List<CollectionFolderCommonMediaModel>();
         allCollected.AddRange(templatePageData.Medias);
 
-        if (totalMediaCount > supposedMediaCountPerPage && fetchCompleteMediaList)
+        if (fetchCompleteMediaList)
         {
-            var totalPageCount = totalMediaCount / supposedMediaCountPerPage + 1;
-            for (var page = 2; page <= totalPageCount; page++)
+            var page = 2;
+            while (allCollected.Count < totalMediaCount)
             {
                 var pageModel = await GetPageAsync(page);
                 var pageData = pageModel.EnsureData();
                 fetchedCountProgress?.Report(pageData.Medias.Count);
                 allCollected.AddRange(pageData.Medias);
+                page++;
             }
         }
 
