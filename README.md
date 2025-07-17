@@ -105,6 +105,13 @@ KanaPlayer 依赖 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download
 
 KanaPlayer 使用 [MIT 许可证](LICENSE)
 
+### 第三方库许可证 / Third-party Library Licenses
+
+- **LibVLC** - [LGPL 2.1 许可证](https://github.com/videolan/vlc/blob/master/COPYING.LIB)
+   - LibVLC 是 VideoLAN 项目的一部分
+   - 项目主页：https://www.videolan.org/vlc/libvlc.html
+   - 源代码：https://github.com/videolan/vlc
+
 ## 鸣谢 / Acknowledgements
 
 - **[Dear.Va](https://github.com/DearVa)**

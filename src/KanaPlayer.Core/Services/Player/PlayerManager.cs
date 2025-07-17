@@ -8,9 +8,7 @@ using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models;
-using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Core.Models.PlayerManager;
-using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
 using ObservableCollections;
@@ -121,13 +119,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _audioPlayer.Duration;
 
     public double BufferedProgress
-    {
-        get
-        {
-            if (_cachedAudioStream is null) return 0;
-            return (double)_cachedAudioStream.BufferedLength / _cachedAudioStream.Length;
-        }
-    }
+        => _cachedAudioStream?.BufferedProgress ?? 0;
 
     [ObservableProperty] public partial double Volume { get; set; }
     partial void OnVolumeChanged(double value)
@@ -182,7 +174,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         ArgumentNullException.ThrowIfNull(playListItem);
 
         _loadCancellationTokenSource = new CancellationTokenSource();
-        await _audioPlayer.LoadAsync(async () => _cachedAudioStream = await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, _cookies, _bilibiliClient, _loadCancellationTokenSource.Token));
+        await _audioPlayer.LoadAsync(async () => _cachedAudioStream =
+            await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, _cookies, _bilibiliClient, _loadCancellationTokenSource.Token));
         
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
@@ -447,7 +440,7 @@ public class CachedAudioStream : Stream
     public override long Position { get; set; }
 
     /// <summary>
-    /// If the stream is downloaded from the network, this property indicates the length of the buffered data.
+    /// If the stream is downloaded from the network, this property indicates the progress of the buffered data.
     /// </summary>
-    public int BufferedLength => _data.Count;
+    public double BufferedProgress => (double)_data.Count / Length;
 }

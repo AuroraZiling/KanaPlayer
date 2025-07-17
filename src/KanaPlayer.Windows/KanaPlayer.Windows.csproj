@@ -16,9 +16,8 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="NAudio" />
-        <PackageReference Include="Sdcb.FFmpeg" />
-        <PackageReference Include="Sdcb.FFmpeg.runtime.windows-x64" />
+        <PackageReference Include="LibVLCSharp" />
+        <PackageReference Include="VideoLAN.LibVLC.Windows" />
     </ItemGroup>
 
     <ItemGroup>
