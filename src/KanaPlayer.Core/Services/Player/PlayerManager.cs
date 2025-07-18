@@ -51,9 +51,15 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         foreach (var audioUniqueId in _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList)
             _playList.Add(await GetPlayListItemByAudioUniqueId(audioUniqueId));
         
-        if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is { } uniqueId)
-            await LoadAsync(await GetPlayListItemByAudioUniqueId(uniqueId));
-
+        if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is {} value)
+        {
+            var playListItem = await GetPlayListItemByAudioUniqueId(value);
+            if (_playList.Contains(playListItem))
+                await LoadAsync(playListItem);
+            else
+                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = null;
+        }
+        
         _playList.CollectionChanged += (in args) =>
         {
             switch (args.Action)
@@ -84,7 +90,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             }
             _configurationService.Save();
         };
-        
+        return;
+
         async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
         {
             var cachedAudioMetadata = _favoritesManager.GetCachedAudioMetadataByUniqueId(audioUniqueId);
@@ -145,8 +152,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             case PlaybackMode.RepeatOne:
             case PlaybackMode.RepeatAll:
             case PlaybackMode.Shuffle:
-                CanLoadPrevious = true;
-                CanLoadForward = true;
+                CanLoadPrevious = CurrentPlayListItem is not null;
+                CanLoadForward = CurrentPlayListItem is not null;
                 break;
             case PlaybackMode.MaxValue:
             default:
@@ -313,15 +320,14 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         }
 
         var index = IndexOf(CurrentPlayListItem) + 1;
-        if (index < 0 || index > _playList.Count)
+        if (index == 0)
             throw new ArgumentOutOfRangeException(nameof(CurrentPlayListItem), "Current play item is not in the play list.");
-
-        foreach (var playListItem in playListItems)
-        {
-            if (_playList.Contains(playListItem))
-                Remove(playListItem);
-            _playList.Insert(index++, playListItem);
-        }
+        
+        var itemsToInsert = playListItems.ToList();
+        foreach (var item in itemsToInsert)
+            _playList.Remove(item);
+        index = CurrentPlayListItem is not null ? IndexOf(CurrentPlayListItem) + 1 : 0;
+        _playList.InsertRange(index, itemsToInsert);
     }
     public void Remove(PlayListItem playListItem)
         => _playList.Remove(playListItem);
@@ -331,6 +337,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     public void Clear()
     {
         CurrentPlayListItem = null;
+        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = null;
         _audioPlayer.Stop();
         _playList.Clear();
     }

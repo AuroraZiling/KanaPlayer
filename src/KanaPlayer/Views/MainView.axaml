@@ -115,6 +115,12 @@
                     Thumb.DragStarted="AudioSliderThumb_OnDragStarted" Minimum="0" Maximum="1"
                     Value="{Binding Progress, Mode=TwoWay}" HorizontalAlignment="Stretch"
                     Margin="-8, -16, -8, 0" VerticalAlignment="Top">
+                <Slider.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="PlayerManager.Status" Converter="{x:Static ObjectConverters.Equal}" ConverterParameter="{x:Static interfaces:PlayStatus.Playing}"/>
+                        <Binding Path="PlayerManager.Status" Converter="{x:Static ObjectConverters.Equal}" ConverterParameter="{x:Static interfaces:PlayStatus.Paused}"/>
+                    </MultiBinding>
+                </Slider.IsEnabled>
                 <Slider.Template>
                     <ControlTemplate>
                         <DataValidationErrors>

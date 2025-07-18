@@ -31,6 +31,7 @@ public partial class MainViewModel : ViewModelBase
         get
         {
             if (IsSeeking) return field;
+            if (PlayerManager.Duration.TotalSeconds <= 0) return 0.0;
             return field = PlayerManager.PlaybackTime.TotalSeconds / PlayerManager.Duration.TotalSeconds;
         }
         set
