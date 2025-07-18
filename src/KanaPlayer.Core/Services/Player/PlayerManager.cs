@@ -64,8 +64,17 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 var playListItem = await GetPlayListItemByAudioUniqueId(value);
                 if (_playList.Contains(playListItem))
                 {
-                    ScopedLogger.Info("正在加载上次播放的音频: {Title} | {UniqueId}", playListItem.Title, value);
-                    await LoadAsync(playListItem);
+                    try
+                    {
+                        ScopedLogger.Info("正在加载上次播放的音频: {Title} | {UniqueId}", playListItem.Title, value);
+                        await LoadAsync(playListItem);
+                    }
+                    catch (Exception e)
+                    {
+                        ScopedLogger.Error(e, "加载上次播放的音频失败: {Title} | {UniqueId}", playListItem.Title, value);
+                        _exceptionHandler.HandleException(e);
+                        return;
+                    }
                 }
                 else
                 {
@@ -104,7 +113,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 }
                 _configurationService.SaveImmediate();
             };
-            
+
             async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
             {
                 var cachedAudioMetadata = _favoritesManager.GetCachedAudioMetadataByUniqueId(audioUniqueId);
@@ -184,18 +193,55 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     private CachedAudioStream? _cachedAudioStream;
     private CancellationTokenSource? _loadCancellationTokenSource;
 
-    public Task LoadFirstAsync()
+    public async Task LoadFirstAndPlayAsync()
     {
-        if (PlayList.Count == 0)
+        try
         {
-            ScopedLogger.Warn("播放列表为空，无法加载第一个音频");
-            throw new InvalidOperationException("播放列表为空，无法加载第一个音频");
+            await LoadFirstAsync();
+            _audioPlayer.Play();
         }
-        ScopedLogger.Info("正在加载播放列表中的第一个音频: {AudioUniqueId}", PlayList[0].AudioUniqueId);
-        return LoadAsync(PlayList[0]);
+        catch (Exception e)
+        {
+            ScopedLogger.Error(e, "加载第一个音频失败");
+            _exceptionHandler.HandleException(e);
+        }
     }
 
-    public async Task LoadAsync(PlayListItem playListItem)
+    private async Task LoadFirstAsync()
+    {
+        try
+        {
+            if (PlayList.Count == 0)
+            {
+                ScopedLogger.Warn("播放列表为空，无法加载第一个音频");
+                throw new InvalidOperationException("播放列表为空，无法加载第一个音频");
+            }
+            ScopedLogger.Info("正在加载播放列表中的第一个音频: {AudioUniqueId}", PlayList[0].AudioUniqueId);
+            await LoadAsync(PlayList[0]);
+            _audioPlayer.Play();
+        }
+        catch (Exception e)
+        {
+            ScopedLogger.Error(e, "加载第一个音频失败");
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    public async Task LoadAndPlayAsync(PlayListItem playListItem)
+    {
+        try
+        {
+            await LoadAsync(playListItem);
+            _audioPlayer.Play();
+        }
+        catch (Exception e)
+        {
+            ScopedLogger.Error(e, "加载音频失败: {AudioUniqueId}", playListItem.AudioUniqueId);
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task LoadAsync(PlayListItem playListItem)
     {
         if (_loadCancellationTokenSource is not null) await _loadCancellationTokenSource.CancelAsync();
         if (!_bilibiliClient.TryGetCookies(out var cookies))
@@ -203,7 +249,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             ScopedLogger.Error("无法获取 Cookies，无法加载音频");
             return;
         }
-        
+
         _cachedAudioStream = null;
         CurrentPlayListItem = null;
 
@@ -217,18 +263,10 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         ArgumentNullException.ThrowIfNull(playListItem);
 
         _loadCancellationTokenSource = new CancellationTokenSource();
-        try
-        {
-            await _audioPlayer.LoadAsync(async () => _cachedAudioStream =
-                                                         await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, cookies, _bilibiliClient,
-                                                             _loadCancellationTokenSource.Token));
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-            return;
-        }
-        
+        await _audioPlayer.LoadAsync(async () => _cachedAudioStream =
+                                                     await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, cookies, _bilibiliClient,
+                                                         _loadCancellationTokenSource.Token));
+
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
         {
@@ -244,86 +282,163 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     [ObservableProperty] public partial bool CanLoadPrevious { get; private set; }
     public async Task LoadPrevious(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is null || !CanLoadPrevious) return;
-
-        ScopedLogger.Info("正在加载上一个音频: {CurrentPlayListItem}", CurrentPlayListItem.AudioUniqueId);
-        switch (PlaybackMode)
+        if (CurrentPlayListItem is not {} currentPlayListItem || !CanLoadPrevious) return;
+        try
         {
-            case PlaybackMode.Sequential:
+            ScopedLogger.Info("正在加载上一个音频: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
+            switch (PlaybackMode)
             {
-                var index = _playList.IndexOf(CurrentPlayListItem);
-                if (index <= 0) return;
-                await LoadAsync(PlayList[index - 1]);
-                break;
+                case PlaybackMode.Sequential:
+                {
+                    var index = _playList.IndexOf(currentPlayListItem);
+                    if (index <= 0) return;
+                    await LoadAsync(PlayList[index - 1]);
+                    break;
+                }
+                case PlaybackMode.Shuffle:
+                {
+                    var randomIndex = new Random().Next(PlayList.Count);
+                    await LoadAsync(PlayList[randomIndex]);
+                    break;
+                }
+                case PlaybackMode.RepeatOne when !isManuallyTriggered:
+                    await LoadAsync(CurrentPlayListItem);
+                    break;
+                case PlaybackMode.RepeatAll:
+                case PlaybackMode.RepeatOne when isManuallyTriggered:
+                {
+                    var index = _playList.IndexOf(currentPlayListItem);
+                    if (index <= 0) index = PlayList.Count;
+                    await LoadAsync(PlayList[index - 1]);
+                    break;
+                }
+                case PlaybackMode.MaxValue:
+                default:
+                    ScopedLogger.Error("错误的播放模式: {PlaybackMode}", PlaybackMode);
+                    return;
             }
-            case PlaybackMode.Shuffle:
-            {
-                var randomIndex = new Random().Next(PlayList.Count);
-                await LoadAsync(PlayList[randomIndex]);
-                break;
-            }
-            case PlaybackMode.RepeatOne when !isManuallyTriggered:
-                await LoadAsync(CurrentPlayListItem);
-                break;
-            case PlaybackMode.RepeatAll:
-            case PlaybackMode.RepeatOne when isManuallyTriggered:
-            {
-                var index = _playList.IndexOf(CurrentPlayListItem);
-                if (index <= 0) index = PlayList.Count;
-                await LoadAsync(PlayList[index - 1]);
-                break;
-            }
-            case PlaybackMode.MaxValue:
-            default:
-                ScopedLogger.Error("错误的播放模式: {PlaybackMode}", PlaybackMode);
-                return;
-        }
 
-        if (playWhenLoaded)
-            _audioPlayer.Play();
+            if (playWhenLoaded)
+                _audioPlayer.Play();
+        }
+        catch (Exception e)
+        {
+            ScopedLogger.Error(e, "加载上一个音频失败: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
+            await SkipUnavailableAudioAsync(currentPlayListItem.AudioUniqueId, PlayDirection.Previous);
+        }
+    }
+    
+    private async Task SkipUnavailableAudioAsync(AudioUniqueId currentAudioUniqueId, PlayDirection playDirection)
+    {
+        if (!_bilibiliClient.TryGetCookies(out var cookies))
+        {
+            ScopedLogger.Error("无法获取 Cookies，无法加载音频");
+            return;
+        }
+        if (playDirection == PlayDirection.Forward)
+        {
+            ScopedLogger.Warn("当前音频不可用，尝试加载下一个音频: {CurrentPlayListItem}", currentAudioUniqueId);
+            var currentIndex = _playList.FindIndexOf(item => item.AudioUniqueId == currentAudioUniqueId);
+            if (currentIndex < 0 || currentIndex >= PlayList.Count - 1)
+            {
+                ScopedLogger.Warn("当前音频已是播放列表的最后一个音频，无法加载下一个音频");
+                return;
+            }
+            var nextIndex = currentIndex + 1;
+            while (nextIndex < PlayList.Count)
+            {
+                var nextItem = PlayList[nextIndex];
+                try
+                {
+                    ScopedLogger.Info("正在加载下一个音频: {NextAudioUniqueId}", nextItem.AudioUniqueId);
+                    await _bilibiliClient.GetAudioUrlAsync(nextItem.AudioUniqueId, cookies);
+                    await LoadAndPlayAsync(nextItem);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    _exceptionHandler.HandleException(e);
+                }
+                nextIndex++;
+            }
+        }
+        else
+        {
+            ScopedLogger.Warn("当前音频不可用，尝试加载上一个音频: {CurrentPlayListItem}", currentAudioUniqueId);
+            var currentIndex = _playList.FindIndexOf(item => item.AudioUniqueId == currentAudioUniqueId);
+            if (currentIndex <= 0)
+            {
+                ScopedLogger.Warn("当前音频已是播放列表的第一个音频，无法加载上一个音频");
+                return;
+            }
+            var previousIndex = currentIndex - 1;
+            while (previousIndex >= 0)
+            {
+                var previousItem = PlayList[previousIndex];
+                try
+                {
+                    ScopedLogger.Info("正在加载上一个音频: {PreviousAudioUniqueId}", previousItem.AudioUniqueId);
+                    await _bilibiliClient.GetAudioUrlAsync(previousItem.AudioUniqueId, cookies);
+                    await LoadAndPlayAsync(previousItem);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    _exceptionHandler.HandleException(e);
+                }
+                previousIndex--;
+            }
+        }
     }
 
     [ObservableProperty] public partial bool CanLoadForward { get; private set; }
     public async Task LoadForward(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is null || !CanLoadForward) return;
-
-        ScopedLogger.Info("正在加载下一个音频: {CurrentPlayListItem}", CurrentPlayListItem.AudioUniqueId);
-        switch (PlaybackMode)
+        if (CurrentPlayListItem is not {} currentPlayListItem || !CanLoadForward) return;
+        try
         {
-            case PlaybackMode.Sequential:
+            ScopedLogger.Info("正在加载下一个音频: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
+            switch (PlaybackMode)
             {
-                var index = _playList.IndexOf(CurrentPlayListItem);
-                if (index < 0 || index >= PlayList.Count - 1) return;
-                await LoadAsync(PlayList[index + 1]);
-                break;
+                case PlaybackMode.Sequential:
+                {
+                    var index = _playList.IndexOf(currentPlayListItem);
+                    if (index < 0 || index >= PlayList.Count - 1) return;
+                    await LoadAsync(PlayList[index + 1]);
+                    break;
+                }
+                case PlaybackMode.Shuffle:
+                {
+                    var randomIndex = new Random().Next(PlayList.Count);
+                    await LoadAsync(PlayList[randomIndex]);
+                    break;
+                }
+                case PlaybackMode.RepeatOne when !isManuallyTriggered:
+                    await LoadAsync(currentPlayListItem);
+                    break;
+                case PlaybackMode.RepeatAll:
+                case PlaybackMode.RepeatOne when isManuallyTriggered:
+                {
+                    var index = _playList.IndexOf(currentPlayListItem);
+                    if (index < 0) return;
+                    if (index >= PlayList.Count - 1) index = -1;
+                    await LoadAsync(PlayList[index + 1]);
+                    break;
+                }
+                case PlaybackMode.MaxValue:
+                default:
+                    ScopedLogger.Error("错误的播放模式: {PlaybackMode}", PlaybackMode);
+                    return;
             }
-            case PlaybackMode.Shuffle:
-            {
-                var randomIndex = new Random().Next(PlayList.Count);
-                await LoadAsync(PlayList[randomIndex]);
-                break;
-            }
-            case PlaybackMode.RepeatOne when !isManuallyTriggered:
-                await LoadAsync(CurrentPlayListItem);
-                break;
-            case PlaybackMode.RepeatAll:
-            case PlaybackMode.RepeatOne when isManuallyTriggered:
-            {
-                var index = _playList.IndexOf(CurrentPlayListItem);
-                if (index < 0) return;
-                if (index >= PlayList.Count - 1) index = -1;
-                await LoadAsync(PlayList[index + 1]);
-                break;
-            }
-            case PlaybackMode.MaxValue:
-            default:
-                ScopedLogger.Error("错误的播放模式: {PlaybackMode}", PlaybackMode);
-                return;
-        }
 
-        if (playWhenLoaded)
-            _audioPlayer.Play();
+            if (playWhenLoaded)
+                _audioPlayer.Play();
+        }
+        catch (Exception e)
+        {
+            ScopedLogger.Error(e, "加载下一个音频失败: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
+            await SkipUnavailableAudioAsync(currentPlayListItem.AudioUniqueId, PlayDirection.Forward);
+        }
     }
 
     public void Play()
@@ -402,6 +517,12 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _audioPlayer.Stop();
         _playList.Clear();
         ScopedLogger.Info("播放列表已清空");
+    }
+    
+    private enum PlayDirection
+    {
+        Previous,
+        Forward
     }
 }
 

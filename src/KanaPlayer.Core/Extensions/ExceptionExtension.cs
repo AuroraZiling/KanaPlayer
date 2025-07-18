@@ -71,6 +71,14 @@ public static class ExceptionExtension
             {
                 return "格式错误";
             }
+            case InvalidOperationException:
+            {
+                var message = e.Message;
+                if (message.Contains("未找到 Play Info"))
+                    return "未找到 Play Info";
+                else
+                    return e.Message;
+            }
             default:
             {
                 return e.Message;

@@ -15,8 +15,8 @@ public interface IPlayerManager : INotifyPropertyChanged
     TimeSpan Duration { get; }
     PlayListItem? CurrentPlayListItem { get; }
     PlaybackMode PlaybackMode { get; set; }
-    Task LoadFirstAsync();
-    Task LoadAsync(PlayListItem playListItem);
+    Task LoadFirstAndPlayAsync();
+    Task LoadAndPlayAsync(PlayListItem playListItem);
     bool CanLoadPrevious { get; }
     Task LoadPrevious(bool isManuallyTriggered, bool playWhenLoaded);
     bool CanLoadForward { get; }

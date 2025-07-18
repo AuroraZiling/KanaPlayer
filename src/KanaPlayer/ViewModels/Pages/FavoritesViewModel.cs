@@ -78,8 +78,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
                 ScopedLogger.Error("错误的收藏夹双击播放行为：{Behavior}", behavior);
                 return;
         }
-        await playerManager.LoadAsync(selectedPlayListItem);
-        playerManager.Play();
+        await playerManager.LoadAndPlayAsync(selectedPlayListItem);
         ScopedLogger.Info("双击播放收藏夹音频：{Title}，所属收藏夹：{FolderName}，播放模式：{playbackMode}", SelectedPlayListItem.Title, SelectedFavoriteFolder.Title, behavior);
     }
 
@@ -111,8 +110,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
             await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                 cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
         }
-        await playerManager.LoadFirstAsync();
-        playerManager.Play();
+        await playerManager.LoadFirstAndPlayAsync();
         ScopedLogger.Info("播放收藏夹全部音频：{FolderName}，音频数量：{Count}", SelectedFavoriteFolder.Title, FavoriteFolderItems.Count);
     }
 

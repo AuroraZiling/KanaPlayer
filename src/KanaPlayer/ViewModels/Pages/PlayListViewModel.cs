@@ -23,8 +23,7 @@ public partial class PlayListViewModel : ViewModelBase
             ScopedLogger.Warn("尝试播放空的选中项");
             return;
         }
-        await PlayerManager.LoadAsync(SelectedPlayListItem);
-        PlayerManager.Play();
+        await PlayerManager.LoadAndPlayAsync(SelectedPlayListItem);
     }
 
     [RelayCommand]
