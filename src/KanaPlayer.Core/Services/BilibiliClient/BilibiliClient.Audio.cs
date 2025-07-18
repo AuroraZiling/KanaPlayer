@@ -10,7 +10,7 @@ namespace KanaPlayer.Core.Services;
 public partial class BilibiliClient<TSettings>
 {
     /// <summary>
-    /// Get audio basic information from audio unique ID.
+    /// 获取视频基本信息 - 获取视频详细信息
     /// https://socialsisteryi.github.io/bilibili-API-collect/docs/video/info.html
     /// </summary>
     /// <param name="audioUniqueId"></param>
@@ -24,15 +24,23 @@ public partial class BilibiliClient<TSettings>
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint).LoadCookies(cookies);
         var response = await httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get audio info: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Debug("获取视频详细信息失败: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+            throw new HttpRequestException($"获取视频详细信息失败: {response.StatusCode} - {response.ReasonPhrase}");
+        }
 
         var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<AudioInfoModel>(content)
-               ?? throw new HttpRequestException("Failed to get audio info");
+        var audioInfoModel = JsonSerializer.Deserialize<AudioInfoModel>(content);
+        if (audioInfoModel == null)
+        {
+            ScopedLogger.Debug("反序列化音频信息失败: {Content}", content);
+            throw new HttpRequestException("反序列化音频信息失败");
+        }
+        return audioInfoModel;
     }
 
     /// <summary>
-    /// Get audio URL from audio unique ID.
+    /// 从B站直接获取视频音频地址 
     /// </summary>
     /// <param name="audioUniqueId"></param>
     /// <param name="cookies"></param>
@@ -46,12 +54,18 @@ public partial class BilibiliClient<TSettings>
         var videoPageRequest = new HttpRequestMessage(HttpMethod.Get, videoEndpoint).LoadCookies(cookies);
         var videoPageResponse = await httpClient.SendAsync(videoPageRequest);
         if (!videoPageResponse.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get music url: {videoPageResponse.ReasonPhrase}");
+        {
+            ScopedLogger.Debug("获取视频页面失败: {StatusCode} - {ReasonPhrase}", videoPageResponse.StatusCode, videoPageResponse.ReasonPhrase);
+            throw new HttpRequestException($"获取视频页面失败: {videoPageResponse.StatusCode} - {videoPageResponse.ReasonPhrase}");
+        }
 
         var videoPageContent = await videoPageResponse.Content.ReadAsStringAsync();
         var match = ExtractPlayInfoJsonRegex().Match(videoPageContent);
         if (!match.Success)
-            throw new Exception("PlayInfo JSON not found.");
+        {
+            ScopedLogger.Debug("未找到 Play Info: {Content}", videoPageContent);
+            throw new HttpRequestException("未找到 Play Info");
+        }
 
         var json = match.Groups[1].Value;
         var jsonDocument = JsonDocument.Parse(json);
@@ -63,9 +77,22 @@ public partial class BilibiliClient<TSettings>
                                    .FirstOrDefault()
                                    .GetProperty("base_url")
                                    .GetString();
-        return audioUrl ?? throw new Exception("Audio URL not found in PlayInfo JSON.");
+        if (audioUrl == null)
+        {
+            ScopedLogger.Debug("未找到音频URL: {Json}", json);
+            throw new Exception("未找到音频URL");
+        }
+        return audioUrl;
     }
 
+    /// <summary>
+    /// 获取音频流
+    /// </summary>
+    /// <param name="audioUniqueId"></param>
+    /// <param name="cookies"></param>
+    /// <returns></returns>
+    /// <exception cref="HttpRequestException"></exception>
+    /// <exception cref="Exception"></exception>
     public async Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies)
     {
         var audioUrl = await GetAudioUrlAsync(audioUniqueId, cookies);
@@ -81,12 +108,27 @@ public partial class BilibiliClient<TSettings>
         }, HttpCompletionOption.ResponseHeadersRead);
 
         if (!audioResponse.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get audio stream: {audioResponse.ReasonPhrase}");
+        {
+            ScopedLogger.Debug("获取音频流失败: {StatusCode} - {ReasonPhrase}", audioResponse.StatusCode, audioResponse.ReasonPhrase);
+            throw new HttpRequestException($"获取音频流失败: {audioResponse.StatusCode} - {audioResponse.ReasonPhrase}");
+        }
+
+        if (audioResponse.Content.Headers.ContentLength is { } contentLength) 
+            return new HttpResultStream(await audioResponse.Content.ReadAsStreamAsync(), contentLength);
         
-        return new HttpResultStream(await audioResponse.Content.ReadAsStreamAsync(),
-            audioResponse.Content.Headers.ContentLength ?? throw new Exception("Audio stream not found in PlayInfo JSON."));
+        ScopedLogger.Debug("音频流没有内容长度: {StatusCode} - {ReasonPhrase}", audioResponse.StatusCode, audioResponse.ReasonPhrase);
+        throw new Exception("音频流没有内容长度");
     }
 
+    /// <summary>
+    /// 合集和视频列表信息 - 获取合集内容
+    /// </summary>
+    /// <param name="collectionId"></param>
+    /// <param name="cookies"></param>
+    /// <param name="fetchCompleteMediaList"></param>
+    /// <param name="fetchedCountProgress"></param>
+    /// <returns></returns>
+    /// <exception cref="HttpRequestException"></exception>
     public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList,
                                                           IProgress<int>? fetchedCountProgress = null)
     {
@@ -122,11 +164,19 @@ public partial class BilibiliClient<TSettings>
             var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
             var response = await httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException($"Failed to get collection: {response.ReasonPhrase}");
+            {
+                ScopedLogger.Debug("获取合集内容失败: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                throw new HttpRequestException($"获取合集内容失败: {response.StatusCode} - {response.ReasonPhrase}");
+            }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<CollectionModel>(content)
-                   ?? throw new HttpRequestException("Failed to get collection");
+            var collectionModel = JsonSerializer.Deserialize<CollectionModel>(content);
+            if (collectionModel == null)
+            {
+                ScopedLogger.Debug("反序列化合集内容失败: {Content}", content);
+                throw new HttpRequestException("反序列化合集内容失败");
+            }
+            return collectionModel;
         }
     }
 

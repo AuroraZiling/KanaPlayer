@@ -76,7 +76,7 @@ public class TrayMenuService : ITrayMenuService
         if (save)
         {
             _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = playbackMode;
-            _configurationService.Save();
+            _configurationService.SaveImmediate();
         }
     }
 

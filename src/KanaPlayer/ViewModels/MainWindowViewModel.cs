@@ -6,12 +6,13 @@ using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;
 using KanaPlayer.Views.Pages;
+using NLog;
 
 namespace KanaPlayer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(MainWindowViewModel));
     public IKanaToastManager ToastManager { get; }
     public IKanaDialogManager DialogManager { get; }
     [ObservableProperty] public partial bool IsLoggedIn { get; set; } = false;
@@ -54,11 +55,13 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             UserName = _configurationService.Settings.CommonSettings.Account.UserName;
             AvatarUrl = _configurationService.Settings.CommonSettings.Account.AvatarImgUri;
+            ScopedLogger.Info("用户已登录: {UserName}", UserName);
         }
         else
         {
             UserName = null;
             AvatarUrl = null;
+            ScopedLogger.Info("用户未登录或账户信息缺失");
         }
     }
     

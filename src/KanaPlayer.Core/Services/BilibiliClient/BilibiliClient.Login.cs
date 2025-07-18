@@ -25,20 +25,12 @@ public partial class BilibiliClient<TSettings>
 
             if (checkRefreshCookies.Data == null || checkRefreshCookies.Data.Refresh) // 登录失效
             {
-                try
-                {
-                    var correspondPath = GenerateCorrespondPath();
-                    var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
-                    var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
-                    var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
-                    confirmRefreshCookies.EnsureSuccess();
-                    configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return;
-                }
+                var correspondPath = GenerateCorrespondPath();
+                var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
+                var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
+                var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
+                confirmRefreshCookies.EnsureSuccess();
+                configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
             }
             else
             {
@@ -47,37 +39,26 @@ public partial class BilibiliClient<TSettings>
                 cookies["buvid4"] = $"buvid4={buVid.BuVid4}";
                 configurationService.Settings.CommonSettings.Authentication.Cookies = cookies;
             }
-            configurationService.Save();
+            configurationService.SaveImmediate();
+            ScopedLogger.Info("登录态更新成功");
         }
 
-        try
+        if (configurationService.Settings.CommonSettings.Authentication == null)
         {
-            if (configurationService.Settings.CommonSettings.Authentication == null)
-                return;
-            var accountNavInfo =
-                await GetAccountNavInfoAsync(configurationService.Settings.CommonSettings.Authentication.Cookies);
-            if (accountNavInfo.Data is null)
-            {
-                Console.WriteLine("账户信息获取失败");
-                return;
-            }
+            ScopedLogger.Info("未检测到登录态");
+            return;
+        }
+        var accountNavInfo = await GetAccountNavInfoAsync(configurationService.Settings.CommonSettings.Authentication.Cookies);
+        ArgumentNullException.ThrowIfNull(accountNavInfo.Data);
 
-            configurationService.Settings.CommonSettings.Account = new CommonAccountSettings(
-                accountNavInfo.Data.Face, accountNavInfo.Data.Mid, accountNavInfo.Data.UserName,
-                new CommonAccountLevelSettings(accountNavInfo.Data.LevelInfo.CurrentLevel,
-                    accountNavInfo.Data.LevelInfo.CurrentMin, accountNavInfo.Data.LevelInfo.CurrentExp),
-                accountNavInfo.Data.VipLabel.ImgLabelUri);
-            configurationService.Save();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-        finally
-        {
-            IsAuthenticated = configurationService.Settings.CommonSettings.Authentication != null;
-        }
+        configurationService.Settings.CommonSettings.Account = new CommonAccountSettings(
+            accountNavInfo.Data.Face, accountNavInfo.Data.Mid, accountNavInfo.Data.UserName,
+            new CommonAccountLevelSettings(accountNavInfo.Data.LevelInfo.CurrentLevel,
+                accountNavInfo.Data.LevelInfo.CurrentMin, accountNavInfo.Data.LevelInfo.CurrentExp),
+            accountNavInfo.Data.VipLabel.ImgLabelUri);
+        configurationService.SaveImmediate();
+        IsAuthenticated = configurationService.Settings.CommonSettings.Authentication != null;
+        ScopedLogger.Info("登录成功");
     }
 
     public bool TryGetCookies(out Dictionary<string, string> cookies)
@@ -112,7 +93,9 @@ public partial class BilibiliClient<TSettings>
         var dataToEncrypt = $"refresh_{timestamp}";
         var encryptedData = rsa.Encrypt(Encoding.UTF8.GetBytes(dataToEncrypt),
             RSAEncryptionPadding.OaepSHA256);
-        return Convert.ToHexString(encryptedData).ToLowerInvariant();
+        var hexString = Convert.ToHexString(encryptedData).ToLowerInvariant();
+        ScopedLogger.Debug($"生成 Correspond Path: {hexString}");
+        return hexString;
     }
 
     private static async Task<string> GetRefreshCsrfAsync(string correspondPath, Dictionary<string, string> cookies)
@@ -126,10 +109,15 @@ public partial class BilibiliClient<TSettings>
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint).LoadCookies(cookies);
         var response = await scopedHttpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get refresh csrf: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Error($"获取 Refresh CSRF 失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"获取 Refresh CSRF 失败: {response.ReasonPhrase}");
+        }
 
         var content = await response.Content.ReadAsStringAsync();
-        return RefreshCsrfRegex().Matches(content)[0].Groups[1].Value;
+        var refreshCsrfMatch = RefreshCsrfRegex().Matches(content)[0].Groups[1].Value;
+        ScopedLogger.Debug($"获取到 Refresh CSRF: {refreshCsrfMatch}");
+        return refreshCsrfMatch;
     }
 
     private static async Task<RefreshCookiesModel> RefreshCookiesAsync(string refreshToken, string refreshCsrf, Dictionary<string, string> cookies)
@@ -138,7 +126,10 @@ public partial class BilibiliClient<TSettings>
 
         var cookieSessData = cookies.TryGetValue("SESSDATA", out var sessData);
         if (!cookieSessData)
-            throw new InvalidOperationException("SESSDATA cookie is required for refreshing cookies.");
+        {
+            ScopedLogger.Error("未发现 SESSDATA，无法刷新 Cookies");
+            throw new InvalidOperationException("未发现 SESSDATA，无法刷新 Cookies");
+        }
 
         using var scopedHttpClient = new HttpClient(new HttpClientHandler
         {
@@ -154,17 +145,24 @@ public partial class BilibiliClient<TSettings>
         ]);
         var response = await scopedHttpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to refresh cookies: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Error($"刷新 Cookies 失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"刷新 Cookies 失败: {response.ReasonPhrase}");
+        }
 
         var content = await response.Content.ReadAsStringAsync();
         var jsonContent = JsonSerializer.Deserialize<CommonApiModel<RefreshCookiesDataModel>>(content)
                           ?? throw new HttpRequestException("Failed to refresh cookies");
         response.Headers.TryGetValues("Set-Cookie", out var newCookies);
         if (newCookies is null || jsonContent.Data is null)
-            throw new HttpRequestException("No/Broken cookies returned in the response.");
+        {
+            ScopedLogger.Error("刷新 Cookies 失败，未获取到新的 Cookies 或数据");
+            throw new HttpRequestException("刷新 Cookies 失败，未获取到新的 Cookies 或数据");
+        }
 
         var newCookiesDictionary = newCookies.ToDictionary(newCookie => newCookie.Split('=')[0], newCookie => newCookie);
         newCookiesDictionary["ac_time_value"] = $"ac_time_value={jsonContent.Data.RefreshToken}";
+        ScopedLogger.Debug("刷新 Cookies 成功");
         return new RefreshCookiesModel(jsonContent, newCookiesDictionary);
     }
 
@@ -174,7 +172,10 @@ public partial class BilibiliClient<TSettings>
 
         var cookieSessData = newCookies.TryGetValue("SESSDATA", out var sessData);
         if (!cookieSessData)
-            throw new InvalidOperationException("SESSDATA cookie is required for confirming refresh cookies.");
+        {
+            ScopedLogger.Error("未发现 SESSDATA，无法确认 Cookies 刷新");
+            throw new InvalidOperationException("未发现 SESSDATA，无法确认 Cookies 刷新");
+        }
         using var scopedHttpClient = new HttpClient(new HttpClientHandler
         {
             AutomaticDecompression = DecompressionMethods.GZip
@@ -188,10 +189,19 @@ public partial class BilibiliClient<TSettings>
 
         var response = await scopedHttpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to confirm refresh cookies: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Error($"确认 Cookies 刷新失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"确认 Cookies 刷新失败: {response.ReasonPhrase}");
+        }
         var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<ConfirmRefreshCookiesModel>(content)
-               ?? throw new HttpRequestException("Failed to confirm refresh cookies");
+        var jsonContent = JsonSerializer.Deserialize<ConfirmRefreshCookiesModel>(content);
+        if (jsonContent is null)
+        {
+            ScopedLogger.Error("确认 Cookies 刷新失败，未获取到数据");
+            throw new HttpRequestException("确认 Cookies 刷新失败，未获取到数据");
+        }
+        ScopedLogger.Debug("确认 Cookies 刷新成功");
+        return jsonContent;
     }
 
     public async Task<ApplyQrCodeModel> GetApplyQrCodeAsync()
@@ -200,11 +210,20 @@ public partial class BilibiliClient<TSettings>
 
         var response = await httpClient.GetAsync(endpoint);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get QR code: {response.ReasonPhrase}");
-        
+        {
+            ScopedLogger.Error($"获取 QR 码失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"获取 QR 码失败: {response.ReasonPhrase}");
+        }
+
         var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<ApplyQrCodeModel>(content)
-               ?? throw new HttpRequestException("Failed to get QR code");
+        var json = JsonSerializer.Deserialize<ApplyQrCodeModel>(content);
+        if (json is null)
+        {
+            ScopedLogger.Error("获取 QR 码失败，未获取到数据");
+            throw new HttpRequestException("获取 QR 码失败，未获取到数据");
+        }
+        ScopedLogger.Debug("获取 QR 码成功");
+        return json;
     }
 
     public async Task<LoginQrCodeModel> GetLoginQrCodeAsync(string qrCodeKey)
@@ -214,28 +233,45 @@ public partial class BilibiliClient<TSettings>
 
         var response = await httpClient.GetAsync(endpoint);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to poll QR code: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Error($"轮询 QR 码失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"轮询 QR 码失败: {response.ReasonPhrase}");
+        }
         response.Headers.TryGetValues("Set-Cookie", out var cookies);
 
         var content = await response.Content.ReadAsStringAsync();
-        var json = JsonSerializer.Deserialize<LoginQrCodeModel>(content)
-                   ?? throw new HttpRequestException("Failed to poll QR code");
+        var json = JsonSerializer.Deserialize<LoginQrCodeModel>(content);
+        if (json is null)
+        {
+            ScopedLogger.Debug("轮询 QR 码失败，未获取到数据");
+            throw new HttpRequestException("轮询 QR 码失败，未获取到数据");
+        }
 
         if (cookies is null)
             return json;
 
         if (json.Data is null)
-            throw new HttpRequestException("QR code data is null, login may have failed.");
+        {
+            ScopedLogger.Debug("轮询 QR 码失败，未获取到数据");
+            throw new HttpRequestException("轮询 QR 码失败，未获取到数据");
+        }
         var cookiesDictionary = cookies.ToDictionary(cookie => cookie.Split('=')[0], cookie => cookie);
         cookiesDictionary["ac_time_value"] = json.Data.RefreshToken;
 
         var buvidResponse = await httpClient.GetAsync(buvidEndpoint);
         if (!buvidResponse.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get buvid: {buvidResponse.ReasonPhrase}");
-        
+        {
+            ScopedLogger.Error($"获取 Buvid 失败: {buvidResponse.ReasonPhrase}");
+            throw new HttpRequestException($"获取 Buvid 失败: {buvidResponse.ReasonPhrase}");
+        }
+
         var buvidContent = await response.Content.ReadAsStringAsync();
-        var buvidJson = JsonSerializer.Deserialize<BuVidModel>(buvidContent)
-                    ?? throw new HttpRequestException("Failed to poll QR code");
+        var buvidJson = JsonSerializer.Deserialize<BuVidModel>(buvidContent);
+        if (buvidJson is null)
+        {
+            ScopedLogger.Error("获取 Buvid 失败，未获取到数据");
+            throw new HttpRequestException("获取 Buvid 失败，未获取到数据");
+        }
 
         cookiesDictionary["buvid3"] = $"buvid3={buvidJson.EnsureData().BuVid3}";
         cookiesDictionary["buvid4"] = $"buvid4={buvidJson.EnsureData().BuVid4}";
@@ -250,11 +286,20 @@ public partial class BilibiliClient<TSettings>
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint).LoadCookies(cookies);
         var response = await httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to refresh cookies: {response.ReasonPhrase}");
-        
+        {
+            ScopedLogger.Error($"刷新 Cookies 失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"刷新 Cookies 失败: {response.ReasonPhrase}");
+        }
+
         var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<CheckCookieRefreshModel>(content)
-               ?? throw new HttpRequestException("Failed to refresh cookies");
+        var json = JsonSerializer.Deserialize<CheckCookieRefreshModel>(content);
+        if (json is null)
+        {
+            ScopedLogger.Error("刷新 Cookies 失败，未获取到数据");
+            throw new HttpRequestException("刷新 Cookies 失败，未获取到数据");
+        }
+        ScopedLogger.Debug("刷新 Cookies 成功");
+        return json;
     }
 
     private async Task<BuVidDataModel> GetBuVidAsync()
@@ -263,11 +308,18 @@ public partial class BilibiliClient<TSettings>
 
         var response = await httpClient.GetAsync(endpoint);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to get buvid: {response.ReasonPhrase}");
+        {
+            ScopedLogger.Error($"获取 Buvid 失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"获取 Buvid 失败: {response.ReasonPhrase}");
+        }
 
         var content = await response.Content.ReadAsStringAsync();
-        var json = JsonSerializer.Deserialize<BuVidModel>(content)
-                   ?? throw new HttpRequestException("Failed to get buvid");
+        var json = JsonSerializer.Deserialize<BuVidModel>(content);
+        if (json?.Data is null)
+        {
+            ScopedLogger.Error("获取 Buvid 失败，未获取到数据");
+            throw new HttpRequestException("获取 Buvid 失败，未获取到数据");
+        }
 
         return json.EnsureData();
     }

@@ -1,11 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Media;
+using NLog;
 using RgbColor = Avalonia.Media.Color;
 
 namespace KanaPlayer.Services.Theme;
 
 public class ThemeService: IThemeService
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(ThemeService));
     private static readonly Application Application = Application.Current!;
 
     #region Notification Colors
@@ -45,5 +47,7 @@ public class ThemeService: IThemeService
         SetColorKey("KanaNotificationSuccessColor", KanaNotificationSuccessColor);
         SetColorKey("KanaNotificationWarningColor", KanaNotificationWarningColor);
         SetColorKey("KanaNotificationCriticalColor", KanaNotificationErrorColor);
+        
+        ScopedLogger.Info("主题色已设置: {AccentColor}", accentRgbColor);
     }
 }

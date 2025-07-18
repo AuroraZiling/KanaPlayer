@@ -9,11 +9,14 @@ using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Services.TrayMenu;
+using NLog;
 
 namespace KanaPlayer.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(MainViewModel));
+    
     public IPlayerManager PlayerManager { get; }
 
     public TimeSpan PlaybackTime
@@ -91,7 +94,7 @@ public partial class MainViewModel : ViewModelBase
     {
         PlayerManager.Volume = value;
         _configurationService.Settings.CommonSettings.BehaviorHistory.Volume = value;
-        _configurationService.Save();
+        _configurationService.SaveDelayed();
     }
     
     private double _beforeMuteVolume;
@@ -116,7 +119,8 @@ public partial class MainViewModel : ViewModelBase
         PlaybackMode = (PlaybackMode)((int)(PlaybackMode + 1) % (int)PlaybackMode.MaxValue);
         PlayerManager.PlaybackMode = PlaybackMode;
         _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = PlaybackMode;
-        _configurationService.Save();
+        _configurationService.SaveImmediate();
+        ScopedLogger.Info("切换播放模式到 {PlaybackMode}", PlaybackMode);
     }
     
     [RelayCommand]
@@ -127,9 +131,15 @@ public partial class MainViewModel : ViewModelBase
     private void TogglePlay()
     {
         if (PlayerManager.Status == PlayStatus.Playing)
+        {
+            ScopedLogger.Info("暂停播放");
             PlayerManager.Pause();
+        }
         else
+        {
+            ScopedLogger.Info("开始播放");
             PlayerManager.Play();
+        }
     }
     
     [RelayCommand]

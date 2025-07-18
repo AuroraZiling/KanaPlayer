@@ -11,6 +11,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Helpers;
+using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Database;
@@ -19,11 +20,8 @@ using KanaPlayer.Services;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
 using KanaPlayer.Views;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NLog.Config;
-using NLog.Extensions.Logging;
+using NLog;
 
 namespace KanaPlayer;
 
@@ -32,10 +30,27 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        InitializeNLog();
+
         AvaloniaXamlLoader.Load(this);
         this.AttachDeveloperTools();
 
         ImageLoader.AsyncImageLoader = new DiskCachedWebImageLoader(AppHelper.ApplicationImageCachesFolderPath);
+    }
+
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(App));
+    private static void InitializeNLog()
+    {
+        try
+        {
+            Directory.CreateDirectory(AppHelper.ApplicationLoggingFolderPath);
+            LogManager.Setup().LoadConfigurationFromFile("NLog.config");
+            ScopedLogger.Info("正在启动 KanaPlayer");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"日志初始化失败: {ex.Message}");
+        }
     }
 
     public static event Action<IServiceCollection>? ConfigureServices;
@@ -66,23 +81,31 @@ public partial class App : Application
             desktop.MainWindow = splashWindow;
             splashWindow.RunAsync(async () =>
             {
-                await Task.Run(() =>
+                try
                 {
-                    GetService<MainDbContext>().Database.EnsureCreated();
-                });
+                    await Task.Run(() =>
+                    {
+                        GetService<MainDbContext>().Database.EnsureCreated();
+                    });
 
-                // First Authenticate Attempt
-                await GetService<IBilibiliClient>().AuthenticateAsync();
+                    // First Authenticate Attempt
+                    await GetService<IBilibiliClient>().AuthenticateAsync();
 
-                // Cache Cleanup
-                await Task.Run(() =>
+                    // Cache Cleanup
+                    await Task.Run(() =>
+                    {
+                        var configuration = GetService<IConfigurationService<SettingsModel>>().Settings.CommonSettings;
+                        CleanupCache(AppHelper.ApplicationAudioCachesFolderPath,
+                            configuration.AudioCache.MaximumCacheSizeInMb);
+                        CleanupCache(AppHelper.ApplicationImageCachesFolderPath,
+                            configuration.ImageCache.MaximumCacheSizeInMb);
+                    });
+                }
+                catch (Exception ex)
                 {
-                    var configuration = GetService<IConfigurationService<SettingsModel>>().Settings.CommonSettings;
-                    CleanupCache(AppHelper.ApplicationAudioCachesFolderPath,
-                        configuration.AudioCache.MaximumCacheSizeInMb);
-                    CleanupCache(AppHelper.ApplicationImageCachesFolderPath,
-                        configuration.ImageCache.MaximumCacheSizeInMb);
-                });
+                    ScopedLogger.Error(ex, "在启动过程中发生错误");
+                    Shutdown();
+                }
             }).ContinueWith(_ =>
             {
                 var mainWindow = GetService<MainWindow>();
@@ -91,7 +114,7 @@ public partial class App : Application
                 mainWindow.Focus();
 
                 desktop.MainWindow = mainWindow;
-            }, TaskContinuationOptions.ExecuteSynchronously).Detach(); // TODO: Exception Handler
+            }, TaskContinuationOptions.ExecuteSynchronously).Detach(GetService<IExceptionHandler>());
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
@@ -103,9 +126,10 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    public static void SafeShutdown()
+    public static void Shutdown()
     {
-        // TODO: Implement a proper shutdown sequence
+        ScopedLogger.Info("正在关闭 KanaPlayer");
+        LogManager.Shutdown();
         Environment.Exit(0);
     }
 
@@ -130,10 +154,12 @@ public partial class App : Application
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to delete cache file {fileToDelete.FullName}: {ex.Message}");
+                ScopedLogger.Warn(ex, "删除缓存文件失败，已跳过: {FilePath}", fileToDelete.FullName);
+                continue;
             }
             files.Remove(fileToDelete);
         }
+        ScopedLogger.Info($"缓存目录: {cacheFolderPath}，当前大小: {currentCacheSizeInBytes / (1024 * 1024)} MB");
     }
 
     private static void DisableAvaloniaDataAnnotationValidation()

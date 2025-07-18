@@ -123,7 +123,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
         }
         catch (Exception ex)
         {
-            Status = PlayStatus.Stopped;
+            Stop();
             throw new InvalidOperationException($"Failed to load audio stream asynchronously: {ex.Message}", ex);
         }
     }

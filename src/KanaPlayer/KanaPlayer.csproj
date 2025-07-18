@@ -4,7 +4,6 @@
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,54 +11,63 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AsyncImageLoader.Avalonia" />
+        <Content Include="NLog.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AsyncImageLoader.Avalonia"/>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Themes.Fluent"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
-        
-<!--    如果没有 Avalonia Accelerate，请使用 Avalonia.Diagnostics，并把 AvaloniaUI.DiagnosticsSupport 注释掉 -->
-<!--        <PackageReference Include="Avalonia.Diagnostics">-->
-<!--            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
-<!--            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
-<!--        </PackageReference>-->
-        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
-        
+
+        <!--    如果没有 Avalonia Accelerate，请使用 Avalonia.Diagnostics，并把 AvaloniaUI.DiagnosticsSupport 注释掉 -->
+        <!--        <PackageReference Include="Avalonia.Diagnostics">-->
+        <!--            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
+        <!--            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
+        <!--        </PackageReference>-->
+        <PackageReference Include="AvaloniaUI.DiagnosticsSupport"/>
+
         <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="Lucide.Avalonia"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Include="Microsoft.Extensions.Http" />
-        <PackageReference Include="ObservableCollections" />
-        <PackageReference Include="QRCoder" />
-        <PackageReference Include="Xaml.Behaviors" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
+        <PackageReference Include="Microsoft.Extensions.Http"/>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="NLog"/>
+        <PackageReference Include="NLog.Extensions.Logging"/>
+        <PackageReference Include="ObservableCollections"/>
+        <PackageReference Include="QRCoder"/>
+        <PackageReference Include="Xaml.Behaviors"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\KanaPlayer.Core\KanaPlayer.Core.csproj" />
+        <ProjectReference Include="..\KanaPlayer.Core\KanaPlayer.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Theming\Styles\TextBlockStyle.axaml" />
+        <AdditionalFiles Include="Theming\Styles\TextBlockStyle.axaml"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Controls\InlineHyperlink.cs">
-        <DependentUpon>InlineHyperlink.axaml</DependentUpon>
-      </Compile>
-      <Compile Update="Controls\KanaTrayIcon.axaml.cs">
-        <DependentUpon>AppTrayIcon.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Hosts\Toast\KanaToast.axaml.cs">
-        <DependentUpon>KanaToast.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Hosts\Toast\KanaToastHost.axaml.cs">
-        <DependentUpon>KanaToastHost.axaml.axaml</DependentUpon>
-      </Compile>
+        <Compile Update="Controls\InlineHyperlink.cs">
+            <DependentUpon>InlineHyperlink.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Controls\KanaTrayIcon.axaml.cs">
+            <DependentUpon>AppTrayIcon.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\Hosts\Toast\KanaToast.axaml.cs">
+            <DependentUpon>KanaToast.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\Hosts\Toast\KanaToastHost.axaml.cs">
+            <DependentUpon>KanaToastHost.axaml.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="KanaPlayer.csproj.DotSettings" />
+        <None Remove="KanaPlayer.csproj.DotSettings"/>
     </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
+using NLog;
 using ObservableCollections;
 
 namespace KanaPlayer.ViewModels.Pages;
@@ -22,6 +23,8 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
                                    ILauncher launcher, IFavoritesManager favoritesManager, IConfigurationService<SettingsModel> configurationService)
     : ViewModelBase, INavigationAware
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(HomeViewModel));
+    
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<AudioRegionFeedDataInfoModel> MusicRegionFeeds
         => field ??= _musicRegionFeeds.ToNotifyCollectionChangedSlim();
@@ -33,71 +36,90 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
     {
         _musicRegionFeeds.Clear();
         await LoadMoreAsync();
+        ScopedLogger.Info("音乐分区动态已刷新");
     }
 
     [RelayCommand]
     private async Task LoadMoreAsync()
     {
-        bilibiliClient.TryGetCookies(out var cookies);
-        var feeds = await bilibiliClient.GetAudioRegionFeedAsync(cookies);
-        if (feeds.Data is null)
-            throw new Exception("获取音乐分区动态失败，数据为空。请检查网络连接或B站服务状态。");
-        _musicRegionFeeds.AddRange(feeds.Data.Archives);
+        if (bilibiliClient.TryGetCookies(out var cookies))
+        {
+            var feeds = await bilibiliClient.GetAudioRegionFeedAsync(cookies);
+            if (feeds.Data is null)
+            {
+                ScopedLogger.Warn("获取音乐分区动态失败，数据为空");
+                return;
+            }
+            _musicRegionFeeds.AddRange(feeds.Data.Archives);
+            ScopedLogger.Info("音乐分区动态已加载，数量: {Count}", feeds.Data.Archives.Count);
+        }
+        else
+            ScopedLogger.Warn("获取Cookies失败，无法加载音乐分区动态");
     }
 
     [RelayCommand]
     private async Task LoadAudioAsync(AudioRegionFeedDataInfoModel audioRegionFeedDataInfoModel)
     {
-        bilibiliClient.TryGetCookies(out var cookies);
-
-        var uniqueId = new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid);
-        var cachedAudioMetadata = favoritesManager.GetCachedAudioMetadataByUniqueId(uniqueId);
-
-        AudioInfoDataModel audioInfoData;
-        if (cachedAudioMetadata is null)
+        if (bilibiliClient.TryGetCookies(out var cookies))
         {
-            var audioInfo = await bilibiliClient.GetAudioInfoAsync(uniqueId, cookies);
-            audioInfoData = audioInfo.EnsureData();
-            favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
+            var uniqueId = new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid);
+            var cachedAudioMetadata = favoritesManager.GetCachedAudioMetadataByUniqueId(uniqueId);
+
+            AudioInfoDataModel audioInfoData;
+            if (cachedAudioMetadata is null)
+            {
+                var audioInfo = await bilibiliClient.GetAudioInfoAsync(uniqueId, cookies);
+                audioInfoData = audioInfo.EnsureData();
+                favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
+            }
+            else
+            {
+                audioInfoData = new AudioInfoDataModel(cachedAudioMetadata);
+            }
+        
+            var playItem = new PlayListItem(
+                audioInfoData.Title,
+                audioInfoData.CoverUrl,
+                audioInfoData.Owner.Name,
+                audioInfoData.Owner.Mid,
+                uniqueId,
+                TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
+            );
+
+            var behavior = configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior;
+            switch (behavior)
+            {
+                case FavoritesAddBehaviors.AddToNextInPlayList:
+                    await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
+                    break;
+                case FavoritesAddBehaviors.AddToEndOfPlayList:
+                    await playerManager.AppendAsync(playItem);
+                    break;
+                case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
+                    await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
+                    Task.Run(async () =>
+                    {
+                        await playerManager.LoadAsync(playItem);
+                        playerManager.Play();
+                    }).Detach();
+                    break;
+                case FavoritesAddBehaviors.ReplaceCurrentPlayList:
+                default:
+                    ScopedLogger.Warn("错误的添加行为: {Behavior}", behavior);
+                    return;
+            }
+            ScopedLogger.Info("已将音频添加到播放列表: {Title}，行为: {Behavior}", audioInfoData.Title, behavior);
         }
         else
-        {
-            audioInfoData = new AudioInfoDataModel(cachedAudioMetadata);
-        }
-        
-        var playItem = new PlayListItem(
-            audioInfoData.Title,
-            audioInfoData.CoverUrl,
-            audioInfoData.Owner.Name,
-            audioInfoData.Owner.Mid,
-            uniqueId,
-            TimeSpan.FromSeconds(audioInfoData.DurationSeconds)
-        );
-        switch (configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior)
-        {
-            case FavoritesAddBehaviors.AddToNextInPlayList:
-                await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
-                break;
-            case FavoritesAddBehaviors.AddToEndOfPlayList:
-                await playerManager.AppendAsync(playItem);
-                break;
-            case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
-                await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
-                Task.Run(async () =>
-                {
-                    await playerManager.LoadAsync(playItem);
-                    playerManager.Play();
-                }).Detach();
-                break;
-            case FavoritesAddBehaviors.ReplaceCurrentPlayList:
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            ScopedLogger.Warn("获取Cookies失败，无法加载音频");
     }
 
     [RelayCommand]
     private void OpenAuthorSpaceUrl(ulong mid)
-        => launcher.LaunchUriAsync(new Uri($"https://space.bilibili.com/{mid}", UriKind.Absolute));
+    {
+        launcher.LaunchUriAsync(new Uri($"https://space.bilibili.com/{mid}", UriKind.Absolute));
+        ScopedLogger.Info("已打开作者空间链接: https://space.bilibili.com/{Mid}", mid);
+    }
 
     public void OnNavigatedTo()
     {

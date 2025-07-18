@@ -46,7 +46,7 @@ public partial class MainWindow : Window
                 break;
             case CloseBehaviors.Close:
             default:
-                Environment.Exit(0);
+                App.Shutdown();
                 break;
         }
     }

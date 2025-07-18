@@ -3,11 +3,14 @@ using System.Net.Http;
 using Avalonia.Platform.Storage;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
+using KanaPlayer.Core.Helpers;
+using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Database;
+using KanaPlayer.Helpers;
 using KanaPlayer.Models;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.Services.TrayMenu;
@@ -18,6 +21,9 @@ using KanaPlayer.Views;
 using KanaPlayer.Views.Pages;
 using KanaPlayer.Views.Pages.SubPages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace KanaPlayer.Services;
 
@@ -79,13 +85,22 @@ public static class ServiceExtensions
 
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
+        services.AddLogging(builder =>
+        {
+            builder.ClearProviders();
+            builder.SetMinimumLevel(LogLevel.Debug);
+            builder.AddNLog();
+        });
+
+        services.AddDbContext<MainDbContext>(ServiceLifetime.Singleton);
+        services.AddSingleton<IExceptionHandler, KanaExceptionHandler>();
         services.AddSingleton<IKanaToastManager, KanaToastManager>();
         services.AddSingleton<IKanaDialogManager, KanaDialogManager>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<ITrayMenuService, TrayMenuService>();
         services.AddSingleton<IConfigurationService<SettingsModel>, ConfigurationService<SettingsModel>>();
         services.AddSingleton<IPlayerManager, PlayerManager<SettingsModel>>();
-        services.AddDbContext<MainDbContext>(ServiceLifetime.Singleton);
+        services.AddKeyedSingleton<IExceptionHandler, PlayerManagerExceptionHandler>("PlayerManagerExceptionHandler");
         
         services.AddSingleton<IFavoritesManager>(x => x.GetRequiredService<MainDbContext>());
         

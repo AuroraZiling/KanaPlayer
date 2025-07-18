@@ -8,39 +8,17 @@ using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
+using NLog;
 
 namespace KanaPlayer.ViewModels.Pages;
 
-public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, ILauncher launcher) : ViewModelBase
+public partial class SettingsViewModel(IConfigurationService<SettingsModel> configurationService, ILauncher launcher) : ViewModelBase, IDisposable
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(SettingsViewModel));
+    
     [RelayCommand]
     private void Test()
     {
-        // var kanaToastManager = App.GetService<IKanaToastManager>();
-        // var kanaDialogManager = App.GetService<IKanaDialogManager>();
-        // var bilibiliClient = App.GetService<IBilibiliClient>();
-        // var mainDbContext = App.GetService<MainDbContext>();
-        // var navigationService = App.GetService<INavigationService>();
-        // var fakeImportItem = new FavoriteFolderItem
-        // {
-        //     Id = 3463008729,
-        //     Title = "叮咚鸡精选集",
-        //     CoverUrl = "http://i1.hdslb.com/bfs/archive/82c1f7360650a26215467bfe83227f24e588e218.jpg",
-        //     Description = "大狗大狗叫叫叫",
-        //     Owner = new CommonOwnerModel
-        //     {
-        //         Mid = 12879829,
-        //         Name = "DearVa",
-        //     },
-        //     FavoriteType = FavoriteType.Folder | FavoriteType.Collected,
-        //     CreatedTimestamp = 1744221085,
-        //     ModifiedTimestamp = 1744221085,
-        //     MediaCount = 7
-        // };
-        // kanaDialogManager.CreateDialog()
-        //                  .WithView(new FavoritesBilibiliImportDialog())
-        //                  .WithViewModel(dialog => new FavoritesBilibiliImportDialogViewModel(dialog, fakeImportItem, bilibiliClient, mainDbContext, kanaToastManager, navigationService))
-        //                  .TryShow();
     }
 
     #region Behaviors
@@ -52,7 +30,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnSelectedCloseBehaviorChanged(CloseBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.CloseBehavior = value;
-        configurationService.Save();
+        configurationService.SaveImmediate();
+        ScopedLogger.Info($"窗口关闭按钮行为变更为: {value}");
     }
 
     // Favorites - Play All Button Warning
@@ -62,7 +41,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnIsFavoritesPlayAllReplaceWarningEnabledChanged(bool value)
     {
         configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled = value;
-        configurationService.Save();
+        configurationService.SaveImmediate();
+        ScopedLogger.Info($"收藏夹播放全部警告已设置为: {value}");
     }
 
     // Home - Add Behavior
@@ -73,7 +53,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeHomeAddBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior = value;
-        configurationService.Save();
+        configurationService.SaveImmediate();
+        ScopedLogger.Info($"主页添加单曲行为变更为: {value}");
     }
 
     // Favorites - DoubleTapped PlayListItem Behavior
@@ -84,7 +65,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeDoubleTappedPlayListItemBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior = value;
-        configurationService.Save();
+        configurationService.SaveImmediate();
+        ScopedLogger.Info($"收藏夹双击列表项行为变更为: {value}");
     }
 
     // Favorites - Add All Behavior
@@ -95,7 +77,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeFavoritesAddAllBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior = value;
-        configurationService.Save();
+        configurationService.SaveImmediate();
+        ScopedLogger.Info($"收藏夹添加全部行为变更为: {value}");
     }
 
     #endregion
@@ -110,7 +93,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnMaximumAudioCacheSizeInMbChanged(int value)
     {
         configurationService.Settings.CommonSettings.AudioCache.MaximumCacheSizeInMb = value;
-        configurationService.Save();
+        configurationService.SaveDelayed();
     }
 
     // Maximum Image Cache Size (128MB - 5120MB)
@@ -121,18 +104,21 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnMaximumImageCacheSizeInMbChanged(int value)
     {
         configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb = value;
-        configurationService.Save();
+        configurationService.SaveDelayed();
     }
 
     // Manual Cache Cleanup
     [RelayCommand]
-    private void CleanupCache(string cacheType)
-        => App.CleanupCache(cacheType switch
+    private static void CleanupCache(string cacheType)
+    {
+        App.CleanupCache(cacheType switch
         {
             "audio" => AppHelper.ApplicationAudioCachesFolderPath,
             "image" => AppHelper.ApplicationImageCachesFolderPath,
             _       => throw new ArgumentException("Invalid cache type specified.")
         }, 0);
+        ScopedLogger.Info($"已清理 {cacheType} 缓存。");
+    }
 
     #endregion
 
@@ -151,11 +137,18 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
             .ContinueWith(task =>
             {
                 if (task.IsFaulted)
-                {
-                    Console.WriteLine($"Failed to open folder: {task.Exception?.Message}");
-                }
+                    ScopedLogger.Error(task.Exception, $"无法打开 {folderType} 文件夹: {folderPath}");
+                else
+                    ScopedLogger.Info($"已成功打开 {folderType} 文件夹: {folderPath}");
             });
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        configurationService.SaveImmediate();
+        ScopedLogger.Debug("SettingsViewModel 已被释放，所有设置已保存");
+        GC.SuppressFinalize(this);
+    }
 }

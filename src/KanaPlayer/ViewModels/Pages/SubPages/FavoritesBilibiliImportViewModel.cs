@@ -16,6 +16,7 @@ using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Models;
 using KanaPlayer.ViewModels.Dialogs;
 using KanaPlayer.Views.Dialogs;
+using NLog;
 
 namespace KanaPlayer.ViewModels.Pages.SubPages;
 
@@ -24,6 +25,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                                                       INavigationService navigationService, IKanaDialogManager kanaDialogManager, IFavoritesManager favoritesManager)
     : ViewModelBase, INavigationAware
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesBilibiliImportViewModel));
     private static List<FavoriteFolderItem> CachedFavoriteFolderImportItems { get; set; } = [];
 
     [ObservableProperty] public partial ObservableCollection<FavoriteFolderItem>? FavoriteFolderImportItems { get; set; }
@@ -69,6 +71,8 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                     CachedFavoriteFolderImportItems.Add(model);
                     FavoriteFolderImportItems.Add(model);
                 }
+                
+                ScopedLogger.Info($"已获取到 {createdFavoriteFoldersMeta.EnsureData().Folders.Count} 个由用户创建的收藏夹");
 
                 // 用户收集的收藏夹 / 合集
                 foreach (var favoriteCollectedFolderMetaData in collectedFavoriteFoldersMeta)
@@ -120,12 +124,17 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                         FavoriteFolderImportItems.Add(model);
                     }
                 }
+                
+                ScopedLogger.Info($"已获取到 {collectedFavoriteFoldersMeta.Count} 个由用户收集的收藏夹/合集");
             }
 
             navigationService.IsPageProgressBarVisible = false;
         }
         else
+        {
             FavoriteFolderImportItems = new ObservableCollection<FavoriteFolderItem>(CachedFavoriteFolderImportItems);
+            ScopedLogger.Info("使用缓存的收藏夹数据");
+        }
     }
 
     [RelayCommand]
@@ -135,6 +144,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
         if (favoritesManager.IsFolderExists(new FavoriteUniqueId(importItem.Id, importItem.FavoriteType)))
         {
             kanaToastManager.CreateToast().WithType(NotificationType.Error).WithTitle("导入失败").WithContent("该收藏夹已存在于本地收藏中").Queue();
+            ScopedLogger.Warn($"尝试导入的收藏夹已存在: {importItem.Title} (ID: {importItem.Id})");
             return;
         }
 
