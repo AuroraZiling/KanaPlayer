@@ -5,6 +5,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using KanaPlayer.Core.Helpers;
 
 namespace KanaPlayer.Controls;
 
@@ -29,6 +30,15 @@ public class KanaWindowTitleBar : TemplatedControl
     {
         get => GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsDebuggingProperty = AvaloniaProperty.Register<KanaWindowTitleBar, bool>(
+        nameof(IsDebugging), AppHelper.IsDebug);
+
+    public bool IsDebugging
+    {
+        get => GetValue(IsDebuggingProperty);
+        set => SetValue(IsDebuggingProperty, value);
     }
     
     private void EnableWindowsSnapLayout(Button maximize)

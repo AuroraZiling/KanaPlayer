@@ -87,7 +87,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
             _mediaPlayer.Volume = (int)(field * 100);
             OnPropertyChanged();
         }
-    } = 1.0;
+    }
 
     public void Load(Stream audioStream)
     {
@@ -141,6 +141,19 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
         if (Status == PlayStatus.Playing)
         {
             _mediaPlayer.Pause();
+        }
+    }
+    
+    public void Stop()
+    {
+        if (Status != PlayStatus.Stopped)
+        {
+            Progress = 0.0;
+            _mediaPlayer.Stop();
+            _mediaPlayer.Media = null;
+            _currentMedia?.Dispose();
+            _streamMediaInput?.Dispose();
+            Status = PlayStatus.Stopped;
         }
     }
 

@@ -19,7 +19,11 @@ using KanaPlayer.Services;
 using KanaPlayer.Services.Theme;
 using KanaPlayer.ViewModels;
 using KanaPlayer.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Config;
+using NLog.Extensions.Logging;
 
 namespace KanaPlayer;
 
@@ -33,16 +37,17 @@ public partial class App : Application
 
         ImageLoader.AsyncImageLoader = new DiskCachedWebImageLoader(AppHelper.ApplicationImageCachesFolderPath);
     }
-    
+
     public static event Action<IServiceCollection>? ConfigureServices;
 
-    private static readonly Lazy<IServiceProvider> ServiceProvider = new(() => new ServiceCollection()
-        .RegisterViews()
-        .RegisterViewModels()
-        .RegisterServices()
-        .With(x => ConfigureServices?.Invoke(x))
-        .BuildServiceProvider());
-    
+    private static readonly Lazy<IServiceProvider> ServiceProvider = new(() =>
+        new ServiceCollection()
+            .RegisterViews()
+            .RegisterViewModels()
+            .RegisterServices()
+            .With(x => ConfigureServices?.Invoke(x))
+            .BuildServiceProvider());
+
     public static T GetService<T>() where T : notnull => ServiceProvider.Value.GetRequiredService<T>();
 
     public static object GetService(Type type) => ServiceProvider.Value.GetRequiredService(type);
@@ -54,7 +59,7 @@ public partial class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            
+
             GetService<IThemeService>().SetThemeColor(new Color(255, 216, 196, 241), true);
 
             var splashWindow = GetService<SplashWindow>();
@@ -65,7 +70,7 @@ public partial class App : Application
                 {
                     GetService<MainDbContext>().Database.EnsureCreated();
                 });
-                
+
                 // First Authenticate Attempt
                 await GetService<IBilibiliClient>().AuthenticateAsync();
 
@@ -86,7 +91,7 @@ public partial class App : Application
                 mainWindow.Focus();
 
                 desktop.MainWindow = mainWindow;
-            }, TaskContinuationOptions.ExecuteSynchronously).Detach();  // TODO: Exception Handler
+            }, TaskContinuationOptions.ExecuteSynchronously).Detach(); // TODO: Exception Handler
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
@@ -97,24 +102,24 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
-    
+
     public static void SafeShutdown()
     {
-        //TODO: Implement a proper shutdown sequence
+        // TODO: Implement a proper shutdown sequence
         Environment.Exit(0);
     }
-    
+
     internal static void CleanupCache(string cacheFolderPath, int desiredCacheSizeInMb)
     {
         var dirInfo = new DirectoryInfo(cacheFolderPath);
         if (!dirInfo.Exists) return;
 
         var files = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories)
-            .OrderByDescending(f => f.LastAccessTimeUtc)
-            .ToList();
+                           .OrderByDescending(f => f.LastAccessTimeUtc)
+                           .ToList();
         var currentCacheSizeInBytes = files.Sum(f => f.Length);
         var desiredCacheSizeInBytes = desiredCacheSizeInMb * 1024L * 1024L;
-        
+
         while (currentCacheSizeInBytes > desiredCacheSizeInBytes && files.Count > 0)
         {
             var fileToDelete = files.Last();

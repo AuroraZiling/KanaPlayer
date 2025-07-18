@@ -31,7 +31,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _bilibiliClient.TryGetCookies(out _cookies);
 
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
-        Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
+        audioPlayer.Volume = Volume = configurationService.Settings.CommonSettings.BehaviorHistory.Volume;
 
         InitializePlayListCommand.Execute(null);
         _audioPlayer.PropertyChanged += (_, args) =>
@@ -327,8 +327,13 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         => _playList.Remove(playListItem);
     public int IndexOf(PlayListItem playListItem)
         => _playList.IndexOf(playListItem);
+    
     public void Clear()
-        => _playList.Clear();
+    {
+        CurrentPlayListItem = null;
+        _audioPlayer.Stop();
+        _playList.Clear();
+    }
 }
 
 public class CachedAudioStream : Stream

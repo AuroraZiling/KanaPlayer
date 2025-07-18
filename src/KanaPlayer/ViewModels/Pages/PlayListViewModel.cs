@@ -35,9 +35,7 @@ public partial class PlayListViewModel : ViewModelBase
         playerManager.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IPlayerManager.CurrentPlayListItem))
-            {
                 SelectedPlayListItem = playerManager.CurrentPlayListItem;
-            }
         };
         SelectedPlayListItem = playerManager.CurrentPlayListItem;
     }

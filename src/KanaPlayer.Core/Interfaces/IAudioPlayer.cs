@@ -56,4 +56,5 @@ public interface IAudioPlayer : INotifyPropertyChanged
     /// Pauses the currently playing audio.
     /// </summary>
     void Pause();
+    void Stop();
 }

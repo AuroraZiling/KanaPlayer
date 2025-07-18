@@ -23,6 +23,9 @@
                             FontSize="18"
                             Text="{TemplateBinding Title}"
                             VerticalAlignment="Center" />
+                        <Border VerticalAlignment="Center" CornerRadius="5" Padding="6, 4" Background="OrangeRed" IsVisible="{TemplateBinding IsDebugging}">
+                            <TextBlock Text="Debug"></TextBlock>
+                        </Border>
                     </StackPanel>
                     <StackPanel
                         HorizontalAlignment="Right"

@@ -4,6 +4,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
