@@ -71,7 +71,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                     CachedFavoriteFolderImportItems.Add(model);
                     FavoriteFolderImportItems.Add(model);
                 }
-                
+
                 ScopedLogger.Info($"已获取到 {createdFavoriteFoldersMeta.EnsureData().Folders.Count} 个由用户创建的收藏夹");
 
                 // 用户收集的收藏夹 / 合集
@@ -124,7 +124,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
                         FavoriteFolderImportItems.Add(model);
                     }
                 }
-                
+
                 ScopedLogger.Info($"已获取到 {collectedFavoriteFoldersMeta.Count} 个由用户收集的收藏夹/合集");
             }
 
@@ -149,9 +149,10 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
         }
 
         kanaDialogManager.CreateDialog()
-                         .WithView(new FavoritesBilibiliImportDialog())
+                         .WithView(new FavoritesBilibiliDialog())
                          .WithViewModel(dialog =>
-                             new FavoritesBilibiliImportDialogViewModel(dialog, importItem, bilibiliClient, favoritesManager, kanaToastManager, navigationService))
+                             new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Import, dialog, importItem,
+                                 bilibiliClient, favoritesManager, kanaToastManager, navigationService))
                          .TryShow();
     }
 

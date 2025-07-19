@@ -2,9 +2,9 @@
 
 namespace KanaPlayer.Views.Dialogs;
 
-public partial class FavoritesBilibiliImportDialog : UserControl
+public partial class FavoritesBilibiliDialog : UserControl
 {
-    public FavoritesBilibiliImportDialog()
+    public FavoritesBilibiliDialog()
     {
         InitializeComponent();
     }

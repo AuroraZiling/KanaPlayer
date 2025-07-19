@@ -86,6 +86,9 @@
                         <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
                                 Command="{Binding AddAllToPlayListCommand}">
                         </Button>
+                        <Button Content="同步" attaching:Icon.LucideIconKind="FolderSync"
+                                Command="{Binding SyncCommand}">
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

@@ -2,24 +2,33 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
+using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Database;
+using KanaPlayer.Core.Models.Favorites;
 using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Favorites;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
+using KanaPlayer.ViewModels.Dialogs;
+using KanaPlayer.Views.Dialogs;
 using KanaPlayer.Views.Pages.SubPages;
 using NLog;
 
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class FavoritesViewModel(INavigationService navigationService, IFavoritesManager favoritesManager, IPlayerManager playerManager,
-                                        IConfigurationService<SettingsModel> configurationService, IKanaDialogManager kanaDialogManager)
+                                        IKanaToastManager kanaToastManager,
+                                        IConfigurationService<SettingsModel> configurationService, IKanaDialogManager kanaDialogManager,
+                                        IBilibiliClient bilibiliClient)
     : ViewModelBase, INavigationAware
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesViewModel));
@@ -143,6 +152,35 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
                 ScopedLogger.Error("错误的收藏夹添加全部音频行为：{Behavior}", behavior);
                 return;
         }
+    }
+
+    [RelayCommand]
+    private void Sync()
+    {
+        if (SelectedFavoriteFolder is null)
+            return;
+
+        kanaDialogManager.CreateDialog()
+                         .WithView(new FavoritesBilibiliDialog())
+                         .WithViewModel(dialog =>
+                             new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Sync, dialog, new FavoriteFolderItem
+                                 {
+                                     Id = SelectedFavoriteFolder.UniqueId.Id,
+                                     Title = SelectedFavoriteFolder.Title,
+                                     CoverUrl = SelectedFavoriteFolder.CoverUrl,
+                                     Description = SelectedFavoriteFolder.Description,
+                                     Owner = new CommonOwnerModel
+                                     {
+                                         Mid = SelectedFavoriteFolder.OwnerMid,
+                                         Name = SelectedFavoriteFolder.OwnerName,
+                                     },
+                                     FavoriteType = SelectedFavoriteFolder.FavoriteType,
+                                     CreatedTimestamp = SelectedFavoriteFolder.CreatedTimestamp,
+                                     ModifiedTimestamp = SelectedFavoriteFolder.ModifiedTimestamp,
+                                     MediaCount = SelectedFavoriteFolder.MediaCount
+                                 },
+                                 bilibiliClient, favoritesManager, kanaToastManager, navigationService))
+                         .TryShow();
     }
 
     public void OnNavigatedTo()

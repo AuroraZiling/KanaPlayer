@@ -18,7 +18,7 @@ KanaPlayer 正处于积极开发阶段，存在许多未完成的功能和可能
     <img src=".github/assets/kana-logo.webp" alt="Logo" width="128" height="128">
   </a>
 
-  <h2 align="center">KanaPlayer</h3>
+  <h2 align="center">KanaPlayer</h2>
 
   <p align="center">
     B站音频播放器
