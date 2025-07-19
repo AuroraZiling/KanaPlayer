@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching">
     <Design.PreviewWith>
         <Border Width="400">
             <TabControl>
@@ -68,7 +69,7 @@
                         <DockPanel>
                             <Panel DockPanel.Dock="{TemplateBinding TabStripPlacement}">
                                 <StackPanel Orientation="Horizontal" Spacing="20">
-                                    <TextBlock Text="设置" Classes="h1" VerticalAlignment="Center"></TextBlock>
+                                    <TextBlock Text="{TemplateBinding attaching:TabControlAttaching.Header}" Classes="h1" VerticalAlignment="Center"></TextBlock>
                                     <Border CornerRadius="50" Background="{DynamicResource KanaAccentColor20}">
                                         <ItemsPresenter Name="PART_ItemsPresenter"
                                                         ItemsPanel="{TemplateBinding ItemsPanel}" />

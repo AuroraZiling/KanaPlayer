@@ -129,7 +129,7 @@ public partial class BilibiliClient<TSettings>
     /// <param name="fetchedCountProgress"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList,
+    public async Task<BiliCollectionMediaListModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList,
                                                           IProgress<int>? fetchedCountProgress = null)
     {
         const int supposedMediaCountPerPage = 50;
@@ -140,7 +140,7 @@ public partial class BilibiliClient<TSettings>
         var totalMediaCount = templatePageData.Medias.Count;
         fetchedCountProgress?.Report(templatePageData.Medias.Count);
 
-        var allCollected = new List<CollectionFolderCommonMediaModel>();
+        var allCollected = new List<BiliMediaListCommonMediaModel>();
         allCollected.AddRange(templatePageData.Medias);
 
         if (fetchCompleteMediaList)
@@ -159,7 +159,7 @@ public partial class BilibiliClient<TSettings>
         templatePage.EnsureData().Medias = allCollected;
         return templatePage;
 
-        async Task<CollectionModel> GetPageAsync(int pageNumber)
+        async Task<BiliCollectionMediaListModel> GetPageAsync(int pageNumber)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
             var response = await httpClient.SendAsync(request);
@@ -170,7 +170,7 @@ public partial class BilibiliClient<TSettings>
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            var collectionModel = JsonSerializer.Deserialize<CollectionModel>(content);
+            var collectionModel = JsonSerializer.Deserialize<BiliCollectionMediaListModel>(content);
             if (collectionModel == null)
             {
                 ScopedLogger.Debug("反序列化合集内容失败: {Content}", content);

@@ -1,4 +1,4 @@
-﻿using KanaPlayer.Core.Models.Favorites;
+﻿using KanaPlayer.Core.Models.BiliMediaList;
 
 namespace KanaPlayer.Core.Models;
 
@@ -19,9 +19,9 @@ public readonly record struct AudioUniqueId(string Bvid, int Page = 1)
     }
 }
 
-public readonly record struct FavoriteUniqueId(ulong Id, FavoriteType FavoriteType)
+public readonly record struct FavoriteUniqueId(ulong Id, BiliMediaListType BiliMediaListType)
 {
-    public override string ToString() => $"{Id}_{(int)FavoriteType}";
+    public override string ToString() => $"{Id}_{(int)BiliMediaListType}";
     public static FavoriteUniqueId Parse(string value)
     {
         var indexOfUnderscore = value.IndexOf('_');
@@ -31,6 +31,6 @@ public readonly record struct FavoriteUniqueId(ulong Id, FavoriteType FavoriteTy
         var mid = ulong.Parse(value[..indexOfUnderscore]);
         var favoriteType = int.Parse(value[(indexOfUnderscore + 1)..]);
         
-        return new FavoriteUniqueId(mid, (FavoriteType)favoriteType);
+        return new FavoriteUniqueId(mid, (BiliMediaListType)favoriteType);
     }
 }

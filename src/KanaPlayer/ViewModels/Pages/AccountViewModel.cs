@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Models;
-using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Models.Wrappers.User;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Models;

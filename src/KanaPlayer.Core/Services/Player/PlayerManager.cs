@@ -10,7 +10,7 @@ using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using ObservableCollections;
@@ -24,15 +24,15 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     private readonly IAudioPlayer _audioPlayer;
     private readonly IBilibiliClient _bilibiliClient;
     private readonly IConfigurationService<TSettings> _configurationService;
-    private readonly IFavoritesManager _favoritesManager;
+    private readonly IBiliMediaListManager _biliMediaListManager;
     private readonly IExceptionHandler _exceptionHandler;
     public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient,
-                         IFavoritesManager favoritesManager, [FromKeyedServices("PlayerManagerExceptionHandler")] IExceptionHandler exceptionHandler)
+                         IBiliMediaListManager biliMediaListManager, [FromKeyedServices("PlayerManagerExceptionHandler")] IExceptionHandler exceptionHandler)
     {
         _configurationService = configurationService;
         _audioPlayer = audioPlayer;
         _bilibiliClient = bilibiliClient;
-        _favoritesManager = favoritesManager;
+        _biliMediaListManager = biliMediaListManager;
         _exceptionHandler = exceptionHandler;
 
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
@@ -116,7 +116,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
             async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
             {
-                var cachedAudioMetadata = _favoritesManager.GetCachedAudioMetadataByUniqueId(audioUniqueId);
+                var cachedAudioMetadata = _biliMediaListManager.GetCachedBiliMediaListAudioMetadataByUniqueId(audioUniqueId);
                 PlayListItem playListItem;
                 if (cachedAudioMetadata is not null)
                 {
@@ -127,7 +127,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                     var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, cookies);
                     var audioInfoData = audioInfo.EnsureData();
                     playListItem = new PlayListItem(audioInfoData);
-                    _favoritesManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
+                    _biliMediaListManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
                 }
                 return playListItem;
             }

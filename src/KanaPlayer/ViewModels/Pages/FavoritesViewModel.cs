@@ -2,19 +2,17 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
-using KanaPlayer.Core.Models;
+using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Database;
-using KanaPlayer.Core.Models.Favorites;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
@@ -25,7 +23,7 @@ using NLog;
 
 namespace KanaPlayer.ViewModels.Pages;
 
-public partial class FavoritesViewModel(INavigationService navigationService, IFavoritesManager favoritesManager, IPlayerManager playerManager,
+public partial class FavoritesViewModel(INavigationService navigationService, IBiliMediaListManager biliMediaListManager, IPlayerManager playerManager,
                                         IKanaToastManager kanaToastManager,
                                         IConfigurationService<SettingsModel> configurationService, IKanaDialogManager kanaDialogManager,
                                         IBilibiliClient bilibiliClient)
@@ -33,40 +31,49 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesViewModel));
 
-    [RelayCommand]
-    private void RefreshFavoriteFolders()
-    {
-        FavoriteFolders = new ObservableCollection<LocalFavoriteFolderItem>(favoritesManager.GetLocalFavoriteFolders());
-        ScopedLogger.Info("刷新收藏夹列表，当前收藏夹数量：{Count}", FavoriteFolders.Count);
-    }
+    #region Offline
 
-    [ObservableProperty] public partial ObservableCollection<LocalFavoriteFolderItem> FavoriteFolders { get; set; } = [];
-    [ObservableProperty] public partial LocalFavoriteFolderItem? SelectedFavoriteFolder { get; set; }
-    partial void OnSelectedFavoriteFolderChanged(LocalFavoriteFolderItem? value)
+    
+
+    #endregion
+
+    #region Bili Media List
+
+    [ObservableProperty] public partial ObservableCollection<DbBiliMediaListItem>? BiliMediaLists { get; set; }
+    [ObservableProperty] public partial DbBiliMediaListItem? SelectedBiliMediaList { get; set; }
+    [ObservableProperty] public partial ObservableCollection<DbCachedBiliMediaListAudioMetadata> BiliMediaListItems { get; set; } = [];
+    [ObservableProperty] public partial DbCachedBiliMediaListAudioMetadata? SelectedBiliMediaListItem { get; set; }
+    
+    [RelayCommand]
+    private void RefreshBiliMediaLists()
+    {
+        var dbMediaListItems = new ObservableCollection<DbBiliMediaListItem>(biliMediaListManager.GetBiliMediaListItems());
+        BiliMediaLists = dbMediaListItems.Count > 0 ? dbMediaListItems : null;
+        ScopedLogger.Info("刷新B站收藏夹/合集列表，数量：{Count}", dbMediaListItems.Count);
+    }
+    partial void OnSelectedBiliMediaListChanged(DbBiliMediaListItem? value)
     {
         if (value is null)
             return;
-        FavoriteFolderItems = new ObservableCollection<CachedAudioMetadata>(favoritesManager.GetCachedAudioMetadataList(value));
-        ScopedLogger.Info("已选择收藏夹：{FolderName}，当前收藏夹中的音频数量：{Count}", value.Title, FavoriteFolderItems.Count);
+        BiliMediaListItems = new ObservableCollection<DbCachedBiliMediaListAudioMetadata>(biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(value));
+        ScopedLogger.Info("已选择B站收藏夹/合集：{FolderName}，音频数量：{Count}", value.Title, BiliMediaListItems.Count);
     }
-    [ObservableProperty] public partial ObservableCollection<CachedAudioMetadata> FavoriteFolderItems { get; set; } = [];
-    [ObservableProperty] public partial CachedAudioMetadata? SelectedPlayListItem { get; set; }
 
     [RelayCommand]
     private async Task DoubleTappedSelectedItemAsync()
     {
-        if (SelectedFavoriteFolder is null || SelectedPlayListItem is null)
+        if (SelectedBiliMediaList is null || SelectedBiliMediaListItem is null)
             return;
 
         var behavior = configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior;
-        var selectedPlayListItem = new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl, SelectedPlayListItem.OwnerName,
-            SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds));
+        var selectedPlayListItem = new PlayListItem(SelectedBiliMediaListItem.Title, SelectedBiliMediaListItem.CoverUrl, SelectedBiliMediaListItem.OwnerName,
+            SelectedBiliMediaListItem.OwnerMid, SelectedBiliMediaListItem.UniqueId, TimeSpan.FromSeconds(SelectedBiliMediaListItem.DurationSeconds));
         switch (behavior)
         {
             case FavoritesAddBehaviors.ReplaceCurrentPlayList:
             {
                 playerManager.Clear();
-                foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+                foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList))
                 {
                     await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                         cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
@@ -74,21 +81,21 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
                 break;
             }
             case FavoritesAddBehaviors.AddToNextInPlayList:
-                await playerManager.InsertAfterCurrentPlayItemAsync(new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl,
-                    SelectedPlayListItem.OwnerName,
-                    SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds)));
+                await playerManager.InsertAfterCurrentPlayItemAsync(new PlayListItem(SelectedBiliMediaListItem.Title, SelectedBiliMediaListItem.CoverUrl,
+                    SelectedBiliMediaListItem.OwnerName,
+                    SelectedBiliMediaListItem.OwnerMid, SelectedBiliMediaListItem.UniqueId, TimeSpan.FromSeconds(SelectedBiliMediaListItem.DurationSeconds)));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
-                await playerManager.AppendAsync(new PlayListItem(SelectedPlayListItem.Title, SelectedPlayListItem.CoverUrl, SelectedPlayListItem.OwnerName,
-                    SelectedPlayListItem.OwnerMid, SelectedPlayListItem.UniqueId, TimeSpan.FromSeconds(SelectedPlayListItem.DurationSeconds)));
+                await playerManager.AppendAsync(new PlayListItem(SelectedBiliMediaListItem.Title, SelectedBiliMediaListItem.CoverUrl, SelectedBiliMediaListItem.OwnerName,
+                    SelectedBiliMediaListItem.OwnerMid, SelectedBiliMediaListItem.UniqueId, TimeSpan.FromSeconds(SelectedBiliMediaListItem.DurationSeconds)));
                 break;
             case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
             default:
-                ScopedLogger.Error("错误的收藏夹双击播放行为：{Behavior}", behavior);
+                ScopedLogger.Error("错误的收藏夹/合集双击播放行为：{Behavior}", behavior);
                 return;
         }
         await playerManager.LoadAndPlayAsync(selectedPlayListItem);
-        ScopedLogger.Info("双击播放收藏夹音频：{Title}，所属收藏夹：{FolderName}，播放模式：{playbackMode}", SelectedPlayListItem.Title, SelectedFavoriteFolder.Title, behavior);
+        ScopedLogger.Info("双击播放B站收藏夹/合集音频：{Title}，所属收藏夹/合集：{FolderName}，播放模式：{playbackMode}", SelectedBiliMediaListItem.Title, SelectedBiliMediaList.Title, behavior);
     }
 
     [RelayCommand]
@@ -100,7 +107,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     [RelayCommand]
     private async Task PlayAllAsync()
     {
-        if (SelectedFavoriteFolder is null)
+        if (SelectedBiliMediaList is null)
             return;
 
         if (configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled)
@@ -114,32 +121,32 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
         }
 
         playerManager.Clear();
-        foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+        foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList))
         {
             await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                 cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
         }
         await playerManager.LoadFirstAndPlayAsync();
-        ScopedLogger.Info("播放收藏夹全部音频：{FolderName}，音频数量：{Count}", SelectedFavoriteFolder.Title, FavoriteFolderItems.Count);
+        ScopedLogger.Info("播放B站收藏夹/合集全部音频：{FolderName}，音频数量：{Count}", SelectedBiliMediaList.Title, BiliMediaListItems.Count);
     }
 
     [RelayCommand]
     private void AddAllToPlayList()
     {
-        if (SelectedFavoriteFolder is null)
+        if (SelectedBiliMediaList is null)
             return;
 
         var behavior = configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior;
         switch (behavior)
         {
             case FavoritesAddBehaviors.AddToNextInPlayList:
-                playerManager.InsertAfterCurrentPlayItemRangeAsync(favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder).Select(cachedAudioMetadata =>
+                playerManager.InsertAfterCurrentPlayItemRangeAsync(biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList).Select(cachedAudioMetadata =>
                     new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                         cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
             {
-                foreach (var cachedAudioMetadata in favoritesManager.GetCachedAudioMetadataList(SelectedFavoriteFolder))
+                foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList))
                 {
                     playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                         cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
@@ -149,7 +156,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
             case FavoritesAddBehaviors.ReplaceCurrentPlayList:
             case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
             default:
-                ScopedLogger.Error("错误的收藏夹添加全部音频行为：{Behavior}", behavior);
+                ScopedLogger.Error("错误的收藏夹/合集添加全部音频行为：{Behavior}", behavior);
                 return;
         }
     }
@@ -157,34 +164,36 @@ public partial class FavoritesViewModel(INavigationService navigationService, IF
     [RelayCommand]
     private void Sync()
     {
-        if (SelectedFavoriteFolder is null)
+        if (SelectedBiliMediaList is null)
             return;
 
         kanaDialogManager.CreateDialog()
                          .WithView(new FavoritesBilibiliDialog())
                          .WithViewModel(dialog =>
-                             new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Sync, dialog, new FavoriteFolderItem
+                             new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Sync, dialog, new BiliMediaListItem
                                  {
-                                     Id = SelectedFavoriteFolder.UniqueId.Id,
-                                     Title = SelectedFavoriteFolder.Title,
-                                     CoverUrl = SelectedFavoriteFolder.CoverUrl,
-                                     Description = SelectedFavoriteFolder.Description,
+                                     Id = SelectedBiliMediaList.UniqueId.Id,
+                                     Title = SelectedBiliMediaList.Title,
+                                     CoverUrl = SelectedBiliMediaList.CoverUrl,
+                                     Description = SelectedBiliMediaList.Description,
                                      Owner = new CommonOwnerModel
                                      {
-                                         Mid = SelectedFavoriteFolder.OwnerMid,
-                                         Name = SelectedFavoriteFolder.OwnerName,
+                                         Mid = SelectedBiliMediaList.OwnerMid,
+                                         Name = SelectedBiliMediaList.OwnerName,
                                      },
-                                     FavoriteType = SelectedFavoriteFolder.FavoriteType,
-                                     CreatedTimestamp = SelectedFavoriteFolder.CreatedTimestamp,
-                                     ModifiedTimestamp = SelectedFavoriteFolder.ModifiedTimestamp,
-                                     MediaCount = SelectedFavoriteFolder.MediaCount
+                                     BiliMediaListType = SelectedBiliMediaList.BiliMediaListType,
+                                     CreatedTimestamp = SelectedBiliMediaList.CreatedTimestamp,
+                                     ModifiedTimestamp = SelectedBiliMediaList.ModifiedTimestamp,
+                                     MediaCount = SelectedBiliMediaList.MediaCount
                                  },
-                                 bilibiliClient, favoritesManager, kanaToastManager, navigationService))
+                                 bilibiliClient, biliMediaListManager, kanaToastManager, navigationService))
                          .TryShow();
     }
 
+    #endregion
+
     public void OnNavigatedTo()
     {
-        RefreshFavoriteFoldersCommand.Execute(null);
+        RefreshBiliMediaListsCommand.Execute(null);
     }
 }

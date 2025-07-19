@@ -10,7 +10,7 @@ using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
@@ -20,7 +20,7 @@ using ObservableCollections;
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManager playerManager,
-                                   ILauncher launcher, IFavoritesManager favoritesManager, IConfigurationService<SettingsModel> configurationService)
+                                   ILauncher launcher, IBiliMediaListManager biliMediaListManager, IConfigurationService<SettingsModel> configurationService)
     : ViewModelBase, INavigationAware
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(HomeViewModel));
@@ -63,14 +63,14 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         if (bilibiliClient.TryGetCookies(out var cookies))
         {
             var uniqueId = new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid);
-            var cachedAudioMetadata = favoritesManager.GetCachedAudioMetadataByUniqueId(uniqueId);
+            var cachedAudioMetadata = biliMediaListManager.GetCachedBiliMediaListAudioMetadataByUniqueId(uniqueId);
 
             AudioInfoDataModel audioInfoData;
             if (cachedAudioMetadata is null)
             {
                 var audioInfo = await bilibiliClient.GetAudioInfoAsync(uniqueId, cookies);
                 audioInfoData = audioInfo.EnsureData();
-                favoritesManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
+                biliMediaListManager.AddOrUpdateAudioToCache(uniqueId, audioInfoData);
             }
             else
             {

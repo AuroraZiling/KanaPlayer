@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Models.Wrappers.User;
 
 namespace KanaPlayer.Core.Services;
 

@@ -2,7 +2,7 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class CollectionFolderCommonInfoModel
+public class BiliMediaListCommonInfoModel
 {
     [JsonPropertyName("id")] public required ulong Id { get; set; }
     [JsonPropertyName("title")] public required string Title { get; set; }
@@ -12,7 +12,7 @@ public class CollectionFolderCommonInfoModel
     [JsonPropertyName("media_count")] public required int MediaCount { get; set; }
 }
 
-public class CollectionFolderCommonMediaModel
+public class BiliMediaListCommonMediaModel
 {
     [JsonPropertyName("title")] public required string Title { get; set; }
     [JsonPropertyName("cover")] public required string CoverUrl { get; set; }
@@ -20,10 +20,10 @@ public class CollectionFolderCommonMediaModel
     [JsonPropertyName("pubtime")] public required long PublishTimestamp { get; set; }
     [JsonPropertyName("upper")] public required CommonOwnerModel Owner { get; set; }
     [JsonPropertyName("bvid")] public required string Bvid { get; set; }
-    [JsonPropertyName("cnt_info")] public required CollectionFolderCommonMediaStatisticsModel Statistics { get; set; }
+    [JsonPropertyName("cnt_info")] public required BiliMediaListCommonStatisticsModel Statistics { get; set; }
 }
 
-public class CollectionFolderCommonMediaStatisticsModel
+public class BiliMediaListCommonStatisticsModel
 {
     [JsonPropertyName("collect")] public required int CollectCount { get; set; }
     [JsonPropertyName("danmaku")] public required int DanmakuCount { get; set; }

@@ -2,67 +2,66 @@
 using System.Linq;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
+using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Database;
-using KanaPlayer.Core.Models.Favorites;
-using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using Microsoft.EntityFrameworkCore;
 
 namespace KanaPlayer.Database;
 
-public partial class MainDbContext : IFavoritesManager
+public partial class MainDbContext : IBiliMediaListManager
 {
-    public CachedAudioMetadata? GetCachedAudioMetadataByUniqueId(AudioUniqueId uniqueId)
-        => CachedAudioMetadataSet
-           .Include(metadata => metadata.LocalFavoriteFolderItemSet)
+    public DbCachedBiliMediaListAudioMetadata? GetCachedBiliMediaListAudioMetadataByUniqueId(AudioUniqueId uniqueId)
+        => CachedBiliMediaListAudioMetadataSet
+           .Include(metadata => metadata.BiliMediaListItemSet)
            .FirstOrDefault(metadata => metadata.UniqueId.Equals(uniqueId));
 
-    public List<LocalFavoriteFolderItem> GetLocalFavoriteFolders()
-        => LocalFavoriteFolderItemSet
-           .Include(item => item.CachedAudioMetadataSet)
+    public List<DbBiliMediaListItem> GetBiliMediaListItems()
+        => BiliMediaListItemSet
+           .Include(item => item.CachedBiliMediaListAudioMetadataSet)
            .OrderByDescending(item => item.CreatedTimestamp)
            .ToList();
 
-    public List<CachedAudioMetadata> GetCachedAudioMetadataList(LocalFavoriteFolderItem item)
-        => LocalFavoriteFolderItemSet
-           .Include(folder => folder.CachedAudioMetadataSet)
+    public List<DbCachedBiliMediaListAudioMetadata> GetCachedBiliMediaListAudioMetadataList(DbBiliMediaListItem item)
+        => BiliMediaListItemSet
+           .Include(folder => folder.CachedBiliMediaListAudioMetadataSet)
            .Where(folder => folder.UniqueId.Equals(item.UniqueId))
-           .SelectMany(folder => folder.CachedAudioMetadataSet)
+           .SelectMany(folder => folder.CachedBiliMediaListAudioMetadataSet)
            .OrderByDescending(metadata => metadata.PublishTimestamp)
            .ToList();
 
-    public bool IsFolderExists(FavoriteUniqueId favoriteUniqueId)
-        => LocalFavoriteFolderItemSet
+    public bool IsBiliMediaListExists(FavoriteUniqueId favoriteUniqueId)
+        => BiliMediaListItemSet
             .Any(item => item.UniqueId.Equals(favoriteUniqueId));
 
-    public void ImportFromBilibili(FavoriteFolderItem importItem, List<CollectionFolderCommonMediaModel> importMedias)
+    public void ImportFromBilibili(BiliMediaListItem importItem, List<BiliMediaListCommonMediaModel> importMedias)
     {
-        var localFavoriteFolderItem = LocalFavoriteFolderItemSet
-                                      .Include(item => item.CachedAudioMetadataSet)
-                                      .FirstOrDefault(item => item.UniqueId.Equals(new FavoriteUniqueId(importItem.Id, importItem.FavoriteType)));
+        var biliMediaListItem = BiliMediaListItemSet
+                                      .Include(item => item.CachedBiliMediaListAudioMetadataSet)
+                                      .FirstOrDefault(item => item.UniqueId.Equals(new FavoriteUniqueId(importItem.Id, importItem.BiliMediaListType)));
 
-        if (localFavoriteFolderItem is null)
+        if (biliMediaListItem is null)
         {
-            localFavoriteFolderItem = new LocalFavoriteFolderItem
+            biliMediaListItem = new DbBiliMediaListItem
             {
-                UniqueId = new FavoriteUniqueId(importItem.Id, importItem.FavoriteType),
+                UniqueId = new FavoriteUniqueId(importItem.Id, importItem.BiliMediaListType),
                 Title = importItem.Title.SafeSubstring(0, 128),
                 CoverUrl = importItem.CoverUrl.SafeSubstring(0, 1024),
                 Description = importItem.Description.SafeSubstring(0, 1024),
                 OwnerMid = importItem.Owner.Mid,
                 OwnerName = importItem.Owner.Name.SafeSubstring(0, 64),
-                FavoriteType = importItem.FavoriteType,
+                BiliMediaListType = importItem.BiliMediaListType,
                 CreatedTimestamp = importItem.CreatedTimestamp,
                 ModifiedTimestamp = importItem.ModifiedTimestamp,
                 MediaCount = importItem.MediaCount
             };
 
-            LocalFavoriteFolderItemSet.Add(localFavoriteFolderItem);
+            BiliMediaListItemSet.Add(biliMediaListItem);
         }
 
         var importMediaUniqueIds = importMedias.Select(media => new AudioUniqueId(media.Bvid)).ToHashSet();
-        var existedMediaList = CachedAudioMetadataSet
+        var existedMediaList = CachedBiliMediaListAudioMetadataSet
                                .Where(metadata => importMediaUniqueIds.Contains(metadata.UniqueId))
                                .ToList();
 
@@ -70,7 +69,7 @@ public partial class MainDbContext : IFavoritesManager
         {
             if (existedMediaList.FirstOrDefault(existed => existed.UniqueId.Equals(new AudioUniqueId(media.Bvid))) is not { } audioMetadata)
             {
-                audioMetadata = new CachedAudioMetadata
+                audioMetadata = new DbCachedBiliMediaListAudioMetadata
                 {
                     UniqueId = new AudioUniqueId(media.Bvid),
                     Title = media.Title.SafeSubstring(0, 128),
@@ -83,9 +82,9 @@ public partial class MainDbContext : IFavoritesManager
                     DanmakuCount = media.Statistics.DanmakuCount,
                     PlayCount = media.Statistics.PlayCount,
                 };
-                CachedAudioMetadataSet.Add(audioMetadata);
+                CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
             }
-            localFavoriteFolderItem.CachedAudioMetadataSet.Add(audioMetadata);
+            biliMediaListItem.CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
         }
 
         SaveChanges();
@@ -93,7 +92,7 @@ public partial class MainDbContext : IFavoritesManager
 
     public void AddOrUpdateAudioToCache(AudioUniqueId audioUniqueId, AudioInfoDataModel audioInfoData)
     {
-        if (CachedAudioMetadataSet.FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId)) is { } audioMetadata)
+        if (CachedBiliMediaListAudioMetadataSet.FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId)) is { } audioMetadata)
         {
             audioMetadata.Title = audioInfoData.Title;
             audioMetadata.CoverUrl = audioInfoData.CoverUrl;
@@ -107,7 +106,7 @@ public partial class MainDbContext : IFavoritesManager
         }
         else
         {
-            audioMetadata = new CachedAudioMetadata
+            audioMetadata = new DbCachedBiliMediaListAudioMetadata
             {
                 UniqueId = audioUniqueId,
                 Title = audioInfoData.Title,
@@ -121,7 +120,7 @@ public partial class MainDbContext : IFavoritesManager
                 PlayCount = audioInfoData.Statistics.PlayCount
             };
 
-            CachedAudioMetadataSet.Add(audioMetadata);
+            CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
         }
         SaveChanges();
     }

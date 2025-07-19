@@ -15,4 +15,8 @@
       <PackageReference Include="ObservableCollections" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\MediaList\" />
+    </ItemGroup>
+
 </Project>

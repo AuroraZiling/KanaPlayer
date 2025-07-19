@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using KanaPlayer.Core.Models.Favorites;
+using KanaPlayer.Core.Models.BiliMediaList;
 
 namespace KanaPlayer.Core.Models.Database;
 
-public class LocalFavoriteFolderItem
+public class DbBiliMediaListItem
 {
     [Key]
     public FavoriteUniqueId UniqueId { get; set; }
@@ -19,8 +19,8 @@ public class LocalFavoriteFolderItem
     public required string OwnerName { get; set; }
     public required long CreatedTimestamp { get; set; }
     public required long ModifiedTimestamp { get; set; }
-    public required FavoriteType FavoriteType { get; set; }
+    public required BiliMediaListType BiliMediaListType { get; set; }
     public required int MediaCount { get; set; }
 
-    public HashSet<CachedAudioMetadata> CachedAudioMetadataSet { get; set; } = [];
+    public HashSet<DbCachedBiliMediaListAudioMetadata> CachedBiliMediaListAudioMetadataSet { get; set; } = [];
 }

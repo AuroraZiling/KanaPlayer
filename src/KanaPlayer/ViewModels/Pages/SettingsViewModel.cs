@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Database;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
 using NLog;

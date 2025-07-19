@@ -14,7 +14,7 @@
         <converters:StorageSizeHumanizerConverter x:Key="StorageSizeHumanizerConverter" />
     </UserControl.Resources>
 
-    <TabControl Classes="PageTabControl">
+    <TabControl Classes="PageTabControl" attaching:TabControlAttaching.Header="设置">
         <TabItem Header="行为" Classes="PageTabItem">
             <ScrollViewer>
                 <StackPanel Spacing="15">

@@ -5,15 +5,14 @@ using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Database.Converters;
 using Microsoft.EntityFrameworkCore;
 using NLog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace KanaPlayer.Database;
 
 public partial class MainDbContext : DbContext
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(MainDbContext));
-    public DbSet<LocalFavoriteFolderItem> LocalFavoriteFolderItemSet { get; set; }
-    public DbSet<CachedAudioMetadata> CachedAudioMetadataSet { get; set; }
+    public DbSet<DbBiliMediaListItem> BiliMediaListItemSet { get; set; }
+    public DbSet<DbCachedBiliMediaListAudioMetadata> CachedBiliMediaListAudioMetadataSet { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -24,9 +23,9 @@ public partial class MainDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<LocalFavoriteFolderItem>()
-                    .HasMany(e => e.CachedAudioMetadataSet)
-                    .WithMany(e => e.LocalFavoriteFolderItemSet);
+        modelBuilder.Entity<DbBiliMediaListItem>()
+                    .HasMany(e => e.CachedBiliMediaListAudioMetadataSet)
+                    .WithMany(e => e.BiliMediaListItemSet);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

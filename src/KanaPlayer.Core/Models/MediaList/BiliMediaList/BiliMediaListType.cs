@@ -1,7 +1,7 @@
-﻿namespace KanaPlayer.Core.Models.Favorites;
+﻿namespace KanaPlayer.Core.Models.BiliMediaList;
 
 [Flags]
-public enum FavoriteType
+public enum BiliMediaListType
 {
     Folder = 1,
     

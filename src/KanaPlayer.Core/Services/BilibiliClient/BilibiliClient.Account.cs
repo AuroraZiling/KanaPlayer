@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using KanaPlayer.Core.Extensions;
-using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Models.Wrappers.User;
 
 namespace KanaPlayer.Core.Services;
 

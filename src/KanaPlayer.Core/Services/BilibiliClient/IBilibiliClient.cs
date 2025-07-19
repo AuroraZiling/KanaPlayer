@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Wrappers;
+using KanaPlayer.Core.Models.Wrappers.User;
 
 namespace KanaPlayer.Core.Services;
 
@@ -36,16 +37,16 @@ public interface IBilibiliClient : INotifyPropertyChanged
 
     Task<Stream> GetAudioStreamAsync(AudioUniqueId audioUniqueId, Dictionary<string, string> cookies);
 
-    Task<CollectionModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList, IProgress<int>? fetchedCountProgress = null);
+    Task<BiliCollectionMediaListModel> GetCollectionAsync(ulong collectionId, Dictionary<string, string> cookies, bool fetchCompleteMediaList, IProgress<int>? fetchedCountProgress = null);
 
     #endregion
 
     #region Favorite
 
-    Task<FavoriteCreatedFoldersMetaModel> GetFavoriteCreatedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
-    Task<List<FavoriteCollectedItemMetaDataModel>> GetFavoriteCollectedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies);
-    Task<FavoriteFolderInfoModel> GetFavoriteFolderInfoAsync(ulong folderId, Dictionary<string, string> cookies);
-    Task<FavoriteFolderDetailModel> GetFavoriteFolderDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null);
+    Task<CreatedBiliFavoriteMediaListMetaModel> GetCreatedBiliFavoriteMediaListMetaAsync(ulong upMid, Dictionary<string, string> cookies);
+    Task<List<CollectedBiliFavoriteMediaListMetaDataItemModel>> GetCollectedBiliFavoriteMediaListMetaAsync(ulong upMid, Dictionary<string, string> cookies);
+    Task<BiliFavoriteMediaListInfoModel> GetBiliFavoriteMediaListInfoAsync(ulong folderId, Dictionary<string, string> cookies);
+    Task<BiliFavoriteMediaListDetailModel> GetBiliFavoriteMediaListDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null);
 
     #endregion
 }

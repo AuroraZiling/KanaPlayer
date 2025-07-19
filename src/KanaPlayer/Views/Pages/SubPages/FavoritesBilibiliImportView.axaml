@@ -1,8 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:subPages="clr-namespace:KanaPlayer.ViewModels.Pages.SubPages"
-             xmlns:favorites="clr-namespace:KanaPlayer.Core.Models.Favorites;assembly=KanaPlayer.Core"
              xmlns:converters="clr-namespace:KanaPlayer.Converters"
+             xmlns:biliMediaList="clr-namespace:KanaPlayer.Core.Models.BiliMediaList;assembly=KanaPlayer.Core"
              x:DataType="subPages:FavoritesBilibiliImportViewModel"
              x:Class="KanaPlayer.Views.Pages.SubPages.FavoritesBilibiliImportView">
 
@@ -33,10 +33,10 @@
                 </Style>
             </ListBox.Styles>
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type favorites:FavoriteFolderItem}">
+                <DataTemplate DataType="{x:Type biliMediaList:BiliMediaListItem}">
                     <Grid ColumnDefinitions="50, *, *, *, *, 100">
                         <LucideIcon Grid.Column="0"
-                                    Kind="{Binding FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}">
+                                    Kind="{Binding BiliMediaListType, Converter={StaticResource FavoriteTypeToIconKindConverter}}">
                         </LucideIcon>
 
                         <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>

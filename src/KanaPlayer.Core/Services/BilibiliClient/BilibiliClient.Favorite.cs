@@ -19,7 +19,7 @@ public partial class BilibiliClient<TSettings>
     /// <param name="cookies"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<FavoriteCreatedFoldersMetaModel> GetFavoriteCreatedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies)
+    public async Task<CreatedBiliFavoriteMediaListMetaModel> GetCreatedBiliFavoriteMediaListMetaAsync(ulong upMid, Dictionary<string, string> cookies)
     {
         var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid={upMid}&type=0&web_location=333.1387";
 
@@ -27,18 +27,18 @@ public partial class BilibiliClient<TSettings>
         var response = await httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
-            ScopedLogger.Debug($"获取用户创建的所有收藏夹信息失败: {response.ReasonPhrase}");
-            throw new HttpRequestException($"获取用户创建的所有收藏夹信息失败: {response.ReasonPhrase}");
+            ScopedLogger.Debug($"获取用户创建的所有B站收藏夹信息失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"获取用户创建的所有B站收藏夹信息失败: {response.ReasonPhrase}");
         }
 
         var content = await response.Content.ReadAsStringAsync();
-        var favoriteCreatedFoldersMetaModel = JsonSerializer.Deserialize<FavoriteCreatedFoldersMetaModel>(content);
-        if (favoriteCreatedFoldersMetaModel == null)
+        var createdBiliFavoriteMediaListMetaModel = JsonSerializer.Deserialize<CreatedBiliFavoriteMediaListMetaModel>(content);
+        if (createdBiliFavoriteMediaListMetaModel == null)
         {
-            ScopedLogger.Debug("反序列化获取用户创建的所有收藏夹信息失败");
-            throw new HttpRequestException("反序列化获取用户创建的所有收藏夹信息失败");
+            ScopedLogger.Debug("反序列化获取用户创建的所有B站收藏夹信息失败");
+            throw new HttpRequestException("反序列化获取用户创建的所有B站收藏夹信息失败");
         }
-        return favoriteCreatedFoldersMetaModel;
+        return createdBiliFavoriteMediaListMetaModel;
     }
 
     /// <summary>
@@ -49,11 +49,11 @@ public partial class BilibiliClient<TSettings>
     /// <param name="cookies"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<List<FavoriteCollectedItemMetaDataModel>> GetFavoriteCollectedFoldersMetaAsync(ulong upMid, Dictionary<string, string> cookies)
+    public async Task<List<CollectedBiliFavoriteMediaListMetaDataItemModel>> GetCollectedBiliFavoriteMediaListMetaAsync(ulong upMid, Dictionary<string, string> cookies)
     {
         var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/collected/list?ps=50&up_mid={upMid}&platform=web";
 
-        var allCollected = new List<FavoriteCollectedItemMetaDataModel>();
+        var allCollected = new List<CollectedBiliFavoriteMediaListMetaDataItemModel>();
         var page = 1;
         while (true)
         {
@@ -70,24 +70,24 @@ public partial class BilibiliClient<TSettings>
         }
         return allCollected;
 
-        async Task<FavoriteCollectedMetaModel> GetPageAsync(int pageNumber)
+        async Task<CollectedBiliFavoriteMediaListMetaModel> GetPageAsync(int pageNumber)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
             var response = await httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
-                ScopedLogger.Debug($"获取用户收藏的视频收藏夹信息失败: {response.ReasonPhrase}");
-                throw new HttpRequestException($"获取用户收藏的视频收藏夹信息失败: {response.ReasonPhrase}");
+                ScopedLogger.Debug($"获取用户收藏的B站视频收藏夹信息失败: {response.ReasonPhrase}");
+                throw new HttpRequestException($"获取用户收藏的B站视频收藏夹信息失败: {response.ReasonPhrase}");
             }
             
             var content = await response.Content.ReadAsStringAsync();
-            var favoriteCollectedMetaModel = JsonSerializer.Deserialize<FavoriteCollectedMetaModel>(content);
-            if (favoriteCollectedMetaModel == null)
+            var collectedBiliFavoriteMediaListMetaModel = JsonSerializer.Deserialize<CollectedBiliFavoriteMediaListMetaModel>(content);
+            if (collectedBiliFavoriteMediaListMetaModel == null)
             {
-                ScopedLogger.Debug("反序列化获取用户收藏的视频收藏夹信息失败");
-                throw new HttpRequestException("反序列化获取用户收藏的视频收藏夹信息失败");
+                ScopedLogger.Debug("反序列化获取用户收藏的B站视频收藏夹信息失败");
+                throw new HttpRequestException("反序列化获取用户收藏的B站视频收藏夹信息失败");
             }
-            return favoriteCollectedMetaModel;
+            return collectedBiliFavoriteMediaListMetaModel;
         }
     }
     
@@ -99,7 +99,7 @@ public partial class BilibiliClient<TSettings>
     /// <param name="cookies"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<FavoriteFolderInfoModel> GetFavoriteFolderInfoAsync(ulong folderId, Dictionary<string, string> cookies)
+    public async Task<BiliFavoriteMediaListInfoModel> GetBiliFavoriteMediaListInfoAsync(ulong folderId, Dictionary<string, string> cookies)
     {
         var endpoint = $"https://api.bilibili.com/x/v3/fav/folder/info?media_id={folderId}";
 
@@ -107,18 +107,18 @@ public partial class BilibiliClient<TSettings>
         var response = await httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
-            ScopedLogger.Debug($"获取收藏夹信息失败: {response.ReasonPhrase}");
-            throw new HttpRequestException($"获取收藏夹信息失败: {response.ReasonPhrase}");
+            ScopedLogger.Debug($"获取B站收藏夹信息失败: {response.ReasonPhrase}");
+            throw new HttpRequestException($"获取B站收藏夹信息失败: {response.ReasonPhrase}");
         }
         
         var content = await response.Content.ReadAsStringAsync();
-        var favoriteFolderInfoModel = JsonSerializer.Deserialize<FavoriteFolderInfoModel>(content);
-        if (favoriteFolderInfoModel == null)
+        var biliFavoriteMediaListInfoModel = JsonSerializer.Deserialize<BiliFavoriteMediaListInfoModel>(content);
+        if (biliFavoriteMediaListInfoModel == null)
         {
-            ScopedLogger.Debug("反序列化获取收藏夹信息失败");
-            throw new HttpRequestException("反序列化获取收藏夹信息失败");
+            ScopedLogger.Debug("反序列化获取B站收藏夹信息失败");
+            throw new HttpRequestException("反序列化获取B站收藏夹信息失败");
         }
-        return favoriteFolderInfoModel;
+        return biliFavoriteMediaListInfoModel;
     }
     
     /// <summary>
@@ -130,7 +130,7 @@ public partial class BilibiliClient<TSettings>
     /// <param name="fetchedCountProgress"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<FavoriteFolderDetailModel> GetFavoriteFolderDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null)
+    public async Task<BiliFavoriteMediaListDetailModel> GetBiliFavoriteMediaListDetailAsync(ulong folderId, Dictionary<string, string> cookies, IProgress<int>? fetchedCountProgress = null)
     {
         var endpoint = $"https://api.bilibili.com/x/v3/fav/resource/list?media_id={folderId}&tid=0&ps=40&platform=web";
 
@@ -139,7 +139,7 @@ public partial class BilibiliClient<TSettings>
         var hasMore = templatePageData.HasMore;
         fetchedCountProgress?.Report(templatePageData.Medias.Count);
 
-        var allCollected = new List<CollectionFolderCommonMediaModel>();
+        var allCollected = new List<BiliMediaListCommonMediaModel>();
         allCollected.AddRange(templatePageData.Medias);
         
         if (hasMore)
@@ -160,24 +160,24 @@ public partial class BilibiliClient<TSettings>
         templatePage.EnsureData().Medias = allCollected;
         return templatePage;
 
-        async Task<FavoriteFolderDetailModel> GetPageAsync(int pageNumber)
+        async Task<BiliFavoriteMediaListDetailModel> GetPageAsync(int pageNumber)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}&pn={pageNumber}").LoadCookies(cookies);
             var response = await httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
-                ScopedLogger.Debug($"获取收藏夹内容明细列表失败: {response.ReasonPhrase}");
-                throw new HttpRequestException($"获取收藏夹内容明细列表失败: {response.ReasonPhrase}");
+                ScopedLogger.Debug($"获取B站收藏夹内容明细列表失败: {response.ReasonPhrase}");
+                throw new HttpRequestException($"获取B站收藏夹内容明细列表失败: {response.ReasonPhrase}");
             }
             
             var content = await response.Content.ReadAsStringAsync();
-            var favoriteFolderDetailModel = JsonSerializer.Deserialize<FavoriteFolderDetailModel>(content);
-            if (favoriteFolderDetailModel == null)
+            var biliFavoriteMediaListDetailModel = JsonSerializer.Deserialize<BiliFavoriteMediaListDetailModel>(content);
+            if (biliFavoriteMediaListDetailModel == null)
             {
-                ScopedLogger.Debug("反序列化获取收藏夹内容明细列表失败");
-                throw new HttpRequestException("反序列化获取收藏夹内容明细列表失败");
+                ScopedLogger.Debug("反序列化获取B站收藏夹内容明细列表失败");
+                throw new HttpRequestException("反序列化获取B站收藏夹内容明细列表失败");
             }
-            return favoriteFolderDetailModel;
+            return biliFavoriteMediaListDetailModel;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace KanaPlayer.Core.Models.Wrappers;
+namespace KanaPlayer.Core.Models.Wrappers.User;
 
 public class ApplyQrCodeModel : CommonApiModel<ApplyQrCodeDataModel>;
 

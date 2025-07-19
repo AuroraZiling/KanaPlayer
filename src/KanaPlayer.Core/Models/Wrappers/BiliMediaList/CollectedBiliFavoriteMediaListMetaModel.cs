@@ -2,15 +2,15 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class FavoriteCollectedMetaModel: CommonApiModel<FavoriteCollectedMetaDataModel>;
+public class CollectedBiliFavoriteMediaListMetaModel: CommonApiModel<CollectedBiliFavoriteMediaListMetaDataModel>;
 
-public class FavoriteCollectedMetaDataModel
+public class CollectedBiliFavoriteMediaListMetaDataModel
 {
-    [JsonPropertyName("list")] public List<FavoriteCollectedItemMetaDataModel> List { get; set; } = [];
+    [JsonPropertyName("list")] public List<CollectedBiliFavoriteMediaListMetaDataItemModel> List { get; set; } = [];
     [JsonPropertyName("has_more")] public bool HasMore { get; set; }
 }
 
-public class FavoriteCollectedItemMetaDataModel: CollectionFolderCommonInfoModel
+public class CollectedBiliFavoriteMediaListMetaDataItemModel: BiliMediaListCommonInfoModel
 {
     [JsonPropertyName("ctime")] public required long CreatedTimestamp { get; set; }
     [JsonPropertyName("mtime")] public required long ModifiedTimestamp { get; set; }

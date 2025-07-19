@@ -7,7 +7,7 @@ using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Database;
 using KanaPlayer.Helpers;
@@ -102,7 +102,7 @@ public static class ServiceExtensions
         services.AddSingleton<IPlayerManager, PlayerManager<SettingsModel>>();
         services.AddKeyedSingleton<IExceptionHandler, PlayerManagerExceptionHandler>("PlayerManagerExceptionHandler");
         
-        services.AddSingleton<IFavoritesManager>(x => x.GetRequiredService<MainDbContext>());
+        services.AddSingleton<IBiliMediaListManager>(x => x.GetRequiredService<MainDbContext>());
         
         services.AddSingleton<IBilibiliClient, BilibiliClient<SettingsModel>>();
         services.AddKeyedSingleton<HttpClient, HttpClient>("bilibili", (_, _) =>

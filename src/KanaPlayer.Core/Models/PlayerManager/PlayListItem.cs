@@ -11,8 +11,8 @@ public record PlayListItem(
     AudioUniqueId AudioUniqueId,
     TimeSpan Duration)
 {
-    public PlayListItem(CachedAudioMetadata cachedAudioMetadata) : this(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
-        cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))
+    public PlayListItem(DbCachedBiliMediaListAudioMetadata dbCachedBiliMediaListAudioMetadata) : this(dbCachedBiliMediaListAudioMetadata.Title, dbCachedBiliMediaListAudioMetadata.CoverUrl, dbCachedBiliMediaListAudioMetadata.OwnerName,
+        dbCachedBiliMediaListAudioMetadata.OwnerMid, dbCachedBiliMediaListAudioMetadata.UniqueId, TimeSpan.FromSeconds(dbCachedBiliMediaListAudioMetadata.DurationSeconds))
     {
     }
 

@@ -15,106 +15,114 @@
         <converters:DurationHumanizerConverter x:Key="DurationHumanizerConverter" />
     </UserControl.Resources>
 
-    <Grid RowDefinitions="Auto, *" ColumnDefinitions="250, *">
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="收藏夹" Classes="h1" VerticalAlignment="Center"
-                   HorizontalAlignment="Left">
-        </TextBlock>
-        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Classes="ghost" HorizontalAlignment="Right"
-                VerticalAlignment="Center" Content="从 Bilibili 导入" Command="{Binding ImportFromBilibiliCommand}">
-        </Button>
+    <Panel>
+        <TabControl Classes="PageTabControl" attaching:TabControlAttaching.Header="收藏夹">
+            <TabItem Header="本地歌单" Classes="PageTabItem"></TabItem>
+            <TabItem Header="收藏夹与合集" Classes="PageTabItem">
+                <Grid ColumnDefinitions="250, *">
+                    <ListBox Grid.Column="0" Cursor="Hand" SelectedItem="{Binding SelectedBiliMediaList}"
+                             CornerRadius="15" ItemsSource="{Binding BiliMediaLists}"
+                             IsVisible="{Binding BiliMediaLists, Converter={x:Static ObjectConverters.IsNotNull}}"
+                             Background="{DynamicResource KanaAccentColor20}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type database:DbBiliMediaListItem}">
+                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <LucideIcon Grid.Column="0"
+                                                Kind="{Binding BiliMediaListType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"
+                                                Size="22">
+                                    </LucideIcon>
+                                    <TextBlock Grid.Column="1" Margin="10, 0, 0, 0" Text="{Binding Title}"
+                                               VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="2" Text="{Binding MediaCount}" VerticalAlignment="Center"
+                                               HorizontalAlignment="Right" Margin="0, 0, 6, 0">
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
-        <ListBox Grid.Column="0" Grid.Row="1" Cursor="Hand" SelectedItem="{Binding SelectedFavoriteFolder}"
-                 Margin="0, 30, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolders}"
-                 Background="{DynamicResource KanaAccentColor20}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type database:LocalFavoriteFolderItem}">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <LucideIcon Grid.Column="0"
-                                    Kind="{Binding FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"
-                                    Size="22">
-                        </LucideIcon>
-                        <TextBlock Grid.Column="1" Margin="10, 0, 0, 0" Text="{Binding Title}"
-                                   VerticalAlignment="Center" HorizontalAlignment="Left">
-                        </TextBlock>
-                        <TextBlock Grid.Column="2" Text="{Binding MediaCount}" VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" Margin="0, 0, 6, 0">
-                        </TextBlock>
+                    <Grid Grid.Column="1" RowDefinitions="150, *" Margin="10, 30, 0, 0"
+                          IsVisible="{Binding SelectedBiliMediaList, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
+                            <Border ClipToBounds="True" CornerRadius="15">
+                                <Image
+                                    asyncImageLoader:ImageLoader.Source="{Binding SelectedBiliMediaList.CoverUrl, FallbackValue={x:Null}}"
+                                    Height="150" />
+                            </Border>
+                            <StackPanel Margin="6, 0, 0, 0" Spacing="5" VerticalAlignment="Center">
+                                <TextBlock FontSize="24"
+                                           Text="{Binding SelectedBiliMediaList.Title, FallbackValue={x:Null}}"
+                                           VerticalAlignment="Center">
+                                </TextBlock>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <LucideIcon Kind="UserRound" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedBiliMediaList.OwnerName, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center">
+                                    </TextBlock>
+                                    <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                                    <LucideIcon Kind="ListMusic" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedBiliMediaList.MediaCount, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center">
+                                    </TextBlock>
+                                    <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                                    <LucideIcon Kind="Timer" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedBiliMediaList.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock
+                                    IsVisible="{Binding SelectedBiliMediaList.Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue={x:Null}}"
+                                    MaxWidth="350" TextTrimming="CharacterEllipsis"
+                                    Text="{Binding SelectedBiliMediaList.Description, FallbackValue={x:Null}}">
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <Button Content="播放全部" attaching:Icon.LucideIconKind="Play"
+                                            Command="{Binding PlayAllCommand}">
+                                    </Button>
+                                    <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
+                                            Command="{Binding AddAllToPlayListCommand}">
+                                    </Button>
+                                    <Button Content="同步" attaching:Icon.LucideIconKind="FolderSync"
+                                            Command="{Binding SyncCommand}">
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ListBox Grid.Row="1" SelectedItem="{Binding SelectedBiliMediaListItem, Mode=TwoWay}"
+                                 Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding BiliMediaListItems}"
+                                 Background="{DynamicResource KanaAccentColor20}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type database:DbCachedBiliMediaListAudioMetadata}">
+                                    <Grid ColumnDefinitions="60, *, *, 100">
+                                        <TextBlock Grid.Column="0" Text="序号"></TextBlock>
+                                        <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
+                                        <TextBlock Grid.Column="2" Text="{Binding OwnerName}"></TextBlock>
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}">
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="DoubleTapped">
+                                    <InvokeCommandAction Command="{Binding DoubleTappedSelectedItemCommand}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </ListBox>
                     </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="150, *" Margin="10, 30, 0, 0"
-              IsVisible="{Binding SelectedFavoriteFolder, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
-                <Border ClipToBounds="True" CornerRadius="15">
-                    <Image
-                        asyncImageLoader:ImageLoader.Source="{Binding SelectedFavoriteFolder.CoverUrl, FallbackValue={x:Null}}"
-                        Height="150" />
-                </Border>
-                <StackPanel Margin="6, 0, 0, 0" Spacing="5" VerticalAlignment="Center">
-                    <TextBlock FontSize="24"
-                               Text="{Binding SelectedFavoriteFolder.Title, FallbackValue={x:Null}}"
-                               VerticalAlignment="Center">
-                    </TextBlock>
-
-                    <StackPanel Orientation="Horizontal">
-                        <LucideIcon Kind="UserRound" Size="22"></LucideIcon>
-                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
-                                   Text="{Binding SelectedFavoriteFolder.OwnerName, FallbackValue={x:Null}}"
-                                   VerticalAlignment="Center">
-                        </TextBlock>
-                        <LucideIcon Kind="Dot" Size="22"></LucideIcon>
-                        <LucideIcon Kind="ListMusic" Size="22"></LucideIcon>
-                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
-                                   Text="{Binding SelectedFavoriteFolder.MediaCount, FallbackValue={x:Null}}"
-                                   VerticalAlignment="Center">
-                        </TextBlock>
-                        <LucideIcon Kind="Dot" Size="22"></LucideIcon>
-                        <LucideIcon Kind="Timer" Size="22"></LucideIcon>
-                        <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
-                                   Text="{Binding SelectedFavoriteFolder.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-                    <TextBlock
-                        IsVisible="{Binding SelectedFavoriteFolder.Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue={x:Null}}"
-                        MaxWidth="350" TextTrimming="CharacterEllipsis"
-                        Text="{Binding SelectedFavoriteFolder.Description, FallbackValue={x:Null}}">
-                    </TextBlock>
-                    <StackPanel Orientation="Horizontal" Spacing="7">
-                        <Button Content="播放全部" attaching:Icon.LucideIconKind="Play" Command="{Binding PlayAllCommand}"></Button>
-                        <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
-                                Command="{Binding AddAllToPlayListCommand}">
-                        </Button>
-                        <Button Content="同步" attaching:Icon.LucideIconKind="FolderSync"
-                                Command="{Binding SyncCommand}">
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-
-            <ListBox Grid.Row="1" SelectedItem="{Binding SelectedPlayListItem, Mode=TwoWay}"
-                     Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding FavoriteFolderItems}"
-                     Background="{DynamicResource KanaAccentColor20}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type database:CachedAudioMetadata}">
-                        <Grid ColumnDefinitions="60, *, *, 100">
-                            <TextBlock Grid.Column="0" Text="序号"></TextBlock>
-                            <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
-                            <TextBlock Grid.Column="2" Text="{Binding OwnerName}"></TextBlock>
-                            <TextBlock Grid.Column="3"
-                                       Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}">
-                            </TextBlock>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-                
-                <Interaction.Behaviors>
-                    <EventTriggerBehavior EventName="DoubleTapped">
-                        <InvokeCommandAction Command="{Binding DoubleTappedSelectedItemCommand}" />
-                    </EventTriggerBehavior>
-                </Interaction.Behaviors>
-            </ListBox>
-        </Grid>
-    </Grid>
+                    
+                    
+                    <Button Grid.Column="1" Margin="0, -64, 0, 0" Classes="ghost" HorizontalAlignment="Right"
+                            VerticalAlignment="Top" Content="从 Bilibili 导入" Command="{Binding ImportFromBilibiliCommand}">
+                    </Button>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Panel>
 </UserControl>

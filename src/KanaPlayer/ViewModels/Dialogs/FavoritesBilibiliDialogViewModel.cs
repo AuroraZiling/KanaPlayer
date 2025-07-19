@@ -6,10 +6,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
 using KanaPlayer.Controls.Navigation;
-using KanaPlayer.Core.Models.Favorites;
+using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
-using KanaPlayer.Core.Services.Favorites;
+using KanaPlayer.Core.Services.MediaList;
 using KanaPlayer.Views.Pages;
 using NLog;
 
@@ -27,16 +27,16 @@ public partial class FavoritesBilibiliDialogViewModel : ViewModelBase
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesBilibiliDialogViewModel));
     private readonly IKanaDialog _kanaDialog;
     private readonly IBilibiliClient _bilibiliClient;
-    private readonly IFavoritesManager _favoritesManager;
+    private readonly IBiliMediaListManager _biliMediaListManager;
     private readonly IKanaToastManager _kanaToastManager;
     private readonly INavigationService _navigationService;
     
-    public FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType favoritesBilibiliDialogType, IKanaDialog kanaDialog, FavoriteFolderItem item, IBilibiliClient bilibiliClient,
-                                            IFavoritesManager favoritesManager, IKanaToastManager kanaToastManager, INavigationService navigationService)
+    public FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType favoritesBilibiliDialogType, IKanaDialog kanaDialog, BiliMediaListItem item, IBilibiliClient bilibiliClient,
+                                            IBiliMediaListManager biliMediaListManager, IKanaToastManager kanaToastManager, INavigationService navigationService)
     {
         _kanaDialog = kanaDialog;
         _bilibiliClient = bilibiliClient;
-        _favoritesManager = favoritesManager;
+        _biliMediaListManager = biliMediaListManager;
         _kanaToastManager = kanaToastManager;
         _navigationService = navigationService;
         
@@ -50,7 +50,7 @@ public partial class FavoritesBilibiliDialogViewModel : ViewModelBase
     }
     
     [ObservableProperty] public partial FavoritesBilibiliDialogType DialogType { get; set; }
-    [ObservableProperty] public partial FavoriteFolderItem Item { get; set; }
+    [ObservableProperty] public partial BiliMediaListItem Item { get; set; }
     [ObservableProperty] public partial int ProceedMediaCount { get; set; } = 0;
     [ObservableProperty] public partial string ProcessingMediaTitle { get; set; } = string.Empty;
 
@@ -63,9 +63,9 @@ public partial class FavoritesBilibiliDialogViewModel : ViewModelBase
             {
                 ProceedMediaCount += count;
             });
-            if (Item.FavoriteType.HasFlag(FavoriteType.Folder))
+            if (Item.BiliMediaListType.HasFlag(BiliMediaListType.Folder))
             {
-                var favoriteFolderInfo = await _bilibiliClient.GetFavoriteFolderDetailAsync(Item.Id, cookies, progress);
+                var favoriteFolderInfo = await _bilibiliClient.GetBiliFavoriteMediaListDetailAsync(Item.Id, cookies, progress);
                 var infoData = favoriteFolderInfo.EnsureData();
                 GenerateLocalFavoriteFolderItem(Item, infoData.Medias);
             }
@@ -96,9 +96,9 @@ public partial class FavoritesBilibiliDialogViewModel : ViewModelBase
             {
                 ProceedMediaCount += count;
             });
-            if (Item.FavoriteType.HasFlag(FavoriteType.Folder))
+            if (Item.BiliMediaListType.HasFlag(BiliMediaListType.Folder))
             {
-                var favoriteFolderInfo = await _bilibiliClient.GetFavoriteFolderDetailAsync(Item.Id, cookies, progress);
+                var favoriteFolderInfo = await _bilibiliClient.GetBiliFavoriteMediaListDetailAsync(Item.Id, cookies, progress);
                 var infoData = favoriteFolderInfo.EnsureData();
                 GenerateLocalFavoriteFolderItem(Item, infoData.Medias);
             }
@@ -119,11 +119,11 @@ public partial class FavoritesBilibiliDialogViewModel : ViewModelBase
         }
     }
 
-    private void GenerateLocalFavoriteFolderItem(FavoriteFolderItem item, List<CollectionFolderCommonMediaModel> importMedias)
+    private void GenerateLocalFavoriteFolderItem(BiliMediaListItem item, List<BiliMediaListCommonMediaModel> importMedias)
     {
         var processTypeName = DialogType == FavoritesBilibiliDialogType.Import ? "导入" : "同步";
         ProcessingMediaTitle = importMedias.Count > 0 ? $"正在{processTypeName} {item.Title} 收藏夹中的 {importMedias.Count} 个视频" : "没有可导入的视频";
-        _favoritesManager.ImportFromBilibili(item, importMedias);
+        _biliMediaListManager.ImportFromBilibili(item, importMedias);
         _navigationService.Navigate(typeof(FavoritesView));
         _kanaDialog.Dismiss();
     }

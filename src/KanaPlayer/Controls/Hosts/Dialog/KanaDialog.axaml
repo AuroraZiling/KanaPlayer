@@ -17,10 +17,10 @@
                             </Border>
                             <Grid RowDefinitions="Auto,*,Auto"
                                   ColumnDefinitions="*"
-                                  Margin="30,30,30,5">
+                                  Margin="30,0,30,5">
                                 <TextBlock Grid.Row="0"
                                            IsVisible="{TemplateBinding Title,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                           HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold"
+                                           HorizontalAlignment="Center" FontSize="18"
                                            Text="{TemplateBinding Title}" />
                                 <ContentControl Margin="0, 24, 0, 0" Grid.Row="1"
                                                 MaxWidth="{TemplateBinding Content, Converter={x:Static dialogs:DialogContentMaxWidthValueConverter.Instance}}"

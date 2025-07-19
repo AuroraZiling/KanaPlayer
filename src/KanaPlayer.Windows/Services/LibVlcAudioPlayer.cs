@@ -6,7 +6,7 @@ namespace KanaPlayer.Windows.Services;
 
 public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDisposable
 {
-    private readonly LibVLC libVlc;
+    private readonly LibVLC _libVlc;
     private readonly MediaPlayer _mediaPlayer;
 
     private BufferedStreamMediaInput? _streamMediaInput;
@@ -17,7 +17,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
     public LibVlcAudioPlayer()
     {
         LibVLCSharp.Shared.Core.Initialize();
-        libVlc = new LibVLC(
+        _libVlc = new LibVLC(
             "--intf=dummy",
             "--no-audio-time-stretch",
             "--no-video",
@@ -28,7 +28,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
             "--file-caching=0",
             "--clock-jitter=0",
             "--clock-synchro=0");
-        _mediaPlayer = new MediaPlayer(libVlc)
+        _mediaPlayer = new MediaPlayer(_libVlc)
         {
             EnableHardwareDecoding = false,
             FileCaching = 0,
@@ -101,7 +101,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
 
             // 创建 LibVLC 媒体对象
             _streamMediaInput = new BufferedStreamMediaInput(audioStream);
-            _currentMedia = new Media(libVlc, _streamMediaInput);
+            _currentMedia = new Media(_libVlc, _streamMediaInput);
 
             _mediaPlayer.Media = _currentMedia;
             Status = PlayStatus.Paused;
@@ -159,7 +159,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
 
     public void Dispose()
     {
-        libVlc.Dispose();
+        _libVlc.Dispose();
         _mediaPlayer.Dispose();
 
         _currentMedia?.Dispose();

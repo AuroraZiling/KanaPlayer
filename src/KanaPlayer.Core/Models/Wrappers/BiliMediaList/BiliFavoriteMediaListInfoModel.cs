@@ -2,9 +2,9 @@
 
 namespace KanaPlayer.Core.Models.Wrappers;
 
-public class FavoriteFolderInfoModel: CommonApiModel<FavoriteCreatedFolderInfoDataModel>;
+public class BiliFavoriteMediaListInfoModel: CommonApiModel<CreatedBiliFavoriteMediaListInfoDataModel>;
 
-public class FavoriteCreatedFolderInfoDataModel: CollectionFolderCommonInfoModel
+public class CreatedBiliFavoriteMediaListInfoDataModel: BiliMediaListCommonInfoModel
 {
     [JsonPropertyName("ctime")] public required long CreatedTimestamp { get; set; }
     [JsonPropertyName("mtime")] public required long ModifiedTimestamp { get; set; }

@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Timers;
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Models;
-using Microsoft.Extensions.Logging;
 using NLog;
 using Timer = System.Timers.Timer;
 

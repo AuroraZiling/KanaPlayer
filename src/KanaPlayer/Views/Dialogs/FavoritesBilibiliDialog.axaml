@@ -12,14 +12,16 @@
     
     <Grid RowDefinitions="*, Auto">
         <StackPanel Grid.Row="0" Spacing="10">
-            <TextBlock Text="正在导入" FontSize="22" FontWeight="DemiBold" IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesBilibiliDialogType.Import}}"></TextBlock>
-            <TextBlock Text="正在同步" FontSize="22" FontWeight="DemiBold" IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesBilibiliDialogType.Sync}}"></TextBlock>
+            <Panel>
+                <TextBlock Text="正在导入" FontSize="22" FontWeight="DemiBold" IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesBilibiliDialogType.Import}}"></TextBlock>
+                <TextBlock Text="正在同步" FontSize="22" FontWeight="DemiBold" IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesBilibiliDialogType.Sync}}"></TextBlock>
+            </Panel>
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Border Height="90" ClipToBounds="True" CornerRadius="15">
                     <Image asyncImageLoader:ImageLoader.Source="{Binding Item.CoverUrl}" Height="90" />
                 </Border>
                 <Grid ColumnDefinitions="Auto, *" RowDefinitions="*, *, *">
-                    <LucideIcon Grid.Row="0" Grid.Column="0" Size="20" Kind="{Binding Item.FavoriteType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"></LucideIcon>
+                    <LucideIcon Grid.Row="0" Grid.Column="0" Size="20" Kind="{Binding Item.BiliMediaListType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"></LucideIcon>
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5, 0, 0, 0" Text="{Binding Item.Title}" VerticalAlignment="Center"></TextBlock>
                     
                     <LucideIcon Grid.Row="1" Grid.Column="0" Kind="UserRound" Size="22"></LucideIcon>
