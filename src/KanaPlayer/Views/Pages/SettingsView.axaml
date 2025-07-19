@@ -14,64 +14,8 @@
         <converters:StorageSizeHumanizerConverter x:Key="StorageSizeHumanizerConverter" />
     </UserControl.Resources>
 
-    <UserControl.Styles>
-        <Style Selector="TabControl">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            Background="{TemplateBinding Background}"
-                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                            TextElement.Foreground="LightGray">
-                        <DockPanel>
-                            <Panel DockPanel.Dock="{TemplateBinding TabStripPlacement}">
-                                <StackPanel Orientation="Horizontal" Spacing="20">
-                                    <TextBlock Text="设置" Classes="h1" VerticalAlignment="Center"></TextBlock>
-                                    <Border CornerRadius="50" Background="{DynamicResource KanaAccentColor20}">
-                                        <ItemsPresenter Name="PART_ItemsPresenter"
-                                                        ItemsPanel="{TemplateBinding ItemsPanel}" />
-                                    </Border>
-                                </StackPanel>
-                            </Panel>
-                            <ContentPresenter Name="PART_SelectedContentHost"
-                                              Margin="0, 20, 0, 0"
-                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              Content="{TemplateBinding SelectedContent}"
-                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
-                        </DockPanel>
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-        </Style>
-
-        <Style Selector="TabItem">
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border CornerRadius="50" Padding="20, -2" Background="Transparent">
-                        <TextBlock FontSize="18" Text="{TemplateBinding Header}" VerticalAlignment="Center"
-                                   HorizontalAlignment="Center" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-            <Style Selector="^:pointerover /template/ Border">
-                <Setter Property="Background">
-                    <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.1" />
-                </Setter>
-            </Style>
-            <Style Selector="^:selected /template/ Border">
-                <Setter Property="Background">
-                    <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.2" />
-                </Setter>
-            </Style>
-        </Style>
-    </UserControl.Styles>
-
-    <TabControl>
-        <TabItem Header="行为">
+    <TabControl Classes="PageTabControl">
+        <TabItem Header="行为" Classes="PageTabItem">
             <ScrollViewer>
                 <StackPanel Spacing="15">
                     <!-- <Button Content="测试用按钮" Command="{Binding TestCommand}"></Button> -->
@@ -164,7 +108,7 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        <TabItem Header="缓存">
+        <TabItem Header="缓存" Classes="PageTabItem">
             <ScrollViewer>
                 <StackPanel Spacing="20">
                     <controls:KanaSettingsGroup Header="音频">
@@ -208,7 +152,7 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        <TabItem Header="关于">
+        <TabItem Header="关于" Classes="PageTabItem">
             <ScrollViewer>
                 <StackPanel Spacing="20">
                     <controls:KanaSettingsGroup Header="目录">

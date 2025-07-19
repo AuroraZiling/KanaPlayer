@@ -32,6 +32,8 @@
 
                 <ResourceInclude Source="/Theming/Button.axaml" />
                 <ResourceInclude Source="/Theming/ToggleButton.axaml" />
+                <ResourceInclude Source="/Theming/TabControl.axaml" />
+                <ResourceInclude Source="/Theming/TabItem.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
