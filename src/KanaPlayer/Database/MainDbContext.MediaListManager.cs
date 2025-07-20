@@ -89,6 +89,19 @@ public partial class MainDbContext : IBiliMediaListManager
 
         SaveChanges();
     }
+    public bool DeleteBiliMediaListItem(FavoriteUniqueId favoriteUniqueId)
+    {
+        var biliMediaListItem = BiliMediaListItemSet
+            .Include(item => item.CachedBiliMediaListAudioMetadataSet)
+            .FirstOrDefault(item => item.UniqueId.Equals(favoriteUniqueId));
+
+        if (biliMediaListItem is null)
+            return false;
+
+        BiliMediaListItemSet.Remove(biliMediaListItem);
+        SaveChanges();
+        return true;
+    }
 
     public void AddOrUpdateAudioToCache(AudioUniqueId audioUniqueId, AudioInfoDataModel audioInfoData)
     {

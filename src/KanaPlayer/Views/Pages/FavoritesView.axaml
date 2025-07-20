@@ -22,11 +22,16 @@
                 <Grid ColumnDefinitions="250, *">
                     <ListBox Grid.Column="0" Cursor="Hand" SelectedItem="{Binding SelectedBiliMediaList}"
                              CornerRadius="15" ItemsSource="{Binding BiliMediaLists}"
-                             IsVisible="{Binding BiliMediaLists, Converter={x:Static ObjectConverters.IsNotNull}}"
+                             IsVisible="{Binding !!BiliMediaLists.Count}"
                              Background="{DynamicResource KanaAccentColor20}">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type database:DbBiliMediaListItem}">
-                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                <Grid ColumnDefinitions="Auto, *, Auto" Background="Transparent">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="删除" CommandParameter="{Binding}" Command="{Binding $parent[UserControl].((pages:FavoritesViewModel)DataContext).RemoveBiliMediaListCommand, FallbackValue={x:Null}}"></MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
                                     <LucideIcon Grid.Column="0"
                                                 Kind="{Binding BiliMediaListType, Converter={StaticResource FavoriteTypeToIconKindConverter}}"
                                                 Size="22">
@@ -42,7 +47,7 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <Grid Grid.Column="1" RowDefinitions="150, *" Margin="10, 30, 0, 0"
+                    <Grid Grid.Column="1" RowDefinitions="150, *" Margin="10, 0, 0, 0"
                           IsVisible="{Binding SelectedBiliMediaList, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
                             <Border ClipToBounds="True" CornerRadius="15">
@@ -118,7 +123,7 @@
                     </Grid>
                     
                     
-                    <Button Grid.Column="1" Margin="0, -64, 0, 0" Classes="ghost" HorizontalAlignment="Right"
+                    <Button Grid.Column="1" Margin="0, -64, 0, 64" Classes="ghost" HorizontalAlignment="Right"
                             VerticalAlignment="Top" Content="从 Bilibili 导入" Command="{Binding ImportFromBilibiliCommand}">
                     </Button>
                 </Grid>

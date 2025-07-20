@@ -1,8 +1,0 @@
-﻿<UserControl
-    x:Class="KanaPlayer.Views.Pages.DownloadQueueView"
-    x:DataType="pages:DownloadQueueViewModel"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    还没做
-</UserControl>

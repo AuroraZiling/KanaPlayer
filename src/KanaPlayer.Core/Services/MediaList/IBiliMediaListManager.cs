@@ -12,5 +12,6 @@ public interface IBiliMediaListManager
     List<DbCachedBiliMediaListAudioMetadata> GetCachedBiliMediaListAudioMetadataList(DbBiliMediaListItem item);
     bool IsBiliMediaListExists(FavoriteUniqueId favoriteUniqueId);
     void ImportFromBilibili(BiliMediaListItem item, List<BiliMediaListCommonMediaModel> importMedias);
+    bool DeleteBiliMediaListItem(FavoriteUniqueId favoriteUniqueId);
     void AddOrUpdateAudioToCache(AudioUniqueId audioUniqueId, AudioInfoDataModel audioInfoData);
 }

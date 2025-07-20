@@ -45,9 +45,6 @@ public static class ServiceExtensions
         // Navigation - Account Features
         services.AddMainPage<FavoritesView>();
 
-        // Navigation - Tools
-        services.AddMainPage<DownloadQueueView>();
-
         // Navigation - TitleBar
         services.AddMainPage<AccountView>();
         services.AddMainPage<SettingsView>();
@@ -71,7 +68,6 @@ public static class ServiceExtensions
         services.AddSingleton<FavoritesViewModel>();
 
         // Navigation - Tools
-        services.AddSingleton<DownloadQueueViewModel>();
 
         // Navigation - TitleBar
         services.AddSingleton<AccountViewModel>();

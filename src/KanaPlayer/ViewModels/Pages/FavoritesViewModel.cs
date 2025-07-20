@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Controls.Hosts;
@@ -33,23 +34,44 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
 
     #region Offline
 
-    
-
     #endregion
 
     #region Bili Media List
 
-    [ObservableProperty] public partial ObservableCollection<DbBiliMediaListItem>? BiliMediaLists { get; set; }
+    [ObservableProperty] public partial ObservableCollection<DbBiliMediaListItem> BiliMediaLists { get; set; } = [];
     [ObservableProperty] public partial DbBiliMediaListItem? SelectedBiliMediaList { get; set; }
     [ObservableProperty] public partial ObservableCollection<DbCachedBiliMediaListAudioMetadata> BiliMediaListItems { get; set; } = [];
     [ObservableProperty] public partial DbCachedBiliMediaListAudioMetadata? SelectedBiliMediaListItem { get; set; }
-    
+
     [RelayCommand]
     private void RefreshBiliMediaLists()
     {
         var dbMediaListItems = new ObservableCollection<DbBiliMediaListItem>(biliMediaListManager.GetBiliMediaListItems());
-        BiliMediaLists = dbMediaListItems.Count > 0 ? dbMediaListItems : null;
+        BiliMediaLists = dbMediaListItems.Count > 0 ? dbMediaListItems : [];
         ScopedLogger.Info("刷新B站收藏夹/合集列表，数量：{Count}", dbMediaListItems.Count);
+    }
+    [RelayCommand]
+    private void RemoveBiliMediaList(DbBiliMediaListItem? removeItem)
+    {
+        if (removeItem is null)
+            return;
+
+        if (!biliMediaListManager.DeleteBiliMediaListItem(removeItem.UniqueId))
+        {
+            kanaToastManager.CreateToast().WithTitle("失败")
+                            .WithContent("删除B站收藏夹/合集失败")
+                            .WithType(NotificationType.Error)
+                            .Queue();
+            return;
+        }
+        
+        kanaToastManager.CreateToast().WithTitle("成功")
+                        .WithContent("删除B站收藏夹/合集成功")
+                        .WithType(NotificationType.Success)
+                        .Queue();
+
+        BiliMediaLists.Remove(removeItem);
+        ScopedLogger.Info("已删除B站收藏夹/合集：{FolderName}", removeItem.Title);
     }
     partial void OnSelectedBiliMediaListChanged(DbBiliMediaListItem? value)
     {
@@ -86,7 +108,8 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                     SelectedBiliMediaListItem.OwnerMid, SelectedBiliMediaListItem.UniqueId, TimeSpan.FromSeconds(SelectedBiliMediaListItem.DurationSeconds)));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
-                await playerManager.AppendAsync(new PlayListItem(SelectedBiliMediaListItem.Title, SelectedBiliMediaListItem.CoverUrl, SelectedBiliMediaListItem.OwnerName,
+                await playerManager.AppendAsync(new PlayListItem(SelectedBiliMediaListItem.Title, SelectedBiliMediaListItem.CoverUrl,
+                    SelectedBiliMediaListItem.OwnerName,
                     SelectedBiliMediaListItem.OwnerMid, SelectedBiliMediaListItem.UniqueId, TimeSpan.FromSeconds(SelectedBiliMediaListItem.DurationSeconds)));
                 break;
             case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
@@ -95,7 +118,8 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                 return;
         }
         await playerManager.LoadAndPlayAsync(selectedPlayListItem);
-        ScopedLogger.Info("双击播放B站收藏夹/合集音频：{Title}，所属收藏夹/合集：{FolderName}，播放模式：{playbackMode}", SelectedBiliMediaListItem.Title, SelectedBiliMediaList.Title, behavior);
+        ScopedLogger.Info("双击播放B站收藏夹/合集音频：{Title}，所属收藏夹/合集：{FolderName}，播放模式：{playbackMode}", SelectedBiliMediaListItem.Title, SelectedBiliMediaList.Title,
+            behavior);
     }
 
     [RelayCommand]
@@ -140,9 +164,12 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         switch (behavior)
         {
             case FavoritesAddBehaviors.AddToNextInPlayList:
-                playerManager.InsertAfterCurrentPlayItemRangeAsync(biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList).Select(cachedAudioMetadata =>
-                    new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
-                        cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
+                playerManager.InsertAfterCurrentPlayItemRangeAsync(biliMediaListManager.GetCachedBiliMediaListAudioMetadataList(SelectedBiliMediaList)
+                                                                                       .Select(cachedAudioMetadata =>
+                                                                                           new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
+                                                                                               cachedAudioMetadata.OwnerName,
+                                                                                               cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId,
+                                                                                               TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
             {
