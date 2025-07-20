@@ -19,10 +19,10 @@ public readonly record struct AudioUniqueId(string Bvid, int Page = 1)
     }
 }
 
-public readonly record struct FavoriteUniqueId(ulong Id, BiliMediaListType BiliMediaListType)
+public readonly record struct BiliMediaListUniqueId(ulong Id, BiliMediaListType BiliMediaListType)
 {
     public override string ToString() => $"{Id}_{(int)BiliMediaListType}";
-    public static FavoriteUniqueId Parse(string value)
+    public static BiliMediaListUniqueId Parse(string value)
     {
         var indexOfUnderscore = value.IndexOf('_');
         if (indexOfUnderscore < 0)
@@ -31,6 +31,17 @@ public readonly record struct FavoriteUniqueId(ulong Id, BiliMediaListType BiliM
         var mid = ulong.Parse(value[..indexOfUnderscore]);
         var favoriteType = int.Parse(value[(indexOfUnderscore + 1)..]);
         
-        return new FavoriteUniqueId(mid, (BiliMediaListType)favoriteType);
+        return new BiliMediaListUniqueId(mid, (BiliMediaListType)favoriteType);
+    }
+}
+
+public readonly record struct LocalMediaListUniqueId(Guid Id)
+{
+    public override string ToString() => Id.ToString();
+    public static LocalMediaListUniqueId Parse(string value)
+    {
+        if (!Guid.TryParse(value, out var id))
+            throw new FormatException("Invalid LocalMediaListUniqueId format.");
+        return new LocalMediaListUniqueId(id);
     }
 }

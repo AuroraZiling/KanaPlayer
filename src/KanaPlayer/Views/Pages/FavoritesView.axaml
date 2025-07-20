@@ -17,7 +17,106 @@
 
     <Panel>
         <TabControl Classes="PageTabControl" attaching:TabControlAttaching.Header="收藏夹">
-            <TabItem Header="本地歌单" Classes="PageTabItem"></TabItem>
+            <TabItem Header="本地歌单" Classes="PageTabItem">
+                <Grid ColumnDefinitions="250, *">
+                    <ListBox Grid.Column="0" Cursor="Hand" SelectedItem="{Binding SelectedLocalMediaList}"
+                             CornerRadius="15" ItemsSource="{Binding LocalMediaLists}"
+                             IsVisible="{Binding !!LocalMediaLists.Count}"
+                             Background="{DynamicResource KanaAccentColor20}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type database:DbLocalMediaListItem}">
+                                <Grid ColumnDefinitions="Auto, *, Auto" Background="Transparent">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="删除" CommandParameter="{Binding}" Command="{Binding $parent[UserControl].((pages:FavoritesViewModel)DataContext).RemoveLocalMediaListCommand, FallbackValue={x:Null}}"></MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                    <TextBlock Grid.Column="1" Margin="10, 0, 0, 0" Text="{Binding Title}"
+                                               VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="2" Text="{Binding MediaCount}" VerticalAlignment="Center"
+                                               HorizontalAlignment="Right" Margin="0, 0, 6, 0">
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Column="1" RowDefinitions="150, *" Margin="10, 0, 0, 0"
+                          IsVisible="{Binding SelectedLocalMediaList, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
+                            <StackPanel Margin="6, 0, 0, 0" Spacing="5" VerticalAlignment="Center">
+                                <TextBlock FontSize="24"
+                                           Text="{Binding SelectedLocalMediaList.Title, FallbackValue={x:Null}}"
+                                           VerticalAlignment="Center">
+                                </TextBlock>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <LucideIcon Kind="ListMusic" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedLocalMediaList.MediaCount, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center">
+                                    </TextBlock>
+                                    <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                                    <LucideIcon Kind="Timer" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedLocalMediaList.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center" />
+                                    <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                                    <LucideIcon Kind="TimerReset" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedLocalMediaList.ModifiedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock
+                                    IsVisible="{Binding SelectedLocalMediaList.Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue={x:Null}}"
+                                    MaxWidth="350" TextTrimming="CharacterEllipsis"
+                                    Text="{Binding SelectedLocalMediaList.Description, FallbackValue={x:Null}}">
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <Button Content="播放全部" attaching:Icon.LucideIconKind="Play"
+                                            Command="{Binding PlayAllLocalMediaListCommand}">
+                                    </Button>
+                                    <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
+                                            Command="{Binding AddAllLocalMediaListToPlayListCommand}">
+                                    </Button>
+                                    <Button Content="添加歌曲" attaching:Icon.LucideIconKind="Plus"
+                                            Command="{Binding AddAudioToLocalMediaListCommand}">
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ListBox Grid.Row="1" SelectedItem="{Binding SelectedLocalMediaListItem, Mode=TwoWay}"
+                                 Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding LocalMediaListItems}"
+                                 Background="{DynamicResource KanaAccentColor20}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type database:DbCachedMediaListAudioMetadata}">
+                                    <Grid ColumnDefinitions="60, *, *, 100">
+                                        <TextBlock Grid.Column="0" Text="序号"></TextBlock>
+                                        <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
+                                        <TextBlock Grid.Column="2" Text="{Binding OwnerName}"></TextBlock>
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding DurationSeconds, Converter={StaticResource DurationHumanizerConverter}}">
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="DoubleTapped">
+                                    <InvokeCommandAction Command="{Binding DoubleTappedSelectedLocalMediaListItemCommand}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </ListBox>
+                    </Grid>
+                    
+                    
+                    <Button Grid.Column="1" Margin="0, -64, 0, 64" Classes="ghost" HorizontalAlignment="Right"
+                            VerticalAlignment="Top" Content="新建歌单" Command="{Binding CreateLocalMediaListCommand}">
+                    </Button>
+                </Grid>
+            </TabItem>
             <TabItem Header="收藏夹与合集" Classes="PageTabItem">
                 <Grid ColumnDefinitions="250, *">
                     <ListBox Grid.Column="0" Cursor="Hand" SelectedItem="{Binding SelectedBiliMediaList}"
@@ -78,6 +177,11 @@
                                     <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
                                                Text="{Binding SelectedBiliMediaList.CreatedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
                                                VerticalAlignment="Center" />
+                                    <LucideIcon Kind="Dot" Size="22"></LucideIcon>
+                                    <LucideIcon Kind="TimerReset" Size="22"></LucideIcon>
+                                    <TextBlock Classes="Caption" Margin="5, 0, 0, 0"
+                                               Text="{Binding SelectedBiliMediaList.ModifiedTimestamp, Converter={StaticResource TimestampHumanizerConverter}, FallbackValue={x:Null}}"
+                                               VerticalAlignment="Center" />
                                 </StackPanel>
                                 <TextBlock
                                     IsVisible="{Binding SelectedBiliMediaList.Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue={x:Null}}"
@@ -86,13 +190,13 @@
                                 </TextBlock>
                                 <StackPanel Orientation="Horizontal" Spacing="7">
                                     <Button Content="播放全部" attaching:Icon.LucideIconKind="Play"
-                                            Command="{Binding PlayAllCommand}">
+                                            Command="{Binding PlayAllBiliMediaListCommand}">
                                     </Button>
                                     <Button Content="添加到播放列表" attaching:Icon.LucideIconKind="ListPlus"
-                                            Command="{Binding AddAllToPlayListCommand}">
+                                            Command="{Binding AddAllBiliMediaListToPlayListCommand}">
                                     </Button>
                                     <Button Content="同步" attaching:Icon.LucideIconKind="FolderSync"
-                                            Command="{Binding SyncCommand}">
+                                            Command="{Binding SyncBiliMediaListCommand}">
                                     </Button>
                                 </StackPanel>
                             </StackPanel>
@@ -102,7 +206,7 @@
                                  Margin="0, 10, 0, 0" CornerRadius="15" ItemsSource="{Binding BiliMediaListItems}"
                                  Background="{DynamicResource KanaAccentColor20}">
                             <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type database:DbCachedBiliMediaListAudioMetadata}">
+                                <DataTemplate DataType="{x:Type database:DbCachedMediaListAudioMetadata}">
                                     <Grid ColumnDefinitions="60, *, *, 100">
                                         <TextBlock Grid.Column="0" Text="序号"></TextBlock>
                                         <TextBlock Grid.Column="1" Text="{Binding Title}"></TextBlock>
@@ -116,7 +220,7 @@
 
                             <Interaction.Behaviors>
                                 <EventTriggerBehavior EventName="DoubleTapped">
-                                    <InvokeCommandAction Command="{Binding DoubleTappedSelectedItemCommand}" />
+                                    <InvokeCommandAction Command="{Binding DoubleTappedSelectedBiliMediaListItemCommand}" />
                                 </EventTriggerBehavior>
                             </Interaction.Behaviors>
                         </ListBox>

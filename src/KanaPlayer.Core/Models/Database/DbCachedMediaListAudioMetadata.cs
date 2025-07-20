@@ -2,7 +2,7 @@
 
 namespace KanaPlayer.Core.Models.Database;
 
-public class DbCachedBiliMediaListAudioMetadata
+public class DbCachedMediaListAudioMetadata
 {
     [Key]
     public AudioUniqueId UniqueId { get; set; }
@@ -19,6 +19,4 @@ public class DbCachedBiliMediaListAudioMetadata
     public required int CollectCount { get; set; }
     public required int DanmakuCount { get; set; }
     public required int PlayCount { get; set; }
-    
-    public HashSet<DbBiliMediaListItem> BiliMediaListItemSet { get; set; } = [];
 }

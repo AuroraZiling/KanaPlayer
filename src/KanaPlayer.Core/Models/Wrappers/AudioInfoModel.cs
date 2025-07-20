@@ -18,19 +18,19 @@ public record AudioInfoDataModel
     [property: JsonPropertyName("stat")] AudioStatisticsDataModel Statistics
 )
 {
-    public AudioInfoDataModel(DbCachedBiliMediaListAudioMetadata dbCachedBiliMediaListAudioMetadata)
-        : this(dbCachedBiliMediaListAudioMetadata.UniqueId.Bvid, 1, dbCachedBiliMediaListAudioMetadata.Title,
-            dbCachedBiliMediaListAudioMetadata.CoverUrl, dbCachedBiliMediaListAudioMetadata.DurationSeconds,
-            dbCachedBiliMediaListAudioMetadata.PublishTimestamp, new CommonOwnerModel
+    public AudioInfoDataModel(DbCachedMediaListAudioMetadata dbCachedMediaListAudioMetadata)
+        : this(dbCachedMediaListAudioMetadata.UniqueId.Bvid, 1, dbCachedMediaListAudioMetadata.Title,
+            dbCachedMediaListAudioMetadata.CoverUrl, dbCachedMediaListAudioMetadata.DurationSeconds,
+            dbCachedMediaListAudioMetadata.PublishTimestamp, new CommonOwnerModel
             {
-                Mid = dbCachedBiliMediaListAudioMetadata.OwnerMid,
-                Name = dbCachedBiliMediaListAudioMetadata.OwnerName
+                Mid = dbCachedMediaListAudioMetadata.OwnerMid,
+                Name = dbCachedMediaListAudioMetadata.OwnerName
             },
             new AudioStatisticsDataModel
             {
-                CollectCount = dbCachedBiliMediaListAudioMetadata.CollectCount,
-                DanmakuCount = dbCachedBiliMediaListAudioMetadata.DanmakuCount,
-                PlayCount = dbCachedBiliMediaListAudioMetadata.PlayCount
+                CollectCount = dbCachedMediaListAudioMetadata.CollectCount,
+                DanmakuCount = dbCachedMediaListAudioMetadata.DanmakuCount,
+                PlayCount = dbCachedMediaListAudioMetadata.PlayCount
             })
     {
     }

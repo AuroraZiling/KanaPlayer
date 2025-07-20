@@ -21,6 +21,12 @@ public static class FluentKanaDialogBuilder
         builder.SetContent(content);
         return builder;
     }
+    
+    public static KanaDialogBuilder WithDismissWithBackgroundClick(this KanaDialogBuilder builder)
+    {
+        builder.SetCanDismissWithBackgroundClick(true);
+        return builder;
+    }
 
     public static KanaDialogBuilder ShowCardBackground(this KanaDialogBuilder builder, bool show)
     {

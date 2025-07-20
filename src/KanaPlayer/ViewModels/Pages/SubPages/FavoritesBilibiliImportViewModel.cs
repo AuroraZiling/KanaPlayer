@@ -12,7 +12,7 @@ using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.MediaList;
+using KanaPlayer.Core.Services.Database;
 using KanaPlayer.Models;
 using KanaPlayer.ViewModels.Dialogs;
 using KanaPlayer.Views.Dialogs;
@@ -141,7 +141,7 @@ public partial class FavoritesBilibiliImportViewModel(IBilibiliClient bilibiliCl
     private void Import(object? selectedImportItem)
     {
         var importItem = selectedImportItem.NotNull<BiliMediaListItem>();
-        if (biliMediaListManager.IsBiliMediaListExists(new FavoriteUniqueId(importItem.Id, importItem.BiliMediaListType)))
+        if (biliMediaListManager.IsBiliMediaListExists(new BiliMediaListUniqueId(importItem.Id, importItem.BiliMediaListType)))
         {
             kanaToastManager.CreateToast().WithType(NotificationType.Error).WithTitle("导入失败").WithContent("该收藏夹已存在于本地收藏中").Queue();
             ScopedLogger.Warn($"尝试导入的收藏夹已存在: {importItem.Title} (ID: {importItem.Id})");

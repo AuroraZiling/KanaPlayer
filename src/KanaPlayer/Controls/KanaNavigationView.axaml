@@ -52,7 +52,7 @@
                                 <TextBlock
                                     Foreground="Gray"
                                     Margin="14,12,0,4"
-                                    Text="工具" FontSize="12" />
+                                    Text="工具" FontSize="12" IsVisible="{Binding !!#ToolsListBox.ItemCount}" />
                                 <ListBox
                                     ItemsSource="{TemplateBinding ToolsNavigationSideBarItems}"
                                     Margin="8,0"

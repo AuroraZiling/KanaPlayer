@@ -10,7 +10,7 @@ using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.MediaList;
+using KanaPlayer.Core.Services.Database;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
 using KanaPlayer.Models.SettingTypes;
@@ -63,7 +63,7 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
         if (bilibiliClient.TryGetCookies(out var cookies))
         {
             var uniqueId = new AudioUniqueId(audioRegionFeedDataInfoModel.Bvid);
-            var cachedAudioMetadata = biliMediaListManager.GetCachedBiliMediaListAudioMetadataByUniqueId(uniqueId);
+            var cachedAudioMetadata = biliMediaListManager.GetCachedMediaListAudioMetadataByUniqueId(uniqueId);
 
             AudioInfoDataModel audioInfoData;
             if (cachedAudioMetadata is null)

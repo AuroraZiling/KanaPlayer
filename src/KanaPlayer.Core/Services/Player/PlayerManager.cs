@@ -10,7 +10,7 @@ using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.PlayerManager;
 using KanaPlayer.Core.Services.Configuration;
-using KanaPlayer.Core.Services.MediaList;
+using KanaPlayer.Core.Services.Database;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using ObservableCollections;
@@ -116,7 +116,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
             async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
             {
-                var cachedAudioMetadata = _biliMediaListManager.GetCachedBiliMediaListAudioMetadataByUniqueId(audioUniqueId);
+                var cachedAudioMetadata = _biliMediaListManager.GetCachedMediaListAudioMetadataByUniqueId(audioUniqueId);
                 PlayListItem playListItem;
                 if (cachedAudioMetadata is not null)
                 {

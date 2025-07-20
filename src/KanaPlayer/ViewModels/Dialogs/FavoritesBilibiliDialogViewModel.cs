@@ -9,7 +9,7 @@ using KanaPlayer.Controls.Navigation;
 using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Wrappers;
 using KanaPlayer.Core.Services;
-using KanaPlayer.Core.Services.MediaList;
+using KanaPlayer.Core.Services.Database;
 using KanaPlayer.Views.Pages;
 using NLog;
 

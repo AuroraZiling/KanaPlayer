@@ -5,47 +5,46 @@ using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.BiliMediaList;
 using KanaPlayer.Core.Models.Database;
 using KanaPlayer.Core.Models.Wrappers;
-using KanaPlayer.Core.Services.MediaList;
+using KanaPlayer.Core.Services.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace KanaPlayer.Database;
 
 public partial class MainDbContext : IBiliMediaListManager
 {
-    public DbCachedBiliMediaListAudioMetadata? GetCachedBiliMediaListAudioMetadataByUniqueId(AudioUniqueId uniqueId)
-        => CachedBiliMediaListAudioMetadataSet
-           .Include(metadata => metadata.BiliMediaListItemSet)
+    public DbCachedMediaListAudioMetadata? GetCachedMediaListAudioMetadataByUniqueId(AudioUniqueId uniqueId)
+        => CachedMediaListAudioMetadataSet
            .FirstOrDefault(metadata => metadata.UniqueId.Equals(uniqueId));
 
     public List<DbBiliMediaListItem> GetBiliMediaListItems()
         => BiliMediaListItemSet
-           .Include(item => item.CachedBiliMediaListAudioMetadataSet)
+           .Include(item => item.CachedMediaListAudioMetadataSet)
            .OrderByDescending(item => item.CreatedTimestamp)
            .ToList();
 
-    public List<DbCachedBiliMediaListAudioMetadata> GetCachedBiliMediaListAudioMetadataList(DbBiliMediaListItem item)
+    public List<DbCachedMediaListAudioMetadata> GetCachedMediaListAudioMetadataList(DbBiliMediaListItem item)
         => BiliMediaListItemSet
-           .Include(folder => folder.CachedBiliMediaListAudioMetadataSet)
-           .Where(folder => folder.UniqueId.Equals(item.UniqueId))
-           .SelectMany(folder => folder.CachedBiliMediaListAudioMetadataSet)
+           .Include(folder => folder.CachedMediaListAudioMetadataSet)
+           .Where(folder => folder.Id.Equals(item.UniqueId.ToString()))
+           .SelectMany(folder => folder.CachedMediaListAudioMetadataSet)
            .OrderByDescending(metadata => metadata.PublishTimestamp)
            .ToList();
 
-    public bool IsBiliMediaListExists(FavoriteUniqueId favoriteUniqueId)
+    public bool IsBiliMediaListExists(BiliMediaListUniqueId biliMediaListUniqueId)
         => BiliMediaListItemSet
-            .Any(item => item.UniqueId.Equals(favoriteUniqueId));
+            .Any(item => item.Id.Equals(biliMediaListUniqueId.ToString()));
 
     public void ImportFromBilibili(BiliMediaListItem importItem, List<BiliMediaListCommonMediaModel> importMedias)
     {
         var biliMediaListItem = BiliMediaListItemSet
-                                      .Include(item => item.CachedBiliMediaListAudioMetadataSet)
-                                      .FirstOrDefault(item => item.UniqueId.Equals(new FavoriteUniqueId(importItem.Id, importItem.BiliMediaListType)));
+                                      .Include(item => item.CachedMediaListAudioMetadataSet)
+                                      .FirstOrDefault(item => item.Id.Equals(new BiliMediaListUniqueId(importItem.Id, importItem.BiliMediaListType).ToString()));
 
         if (biliMediaListItem is null)
         {
             biliMediaListItem = new DbBiliMediaListItem
             {
-                UniqueId = new FavoriteUniqueId(importItem.Id, importItem.BiliMediaListType),
+                UniqueId = new BiliMediaListUniqueId(importItem.Id, importItem.BiliMediaListType),
                 Title = importItem.Title.SafeSubstring(0, 128),
                 CoverUrl = importItem.CoverUrl.SafeSubstring(0, 1024),
                 Description = importItem.Description.SafeSubstring(0, 1024),
@@ -61,7 +60,7 @@ public partial class MainDbContext : IBiliMediaListManager
         }
 
         var importMediaUniqueIds = importMedias.Select(media => new AudioUniqueId(media.Bvid)).ToHashSet();
-        var existedMediaList = CachedBiliMediaListAudioMetadataSet
+        var existedMediaList = CachedMediaListAudioMetadataSet
                                .Where(metadata => importMediaUniqueIds.Contains(metadata.UniqueId))
                                .ToList();
 
@@ -69,7 +68,7 @@ public partial class MainDbContext : IBiliMediaListManager
         {
             if (existedMediaList.FirstOrDefault(existed => existed.UniqueId.Equals(new AudioUniqueId(media.Bvid))) is not { } audioMetadata)
             {
-                audioMetadata = new DbCachedBiliMediaListAudioMetadata
+                audioMetadata = new DbCachedMediaListAudioMetadata
                 {
                     UniqueId = new AudioUniqueId(media.Bvid),
                     Title = media.Title.SafeSubstring(0, 128),
@@ -82,18 +81,18 @@ public partial class MainDbContext : IBiliMediaListManager
                     DanmakuCount = media.Statistics.DanmakuCount,
                     PlayCount = media.Statistics.PlayCount,
                 };
-                CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
+                CachedMediaListAudioMetadataSet.Add(audioMetadata);
             }
-            biliMediaListItem.CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
+            biliMediaListItem.CachedMediaListAudioMetadataSet.Add(audioMetadata);
         }
 
         SaveChanges();
     }
-    public bool DeleteBiliMediaListItem(FavoriteUniqueId favoriteUniqueId)
+    public bool DeleteBiliMediaListItem(BiliMediaListUniqueId biliMediaListUniqueId)
     {
         var biliMediaListItem = BiliMediaListItemSet
-            .Include(item => item.CachedBiliMediaListAudioMetadataSet)
-            .FirstOrDefault(item => item.UniqueId.Equals(favoriteUniqueId));
+            .Include(item => item.CachedMediaListAudioMetadataSet)
+            .FirstOrDefault(item => item.Id.Equals(biliMediaListUniqueId.ToString()));
 
         if (biliMediaListItem is null)
             return false;
@@ -103,9 +102,9 @@ public partial class MainDbContext : IBiliMediaListManager
         return true;
     }
 
-    public void AddOrUpdateAudioToCache(AudioUniqueId audioUniqueId, AudioInfoDataModel audioInfoData)
+    public DbCachedMediaListAudioMetadata AddOrUpdateAudioToCache(AudioUniqueId audioUniqueId, AudioInfoDataModel audioInfoData)
     {
-        if (CachedBiliMediaListAudioMetadataSet.FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId)) is { } audioMetadata)
+        if (CachedMediaListAudioMetadataSet.FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId)) is { } audioMetadata)
         {
             audioMetadata.Title = audioInfoData.Title;
             audioMetadata.CoverUrl = audioInfoData.CoverUrl;
@@ -119,7 +118,7 @@ public partial class MainDbContext : IBiliMediaListManager
         }
         else
         {
-            audioMetadata = new DbCachedBiliMediaListAudioMetadata
+            audioMetadata = new DbCachedMediaListAudioMetadata
             {
                 UniqueId = audioUniqueId,
                 Title = audioInfoData.Title,
@@ -133,8 +132,9 @@ public partial class MainDbContext : IBiliMediaListManager
                 PlayCount = audioInfoData.Statistics.PlayCount
             };
 
-            CachedBiliMediaListAudioMetadataSet.Add(audioMetadata);
+            CachedMediaListAudioMetadataSet.Add(audioMetadata);
         }
         SaveChanges();
+        return audioMetadata;
     }
 }
