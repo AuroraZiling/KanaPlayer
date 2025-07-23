@@ -1,11 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using KanaPlayer.Core.Interfaces;
 using LibVLCSharp.Shared;
+using NLog;
+using LogLevel = LibVLCSharp.Shared.LogLevel;
 
 namespace KanaPlayer.Windows.Services;
 
 public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDisposable
 {
+    private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(LibVlcAudioPlayer));
     private readonly LibVLC _libVlc;
     private readonly MediaPlayer _mediaPlayer;
 
@@ -18,6 +21,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
     {
         LibVLCSharp.Shared.Core.Initialize();
         _libVlc = new LibVLC(
+            enableDebugLogs: true,
             "--intf=dummy",
             "--no-audio-time-stretch",
             "--no-video",
@@ -28,6 +32,26 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
             "--file-caching=0",
             "--clock-jitter=0",
             "--clock-synchro=0");
+        _libVlc.Log += (_, args) =>
+        {
+            switch (args.Level)
+            {
+                case LogLevel.Debug:
+                    ScopedLogger.Debug(args.Message);
+                    break;
+                case LogLevel.Notice:
+                    ScopedLogger.Info(args.Message);
+                    break;
+                case LogLevel.Warning:
+                    ScopedLogger.Warn(args.Message);
+                    break;
+                case LogLevel.Error:
+                    ScopedLogger.Error(args.Message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        };
         _mediaPlayer = new MediaPlayer(_libVlc)
         {
             EnableHardwareDecoding = false,
