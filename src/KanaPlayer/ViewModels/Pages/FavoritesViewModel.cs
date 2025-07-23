@@ -204,7 +204,8 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                                    new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.AddAudio, dialog, localMediaListManager, kanaToastManager,
                                        navigationService,
                                        bilibiliClient, SelectedLocalMediaList))
-                               .OnDismissed(_ => RefreshMediaListsCommand.Execute(null))    
+                               .WithDismissWithBackgroundClick()
+                               .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))    
                                .TryShow();
     }
 
@@ -389,10 +390,17 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
     [RelayCommand]
     private void RefreshMediaLists()
     {
+        var previousSelectedBiliMediaList = SelectedBiliMediaList;
         BiliMediaLists.Reset(biliMediaListManager.GetBiliMediaListItems());
         ScopedLogger.Info("刷新B站收藏夹/合集列表，数量：{Count}", BiliMediaLists.Count);
+        var previousSelectedLocalMediaList = SelectedLocalMediaList;
         LocalMediaLists.Reset(localMediaListManager.GetLocalMediaListItems());
         ScopedLogger.Info("刷新本地歌单列表，数量：{Count}", LocalMediaLists.Count);
+        
+        if (previousSelectedBiliMediaList is not null) 
+            SelectedBiliMediaList = BiliMediaLists.FirstOrDefault(item => item.UniqueId == previousSelectedBiliMediaList.UniqueId);
+        if (previousSelectedLocalMediaList is not null) 
+            SelectedLocalMediaList = LocalMediaLists.FirstOrDefault(item => item.UniqueId == previousSelectedLocalMediaList.UniqueId);
     }
 
     public void OnNavigatedTo()

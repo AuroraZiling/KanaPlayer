@@ -57,8 +57,8 @@ public partial class FavoritesLocalDialogViewModel(FavoritesLocalDialogType favo
             Title = Title,
             CoverUrl = "",
             Description = Description,
-            CreatedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            CreatedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             MediaCount = 0
         });
         navigationService.Navigate(typeof(FavoritesView));
