@@ -6,11 +6,8 @@
 [//]: # ([![Issues][issues-shield]][issues-url])
 [//]: # ([![Unlicense License][license-shield]][license-url])
 
----
-
-KanaPlayer 正处于积极开发阶段，存在许多未完成的功能和可能的错误。
-
----
+> [!WARNING]  
+> KanaPlayer 仍处于开发阶段，存在一些未完成的功能和已知的错误。
 
 <br />
 <div align="center">
@@ -38,7 +35,9 @@ KanaPlayer 正处于积极开发阶段，存在许多未完成的功能和可能
 KanaPlayer 是一个基于 Bilibili API 的音频播放器，旨在提供一个简洁易用的音频播放体验。
 
 > [!IMPORTANT]  
-> Crucial information necessary for users to succeed.
+> 本项目为免费开源软件，仅供学习和个人使用
+> 不进行任何商业化运营，不对 bilibili 平台进行任何破解行为
+> 有关免责声明，请参阅 [DISCLAIMER](DISCLAIMER.md) 文件
 
 ### 特性 / Features
 

@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{F655F8A6-5
 		README.md = README.md
 		.gitignore = .gitignore
 		.github\Roadmap.md = .github\Roadmap.md
+		DISCLAIMER.md = DISCLAIMER.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{F9C2686C-3BB4-4BED-9E73-1B661C5BCDED}"

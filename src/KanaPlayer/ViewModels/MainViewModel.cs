@@ -81,13 +81,11 @@ public partial class MainViewModel : ViewModelBase
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
         trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
         
+        IsLoggedIn = bilibiliClient.IsAuthenticated;
         bilibiliClient.PropertyChanged += (sender, args) =>
         {
-            if (args.PropertyName == nameof(IBilibiliClient.IsAuthenticated))
-            {
+            if (args.PropertyName == nameof(IBilibiliClient.IsAuthenticated)) 
                 IsLoggedIn = bilibiliClient.IsAuthenticated;
-                OnPropertyChanged(nameof(IsLoggedIn));
-            }
         };
         _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(0.1), DispatcherPriority.Normal, delegate
         {
