@@ -76,6 +76,14 @@ public partial class AccountViewModel(
                     case 0 when loginQrCodeModel is { Cookies.Count: > 0 }: // 登录成功
                         LoginAttemptingStatus = "登录成功";
                         succeedLoginQrCodeModel = loginQrCodeModel;
+                        configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings
+                        {
+                            Timestamp = succeedLoginQrCodeModel.EnsureData().Timestamp,
+                            RefreshToken = succeedLoginQrCodeModel.EnsureData().RefreshToken,
+                            Cookies = succeedLoginQrCodeModel.Cookies!
+                        };
+                        ScopedLogger.Info("登录信息保存成功");
+                        configurationService.SaveImmediate();
                         await bilibiliClient.AuthenticateAsync();
                         LoadUserInfo(configurationService.Settings.CommonSettings.Account);
                         IsLoggedIn = true;
@@ -88,15 +96,6 @@ public partial class AccountViewModel(
                 }
                 await Task.Delay(1000);
             }
-
-            configurationService.Settings.CommonSettings.Authentication = new CommonAuthenticationSettings
-            {
-                Timestamp = succeedLoginQrCodeModel.EnsureData().Timestamp,
-                RefreshToken = succeedLoginQrCodeModel.EnsureData().RefreshToken,
-                Cookies = succeedLoginQrCodeModel.Cookies!
-            };
-            configurationService.SaveImmediate();
-            ScopedLogger.Info("登录信息保存成功");
         }
         catch (Exception e)
         {
