@@ -37,6 +37,9 @@ KanaPlayer 正处于积极开发阶段，存在许多未完成的功能和可能
 
 KanaPlayer 是一个基于 Bilibili API 的音频播放器，旨在提供一个简洁易用的音频播放体验。
 
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
 ### 特性 / Features
 
 - 音乐分区首页滚动推送

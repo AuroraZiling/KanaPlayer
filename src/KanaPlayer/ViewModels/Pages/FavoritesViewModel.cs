@@ -33,7 +33,8 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
     : ViewModelBase, INavigationAware
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesViewModel));
-
+    public IBilibiliClient BilibiliClient { get; } = bilibiliClient;
+    
     #region Local Media List
 
     [ObservableProperty] public partial ObservableCollection<DbLocalMediaListItem> LocalMediaLists { get; set; } = [];
@@ -181,7 +182,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                          .WithView(new FavoritesLocalDialog())
                          .WithViewModel(dialog =>
                              new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Create, dialog, localMediaListManager, kanaToastManager, navigationService,
-                                 bilibiliClient))
+                                 BilibiliClient))
                          .WithDismissWithBackgroundClick()
                          .TryShow();
     }
@@ -203,7 +204,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                                .WithViewModel(dialog =>
                                    new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.AddAudio, dialog, localMediaListManager, kanaToastManager,
                                        navigationService,
-                                       bilibiliClient, SelectedLocalMediaList))
+                                       BilibiliClient, SelectedLocalMediaList))
                                .WithDismissWithBackgroundClick()
                                .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))    
                                .TryShow();
@@ -381,7 +382,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                                      ModifiedTimestamp = SelectedBiliMediaList.ModifiedTimestamp,
                                      MediaCount = SelectedBiliMediaList.MediaCount
                                  },
-                                 bilibiliClient, biliMediaListManager, kanaToastManager, navigationService))
+                                 BilibiliClient, biliMediaListManager, kanaToastManager, navigationService))
                          .TryShow();
     }
 

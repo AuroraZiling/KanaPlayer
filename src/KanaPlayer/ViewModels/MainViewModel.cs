@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Interfaces;
 using KanaPlayer.Core.Models.PlayerManager;
+using KanaPlayer.Core.Services;
 using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
 using KanaPlayer.Models;
@@ -68,8 +69,9 @@ public partial class MainViewModel : ViewModelBase
 
     private readonly DispatcherTimer _playbackTimeExecutionTimer;
     private readonly IConfigurationService<SettingsModel> _configurationService;
+    [ObservableProperty] public partial bool IsLoggedIn { get; private set; }
 
-    public MainViewModel(IConfigurationService<SettingsModel> configurationService, IPlayerManager playerManager, ITrayMenuService trayMenuService)
+    public MainViewModel(IConfigurationService<SettingsModel> configurationService, IBilibiliClient bilibiliClient, IPlayerManager playerManager, ITrayMenuService trayMenuService)
     {
         _configurationService = configurationService;
         PlayerManager = playerManager;
@@ -78,7 +80,15 @@ public partial class MainViewModel : ViewModelBase
         
         PlaybackMode = configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode;
         trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
-
+        
+        bilibiliClient.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(IBilibiliClient.IsAuthenticated))
+            {
+                IsLoggedIn = bilibiliClient.IsAuthenticated;
+                OnPropertyChanged(nameof(IsLoggedIn));
+            }
+        };
         _playbackTimeExecutionTimer = new DispatcherTimer(TimeSpan.FromSeconds(0.1), DispatcherPriority.Normal, delegate
         {
             OnPropertyChanged(nameof(Progress));

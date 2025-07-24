@@ -27,7 +27,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     private readonly IBiliMediaListManager _biliMediaListManager;
     private readonly IExceptionHandler _exceptionHandler;
     public PlayerManager(IConfigurationService<TSettings> configurationService, IAudioPlayer audioPlayer, IBilibiliClient bilibiliClient,
-                         IBiliMediaListManager biliMediaListManager, [FromKeyedServices("PlayerManagerExceptionHandler")] IExceptionHandler exceptionHandler)
+        IBiliMediaListManager biliMediaListManager, [FromKeyedServices("PlayerManagerExceptionHandler")] IExceptionHandler exceptionHandler)
     {
         _configurationService = configurationService;
         _audioPlayer = audioPlayer;
@@ -53,89 +53,85 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     [RelayCommand]
     private async Task InitializePlayListAsync()
     {
-        if (_bilibiliClient.TryGetCookies(out var cookies))
+        foreach (var audioUniqueId in _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList)
         {
-            foreach (var audioUniqueId in _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList)
-                _playList.Add(await GetPlayListItemByAudioUniqueId(audioUniqueId));
-            ScopedLogger.Info("播放列表初始化完成，当前播放列表包含 {Count} 个音频", _playList.Count);
+            var playListItem = await GetPlayListItemByAudioUniqueId(audioUniqueId);
+            if (playListItem is not null) _playList.Add(playListItem);
+        }
+        ScopedLogger.Info("播放列表初始化完成，当前播放列表包含 {Count} 个音频", _playList.Count);
 
-            if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is { } value)
+        if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is { } value)
+        {
+            var playListItem = await GetPlayListItemByAudioUniqueId(value);
+            if (playListItem is not null && _playList.Contains(playListItem))
             {
-                var playListItem = await GetPlayListItemByAudioUniqueId(value);
-                if (_playList.Contains(playListItem))
+                try
                 {
-                    try
-                    {
-                        ScopedLogger.Info("正在加载上次播放的音频: {Title} | {UniqueId}", playListItem.Title, value);
-                        await LoadAsync(playListItem);
-                    }
-                    catch (Exception e)
-                    {
-                        ScopedLogger.Error(e, "加载上次播放的音频失败: {Title} | {UniqueId}", playListItem.Title, value);
-                        _exceptionHandler.HandleException(e);
-                        return;
-                    }
+                    ScopedLogger.Info("正在加载上次播放的音频: {Title} | {UniqueId}", playListItem.Title, value);
+                    await LoadAsync(playListItem);
                 }
-                else
+                catch (Exception e)
                 {
-                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = null;
-                    ScopedLogger.Warn("上次播放的音频 {Title} | {UniqueId} 不在播放列表中，清除记录", playListItem.Title, value);
+                    ScopedLogger.Error(e, "加载上次播放的音频失败: {Title} | {UniqueId}", playListItem.Title, value);
+                    _exceptionHandler.HandleException(e);
+                    return;
                 }
             }
-
-            _playList.CollectionChanged += (in args) =>
+            else
             {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add when args.IsSingleItem:
-                    {
-                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
-                        break;
-                    }
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var argsNewItem in args.NewItems)
-                            _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
-                        break;
-                    case NotifyCollectionChangedAction.Remove when args.IsSingleItem:
-                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.OldItem.AudioUniqueId);
-                        break;
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var argsOldItem in args.OldItems)
-                            _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsOldItem.AudioUniqueId);
-                        break;
-                    case NotifyCollectionChangedAction.Reset:
-                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
-                        break;
-                    case NotifyCollectionChangedAction.Replace:
-                    case NotifyCollectionChangedAction.Move:
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                _configurationService.SaveImmediate();
-            };
-
-            async Task<PlayListItem> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
-            {
-                var cachedAudioMetadata = _biliMediaListManager.GetCachedMediaListAudioMetadataByUniqueId(audioUniqueId);
-                PlayListItem playListItem;
-                if (cachedAudioMetadata is not null)
-                {
-                    playListItem = new PlayListItem(cachedAudioMetadata);
-                }
-                else
-                {
-                    var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, cookies);
-                    var audioInfoData = audioInfo.EnsureData();
-                    playListItem = new PlayListItem(audioInfoData);
-                    _biliMediaListManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
-                }
-                return playListItem;
+                _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = null;
+                ScopedLogger.Warn("上次播放的音频 {Title} | {UniqueId} 不在播放列表中，清除记录", playListItem?.Title, value);
             }
         }
-        else
+
+        _playList.CollectionChanged += (in args) =>
         {
-            ScopedLogger.Error("无法获取 Cookies，播放列表初始化失败");
-            throw new InvalidOperationException("无法获取 Cookies，播放列表初始化失败");
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add when args.IsSingleItem:
+                {
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(args.NewItem.AudioUniqueId);
+                    break;
+                }
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var argsNewItem in args.NewItems)
+                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Remove when args.IsSingleItem:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.OldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var argsOldItem in args.OldItems)
+                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsOldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            _configurationService.SaveImmediate();
+        };
+        return;
+
+        async Task<PlayListItem?> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
+        {
+            var cachedAudioMetadata = _biliMediaListManager.GetCachedMediaListAudioMetadataByUniqueId(audioUniqueId);
+            PlayListItem? playListItem = null;
+            if (cachedAudioMetadata is not null)
+            {
+                playListItem = new PlayListItem(cachedAudioMetadata);
+            }
+            else if (_bilibiliClient.TryGetCookies(out var cookies))
+            {
+                var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, cookies);
+                var audioInfoData = audioInfo.EnsureData();
+                playListItem = new PlayListItem(audioInfoData);
+                _biliMediaListManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
+            }
+            return playListItem;
         }
     }
 
@@ -264,8 +260,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
 
         _loadCancellationTokenSource = new CancellationTokenSource();
         await _audioPlayer.LoadAsync(async () => _cachedAudioStream =
-                                                     await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, cookies, _bilibiliClient,
-                                                         _loadCancellationTokenSource.Token));
+            await CachedAudioStream.CreateAsync(playListItem.AudioUniqueId, cookies, _bilibiliClient,
+                _loadCancellationTokenSource.Token));
 
         CurrentPlayListItem = playListItem;
         if (PlayList.Contains(playListItem))
@@ -282,7 +278,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     [ObservableProperty] public partial bool CanLoadPrevious { get; private set; }
     public async Task LoadPrevious(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is not {} currentPlayListItem || !CanLoadPrevious) return;
+        if (CurrentPlayListItem is not { } currentPlayListItem || !CanLoadPrevious) return;
         try
         {
             ScopedLogger.Info("正在加载上一个音频: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
@@ -327,7 +323,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             await SkipUnavailableAudioAsync(currentPlayListItem.AudioUniqueId, PlayDirection.Previous);
         }
     }
-    
+
     private async Task SkipUnavailableAudioAsync(AudioUniqueId currentAudioUniqueId, PlayDirection playDirection)
     {
         if (!_bilibiliClient.TryGetCookies(out var cookies))
@@ -394,7 +390,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     [ObservableProperty] public partial bool CanLoadForward { get; private set; }
     public async Task LoadForward(bool isManuallyTriggered, bool playWhenLoaded)
     {
-        if (CurrentPlayListItem is not {} currentPlayListItem || !CanLoadForward) return;
+        if (CurrentPlayListItem is not { } currentPlayListItem || !CanLoadForward) return;
         try
         {
             ScopedLogger.Info("正在加载下一个音频: {CurrentPlayListItem}", currentPlayListItem.AudioUniqueId);
@@ -518,7 +514,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _playList.Clear();
         ScopedLogger.Info("播放列表已清空");
     }
-    
+
     private enum PlayDirection
     {
         Previous,

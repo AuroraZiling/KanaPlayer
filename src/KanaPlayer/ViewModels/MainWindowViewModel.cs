@@ -62,6 +62,7 @@ public partial class MainWindowViewModel : ViewModelBase
             UserName = null;
             AvatarUrl = null;
             ScopedLogger.Info("用户未登录或账户信息缺失");
+            _navigationService.Navigate(typeof(AccountView));
         }
     }
     

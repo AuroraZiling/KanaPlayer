@@ -106,6 +106,15 @@ public class KanaNavigationView : TemplatedControl
         }
     }
 
+    internal static readonly StyledProperty<bool> IsSideBarEnabledProperty = AvaloniaProperty.Register<KanaNavigationView, bool>(
+        nameof(IsSideBarEnabled), true);
+
+    internal bool IsSideBarEnabled
+    {
+        get => GetValue(IsSideBarEnabledProperty);
+        set => SetValue(IsSideBarEnabledProperty, value);
+    }
+
 
     internal static readonly StyledProperty<AvaloniaList<NavigationSideBarItem>> TopNavigationSideBarItemsProperty = 
         AvaloniaProperty.Register<KanaNavigationView, AvaloniaList<NavigationSideBarItem>>(nameof(TopNavigationSideBarItems));

@@ -54,6 +54,7 @@
                             Content="{LucideIconContent Kind=Cog,
                                                         Size=24}"
                             IsChecked="{Binding IsSettingsChecked, Mode=OneWay}"
+                            IsEnabled="{Binding IsLoggedIn}"
                             IsHitTestVisible="{Binding !$self.IsChecked}"
                             Width="40" />
                         <ToggleButton

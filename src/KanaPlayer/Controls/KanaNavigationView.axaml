@@ -24,7 +24,10 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid ColumnDefinitions="200, *">
-                    <Border Grid.Column="0" Padding="0,0,0,12">
+                    <Border
+                        Grid.Column="0"
+                        IsEnabled="{TemplateBinding IsSideBarEnabled}"
+                        Padding="0,0,0,12">
                         <Panel>
                             <StackPanel VerticalAlignment="Top">
                                 <ListBox
@@ -37,9 +40,10 @@
                                 </ListBox>
 
                                 <TextBlock
+                                    FontSize="12"
                                     Foreground="Gray"
                                     Margin="14,12,0,4"
-                                    Text="个性化" FontSize="12" />
+                                    Text="个性化" />
                                 <ListBox
                                     ItemsSource="{TemplateBinding AccountFeaturesNavigationSideBarItems}"
                                     Margin="8,0"
@@ -50,9 +54,11 @@
                                 </ListBox>
 
                                 <TextBlock
+                                    FontSize="12"
                                     Foreground="Gray"
+                                    IsVisible="{Binding !!#ToolsListBox.ItemCount}"
                                     Margin="14,12,0,4"
-                                    Text="工具" FontSize="12" IsVisible="{Binding !!#ToolsListBox.ItemCount}" />
+                                    Text="工具" />
                                 <ListBox
                                     ItemsSource="{TemplateBinding ToolsNavigationSideBarItems}"
                                     Margin="8,0"
@@ -67,8 +73,7 @@
                             <Style Selector="ListBox">
                                 <Setter Property="Background" Value="Transparent" />
                                 <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="SelectedItem"
-                                        Value="{TemplateBinding SelectedNavigationSideBarItem, Mode=TwoWay}" />
+                                <Setter Property="SelectedItem" Value="{TemplateBinding SelectedNavigationSideBarItem, Mode=TwoWay}" />
                                 <Setter Property="Padding" Value="0" />
                                 <Style Selector="^ ListBoxItem">
                                     <Setter Property="Template">
@@ -80,8 +85,7 @@
                                                     HorizontalAlignment="Stretch"
                                                     Margin="0,2">
                                                     <Panel>
-                                                        <ContentPresenter Content="{TemplateBinding Content}"
-                                                                          Margin="12,8" />
+                                                        <ContentPresenter Content="{TemplateBinding Content}" Margin="12,8" />
                                                     </Panel>
                                                 </Border>
                                             </Border>
@@ -89,12 +93,12 @@
                                     </Setter>
                                     <Style Selector="^:pointerover /template/ Border &gt; Panel">
                                         <Setter Property="Background">
-                                            <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.1"></SolidColorBrush>
+                                            <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.1" />
                                         </Setter>
                                     </Style>
                                     <Style Selector="^:selected /template/ Border &gt; Panel">
                                         <Setter Property="Background">
-                                            <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.2"></SolidColorBrush>
+                                            <SolidColorBrush Color="{DynamicResource KanaAccentColor}" Opacity="0.2" />
                                         </Setter>
                                     </Style>
                                 </Style>
@@ -108,15 +112,15 @@
                         Grid.Column="1">
                         <Panel>
                             <ProgressBar
+                                Background="Transparent"
+                                Foreground="{DynamicResource KanaAccentColor}"
+                                Height="3"
                                 IsIndeterminate="{Binding $parent[controls:KanaNavigationView].NavigationService.IsPageProgressBarIndeterminate}"
                                 IsVisible="{Binding $parent[controls:KanaNavigationView].NavigationService.IsPageProgressBarVisible}"
                                 Value="{Binding $parent[controls:KanaNavigationView].NavigationService.PageProgressBarValue}"
-                                VerticalAlignment="Top" Height="3" Background="Transparent"
-                                Foreground="{DynamicResource KanaAccentColor}">
-                            </ProgressBar>
+                                VerticalAlignment="Top" />
 
-                            <ContentPresenter Padding="32"
-                                              Content="{Binding $parent[controls:KanaNavigationView].NavigationService.CurrentPage}" />
+                            <ContentPresenter Content="{Binding $parent[controls:KanaNavigationView].NavigationService.CurrentPage}" Padding="32" />
                         </Panel>
                     </Border>
                 </Grid>

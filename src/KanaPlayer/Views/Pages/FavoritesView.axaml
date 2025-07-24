@@ -262,6 +262,7 @@
                                     <Button
                                         Command="{Binding SyncBiliMediaListCommand}"
                                         Content="同步"
+                                        IsEnabled="{Binding BilibiliClient.IsAuthenticated}"
                                         attaching:Icon.LucideIconKind="FolderSync" />
                                 </StackPanel>
                             </StackPanel>
@@ -301,9 +302,10 @@
                     <Button
                         Classes="ghost"
                         Command="{Binding ImportFromBilibiliCommand}"
-                        Content="从 Bilibili 导入"
+                        Content="从 bilibili 导入"
                         Grid.Column="1"
                         HorizontalAlignment="Right"
+                        IsEnabled="{Binding BilibiliClient.IsAuthenticated}"
                         Margin="0,-64,0,64"
                         VerticalAlignment="Top" />
                 </Grid>

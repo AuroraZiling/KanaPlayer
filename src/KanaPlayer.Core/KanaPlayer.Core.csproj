@@ -7,6 +7,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DebugSymbols>true</DebugSymbols>
+      <DebugType>embedded</DebugType>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" />

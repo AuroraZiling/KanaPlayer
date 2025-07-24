@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Interfaces;
 using LibVLCSharp.Shared;
 using NLog;
@@ -21,7 +22,7 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
     {
         LibVLCSharp.Shared.Core.Initialize();
         _libVlc = new LibVLC(
-            enableDebugLogs: true,
+            enableDebugLogs: AppHelper.IsDebug,
             "--intf=dummy",
             "--no-audio-time-stretch",
             "--no-video",
