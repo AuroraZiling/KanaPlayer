@@ -10,5 +10,5 @@ public class CoverImageUrlResizeConverter: IValueConverter
         => value is string imageUrl ? $"{imageUrl}@320w_180h_1c_!web-home-common-cover" : null;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => throw new NotSupportedException();
 }

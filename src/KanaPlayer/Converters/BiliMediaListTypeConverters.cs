@@ -22,7 +22,7 @@ public class FavoriteTypeToIconKindConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        throw new NotImplementedException();
+        throw new NotSupportedException();
 }
 
 public class FavoriteTypeToStringConverter : IValueConverter
@@ -41,5 +41,5 @@ public class FavoriteTypeToStringConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        throw new NotImplementedException();
+        throw new NotSupportedException();
 }

@@ -25,7 +25,6 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
             "--intf=dummy",
             "--no-audio-time-stretch",
             "--no-video",
-            "--aout=directsound",
             "--audio-resampler=soxr",
             "--live-caching=0",
             "--network-caching=0",
@@ -70,6 +69,8 @@ public partial class LibVlcAudioPlayer : ObservableObject, IAudioPlayer, IDispos
         _mediaPlayer.Paused += (_, _) => Status = PlayStatus.Paused;
         _mediaPlayer.Stopped += (_, _) => Status = PlayStatus.Stopped;
     }
+    
+    // TODO: audio outputs detection
 
     [ObservableProperty]
     public partial PlayStatus Status { get; private set; } = PlayStatus.Stopped;

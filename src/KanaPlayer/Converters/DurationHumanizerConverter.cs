@@ -10,5 +10,5 @@ public class DurationHumanizerConverter: IValueConverter
         value is ulong duration ? $"{duration / 60:D2}:{duration % 60:D2}" : value;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => 
-        throw new NotImplementedException();
+        throw new NotSupportedException();
 }

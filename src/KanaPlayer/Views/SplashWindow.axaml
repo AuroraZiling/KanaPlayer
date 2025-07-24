@@ -3,7 +3,7 @@
     CornerRadius="20"
     ExtendClientAreaToDecorationsHint="True"
     Height="120"
-    Icon="/Assets/kana-logo.ico"
+    Icon="/Assets/kana-logo.png"
     SystemDecorations="None"
     Title="KanaPlayer - Splash"
     TransparencyLevelHint="AcrylicBlur"

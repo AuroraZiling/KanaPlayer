@@ -3,7 +3,7 @@
     ExtendClientAreaChromeHints="NoChrome"
     ExtendClientAreaTitleBarHeightHint="-1"
     ExtendClientAreaToDecorationsHint="True"
-    Icon="/Assets/kana-logo.ico"
+    Icon="/Assets/kana-logo.png"
     Margin="0"
     MinHeight="500"
     MinWidth="1264"
@@ -15,29 +15,29 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
     xmlns:controls="clr-namespace:KanaPlayer.Controls"
-    xmlns:viewModels="clr-namespace:KanaPlayer.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:hosts="clr-namespace:KanaPlayer.Controls.Hosts"
-    xmlns:views="clr-namespace:KanaPlayer.Views">
+    xmlns:viewModels="clr-namespace:KanaPlayer.ViewModels"
+    xmlns:views="clr-namespace:KanaPlayer.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <VisualLayerManager
-        Margin="{Binding #KanaWindow.OffScreenMargin}">
+    <VisualLayerManager Margin="{Binding #KanaWindow.OffScreenMargin}">
         <VisualLayerManager.ChromeOverlayLayer>
             <hosts:KanaToastHost Manager="{Binding ToastManager}" />
-            <hosts:KanaDialogHost x:Name="KanaDialogHost" Manager="{Binding DialogManager}" />
+            <hosts:KanaDialogHost Manager="{Binding DialogManager}" x:Name="KanaDialogHost" />
             <controls:KanaWindowTitleBar
                 CloseButtonClick="KanaWindowTitleBar_OnCloseButtonClick"
-                Height="60" VerticalAlignment="Top"
+                Height="60"
                 Icon="avares://KanaPlayer/Assets/kana-logo.ico"
                 MaximizeButtonClick="KanaWindowTitleBar_OnMaximizeButtonClick"
                 MinimizeButtonClick="KanaWindowTitleBar_OnMinimizeButtonClick"
                 Title="KanaPlayer"
+                VerticalAlignment="Top"
                 x:Name="MainWindowTitleBar">
                 <controls:KanaWindowTitleBar.RightControl>
                     <StackPanel
+                        IsEnabled="{Binding !#KanaDialogHost.IsDialogOpen}"
                         Margin="0,0,20,0"
                         Orientation="Horizontal"
-                        IsEnabled="{Binding !#KanaDialogHost.IsDialogOpen}"
                         Spacing="7">
                         <StackPanel.Styles>
                             <Style Selector="ToggleButton.KanaWindowTitleBarRightButton">
@@ -52,7 +52,7 @@
                             Classes="KanaWindowTitleBarRightButton Navigation"
                             Command="{Binding NavigateToSettingsCommand}"
                             Content="{LucideIconContent Kind=Cog,
-                                                    Size=24}"
+                                                        Size=24}"
                             IsChecked="{Binding IsSettingsChecked, Mode=OneWay}"
                             IsHitTestVisible="{Binding !$self.IsChecked}"
                             Width="40" />
@@ -94,6 +94,6 @@
             </controls:KanaWindowTitleBar>
         </VisualLayerManager.ChromeOverlayLayer>
 
-        <views:MainView Margin="0, 60, 0, 0"/>
+        <views:MainView Margin="0,60,0,0" />
     </VisualLayerManager>
 </Window>
