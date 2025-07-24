@@ -42,4 +42,13 @@ public static class MathExtension
         t = t * t * (3.0 - 2.0 * t);
         return from.Lerp(to, t);
     }
+
+    /// <summary>
+    /// 如果是NaN或无穷大，则返回default值。
+    /// </summary>
+    /// <returns></returns>
+    public static double SafeDouble(this double value, double defaultValue = 0.0)
+    {
+        return double.IsNaN(value) || double.IsInfinity(value) ? defaultValue : value;
+    }
 }

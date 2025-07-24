@@ -35,12 +35,6 @@ public interface IAudioPlayer : INotifyPropertyChanged
     event Action? PlaybackStopped;
 
     /// <summary>
-    /// Loads audio from a stream. This will stop any currently playing audio instantly and load the new audio stream.
-    /// </summary>
-    /// <param name="audioStream"></param>
-    void Load(Stream audioStream);
-
-    /// <summary>
     /// Loads audio from a factory function that returns a stream asynchronously.
     /// </summary>
     /// <param name="asyncAudioStreamFactory"></param>
@@ -56,5 +50,6 @@ public interface IAudioPlayer : INotifyPropertyChanged
     /// Pauses the currently playing audio.
     /// </summary>
     void Pause();
+
     void Stop();
 }

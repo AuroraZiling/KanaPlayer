@@ -12,7 +12,7 @@ public static class Program
     {
         App.ConfigureServices += x =>
         {
-            x.AddSingleton<IAudioPlayer, LibVlcAudioPlayer>();
+            x.AddSingleton<IAudioPlayer, MediaFoundationAudioPlayer>();
         };
         
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

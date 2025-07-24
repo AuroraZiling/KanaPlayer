@@ -21,8 +21,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="LibVLCSharp" />
-        <PackageReference Include="VideoLAN.LibVLC.Windows" />
+        <PackageReference Include="Vortice.MediaFoundation" />
     </ItemGroup>
 
     <ItemGroup>

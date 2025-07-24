@@ -84,7 +84,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             }
         }
 
-        _playList.CollectionChanged += (in args) =>
+        void OnPlayListOnCollectionChanged(in NotifyCollectionChangedEventArgs<PlayListItem> args)
         {
             switch (args.Action)
             {
@@ -94,15 +94,13 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                     break;
                 }
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var argsNewItem in args.NewItems)
-                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
+                    foreach (var argsNewItem in args.NewItems) _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Add(argsNewItem.AudioUniqueId);
                     break;
                 case NotifyCollectionChangedAction.Remove when args.IsSingleItem:
                     _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(args.OldItem.AudioUniqueId);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var argsOldItem in args.OldItems)
-                        _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsOldItem.AudioUniqueId);
+                    foreach (var argsOldItem in args.OldItems) _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Remove(argsOldItem.AudioUniqueId);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayList.Clear();
@@ -113,7 +111,9 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                     throw new ArgumentOutOfRangeException();
             }
             _configurationService.SaveImmediate();
-        };
+        }
+
+        _playList.CollectionChanged += OnPlayListOnCollectionChanged;
         return;
 
         async Task<PlayListItem?> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)

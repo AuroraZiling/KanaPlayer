@@ -97,10 +97,7 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
                     break;
                 case FavoritesAddBehaviors.AddToNextAndPlayInPlayList:
                     await playerManager.InsertAfterCurrentPlayItemAsync(playItem);
-                    Task.Run(async () =>
-                    {
-                        await playerManager.LoadAndPlayAsync(playItem);
-                    }).Detach();
+                    Task.Run(() => playerManager.LoadAndPlayAsync(playItem)).Detach();
                     break;
                 case FavoritesAddBehaviors.ReplaceCurrentPlayList:
                 default:
