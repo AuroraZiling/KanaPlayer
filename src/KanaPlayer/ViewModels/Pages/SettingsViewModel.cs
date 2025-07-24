@@ -123,6 +123,8 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
 
     #region About
 
+    public string? AppVersion => AppHelper.ApplicationVersion;
+
     [RelayCommand]
     private void RevealFolder(string folderType)
     {

@@ -17,7 +17,7 @@ public static class AppHelper
     public static string SettingsFilePath { get; } =
         Path.Combine(ApplicationDataFolderPath, "settings.json");
 
-    public static string? ApplicationVersion =>
+    public static string? ApplicationVersion { get; } =
         typeof(AppHelper).Assembly.GetName().Version?.ToString(3);
     public static bool IsDebug =>
         Debugger.IsAttached;

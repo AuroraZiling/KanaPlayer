@@ -2,12 +2,12 @@
     x:Class="KanaPlayer.Views.Pages.SettingsView"
     x:DataType="pages:SettingsViewModel"
     xmlns="https://github.com/avaloniaui"
+    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching"
     xmlns:controls="clr-namespace:KanaPlayer.Controls"
     xmlns:converters="clr-namespace:KanaPlayer.Converters"
     xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching"
-    xmlns:settingTypes="clr-namespace:KanaPlayer.Models.SettingTypes">
+    xmlns:settingTypes="clr-namespace:KanaPlayer.Models.SettingTypes"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <UserControl.Resources>
         <converters:CloseBehaviorsToComboBoxIndexConverter x:Key="CloseBehaviorsToComboBoxIndexConverter" />
@@ -15,19 +15,19 @@
     </UserControl.Resources>
 
     <TabControl Classes="PageTabControl" attaching:TabControlAttaching.Header="设置">
-        <TabItem Header="行为" Classes="PageTabItem">
+        <TabItem Classes="PageTabItem" Header="行为">
             <ScrollViewer>
                 <StackPanel Spacing="15">
                     <!-- <Button Content="测试用按钮" Command="{Binding TestCommand}"></Button> -->
                     <controls:KanaSettingsGroup Header="播放器">
                         <StackPanel Spacing="5">
-                            <TextBlock Text="关闭按钮行为" Classes="h6"></TextBlock>
-                            <TextBlock Text="选择按下主窗口关闭按钮后的行为"></TextBlock>
+                            <TextBlock Classes="h6" Text="关闭按钮行为" />
+                            <TextBlock Text="选择按下主窗口关闭按钮后的行为" />
                             <ComboBox
                                 Cursor="Hand"
-                                Width="300"
                                 SelectedIndex="{Binding SelectedCloseBehavior, Mode=TwoWay, Converter={StaticResource CloseBehaviorsToComboBoxIndexConverter}}"
-                                VerticalAlignment="Center">
+                                VerticalAlignment="Center"
+                                Width="300">
                                 <ComboBoxItem Content="最小化至任务栏" />
                                 <ComboBoxItem Content="隐藏至托盘菜单" />
                                 <ComboBoxItem Content="关闭" />
@@ -36,131 +36,181 @@
                     </controls:KanaSettingsGroup>
                     <controls:KanaSettingsGroup Header="首页">
                         <StackPanel Spacing="5">
-                            <TextBlock Text="播放行为" Classes="h6"></TextBlock>
-                            <TextBlock Text="点击首页任意音频的行为"></TextBlock>
+                            <TextBlock Classes="h6" Text="播放行为" />
+                            <TextBlock Text="点击首页任意音频的行为" />
                             <RadioButton
                                 Command="{Binding ChangeHomeAddBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
-                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
-                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首" GroupName="HomeAddBehaviorGroup">
-                            </RadioButton>
+                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首"
+                                GroupName="HomeAddBehaviorGroup"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}" />
                             <RadioButton
                                 Command="{Binding ChangeHomeAddBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextAndPlayInPlayList}"
-                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextAndPlayInPlayList}}"
-                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首并立即播放" GroupName="HomeAddBehaviorGroup">
-                            </RadioButton>
+                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首并立即播放"
+                                GroupName="HomeAddBehaviorGroup"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextAndPlayInPlayList}}" />
                             <RadioButton
                                 Command="{Binding ChangeHomeAddBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
-                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
-                                Content="将选中单曲添加到播放列表末尾" GroupName="HomeAddBehaviorGroup">
-                            </RadioButton>
+                                Content="将选中单曲添加到播放列表末尾"
+                                GroupName="HomeAddBehaviorGroup"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}" />
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                     <controls:KanaSettingsGroup Header="收藏夹">
                         <StackPanel Spacing="5">
-                            <TextBlock Text="替换播放列表警告" Classes="h6"></TextBlock>
-                            <TextBlock Text="按下 播放全部 按钮后是否弹窗警告替换播放列表"></TextBlock>
-                            <ToggleSwitch IsChecked="{Binding IsFavoritesPlayAllReplaceWarningEnabled}"
-                                          OffContent="不会警告" OnContent="将会弹窗警告">
-                            </ToggleSwitch>
+                            <TextBlock Classes="h6" Text="替换播放列表警告" />
+                            <TextBlock Text="按下 播放全部 按钮后是否弹窗警告替换播放列表" />
+                            <ToggleSwitch
+                                IsChecked="{Binding IsFavoritesPlayAllReplaceWarningEnabled}"
+                                OffContent="不会警告"
+                                OnContent="将会弹窗警告" />
                         </StackPanel>
-                        <StackPanel Spacing="5" Margin="0, 16, 0, 0">
-                            <TextBlock Text="添加列表行为" Classes="h6"></TextBlock>
-                            <TextBlock Text="按下 添加到播放列表 按钮后行为"></TextBlock>
+                        <StackPanel Margin="0,16,0,0" Spacing="5">
+                            <TextBlock Classes="h6" Text="添加列表行为" />
+                            <TextBlock Text="按下 添加到播放列表 按钮后行为" />
                             <RadioButton
                                 Command="{Binding ChangeFavoritesAddAllBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
-                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
-                                Content="将收藏夹添加到播放列表末尾" GroupName="AddAllBehaviorGroup">
-                            </RadioButton>
+                                Content="将收藏夹添加到播放列表末尾"
+                                GroupName="AddAllBehaviorGroup"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}" />
                             <RadioButton
                                 Command="{Binding ChangeFavoritesAddAllBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
-                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
-                                Content="将收藏夹添加到播放列表中当前播放歌曲的下一首" GroupName="AddAllBehaviorGroup">
-                            </RadioButton>
+                                Content="将收藏夹添加到播放列表中当前播放歌曲的下一首"
+                                GroupName="AddAllBehaviorGroup"
+                                IsChecked="{Binding FavoritesAddAllBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}" />
                         </StackPanel>
-                        <StackPanel Spacing="5" Margin="0, 16, 0, 0">
-                            <TextBlock Text="双击播放单曲行为" Classes="h6"></TextBlock>
-                            <TextBlock Text="双击收藏夹中单曲播放的行为"></TextBlock>
+                        <StackPanel Margin="0,16,0,0" Spacing="5">
+                            <TextBlock Classes="h6" Text="双击播放单曲行为" />
+                            <TextBlock Text="双击收藏夹中单曲播放的行为" />
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.ReplaceCurrentPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.ReplaceCurrentPlayList}}"
-                                Content="将所在收藏夹替换播放列表" GroupName="DoubleTappedPlayListItemBehaviorGroup">
-                            </RadioButton>
+                                Content="将所在收藏夹替换播放列表"
+                                GroupName="DoubleTappedPlayListItemBehaviorGroup"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.ReplaceCurrentPlayList}}" />
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}"
-                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首" GroupName="DoubleTappedPlayListItemBehaviorGroup">
-                            </RadioButton>
+                                Content="将选中单曲添加到播放列表中当前播放歌曲的下一首"
+                                GroupName="DoubleTappedPlayListItemBehaviorGroup"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToNextInPlayList}}" />
                             <RadioButton
                                 Command="{Binding ChangeDoubleTappedPlayListItemBehaviorsCommand}"
                                 CommandParameter="{x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}"
-                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}"
-                                Content="将选中单曲添加到播放列表的末尾" GroupName="DoubleTappedPlayListItemBehaviorGroup">
-                            </RadioButton>
+                                Content="将选中单曲添加到播放列表的末尾"
+                                GroupName="DoubleTappedPlayListItemBehaviorGroup"
+                                IsChecked="{Binding DoubleTappedPlayListItemBehaviors, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static settingTypes:FavoritesAddBehaviors.AddToEndOfPlayList}}" />
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        <TabItem Header="缓存" Classes="PageTabItem">
+        <TabItem Classes="PageTabItem" Header="缓存">
             <ScrollViewer>
                 <StackPanel Spacing="20">
                     <controls:KanaSettingsGroup Header="音频">
                         <StackPanel Spacing="5">
-                            <TextBlock Text="缓存最大占用" Classes="h6"></TextBlock>
-                            <TextBlock Text="音频缓存文件夹的最大空间占用，到达该占用后会自动清空到设定大小"></TextBlock>
-                            <StackPanel Orientation="Horizontal" Margin="0, -10, 0, 0" Spacing="20">
-                                <Slider Cursor="Hand" Width="500"
-                                        Value="{Binding MaximumAudioCacheSizeInMb, Mode=TwoWay}" Minimum="256"
-                                        Maximum="10240" TickFrequency="256" IsSnapToTickEnabled="True" />
-                                <TextBlock Width="70" FontSize="16" VerticalAlignment="Center"
-                                           Text="{Binding MaximumAudioCacheSizeInMb, Converter={StaticResource StorageSizeHumanizerConverter}}" />
+                            <TextBlock Classes="h6" Text="缓存最大占用" />
+                            <TextBlock Text="音频缓存文件夹的最大空间占用，到达该占用后会自动清空到设定大小" />
+                            <StackPanel
+                                Margin="0,-10,0,0"
+                                Orientation="Horizontal"
+                                Spacing="20">
+                                <Slider
+                                    Cursor="Hand"
+                                    IsSnapToTickEnabled="True"
+                                    Maximum="10240"
+                                    Minimum="256"
+                                    TickFrequency="256"
+                                    Value="{Binding MaximumAudioCacheSizeInMb, Mode=TwoWay}"
+                                    Width="500" />
+                                <TextBlock
+                                    FontSize="16"
+                                    Text="{Binding MaximumAudioCacheSizeInMb, Converter={StaticResource StorageSizeHumanizerConverter}}"
+                                    VerticalAlignment="Center"
+                                    Width="70" />
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Spacing="5">
-                            <TextBlock Text="手动清空" Classes="h6"></TextBlock>
-                            <TextBlock Text="将缓存文件夹彻底清空"></TextBlock>
-                            <Button attaching:Icon.LucideIconKind="Trash" Content="清空音频文件夹"
-                                    Command="{Binding CleanupCacheCommand}" CommandParameter="audio" />
+                            <TextBlock Classes="h6" Text="手动清空" />
+                            <TextBlock Text="将缓存文件夹彻底清空" />
+                            <Button
+                                Command="{Binding CleanupCacheCommand}"
+                                CommandParameter="audio"
+                                Content="清空音频文件夹"
+                                attaching:Icon.LucideIconKind="Trash" />
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                     <controls:KanaSettingsGroup Header="图片">
                         <StackPanel Spacing="5">
-                            <TextBlock Text="缓存最大占用" Classes="h6"></TextBlock>
-                            <TextBlock Text="图片缓存文件夹的最大空间占用，到达该占用后会自动清空到设定大小"></TextBlock>
-                            <StackPanel Orientation="Horizontal" Margin="0, -10, 0, 0" Spacing="20">
-                                <Slider Cursor="Hand" Width="500"
-                                        Value="{Binding MaximumImageCacheSizeInMb, Mode=TwoWay}" Minimum="128"
-                                        Maximum="5120" TickFrequency="128" IsSnapToTickEnabled="True" />
-                                <TextBlock Width="70" FontSize="16" VerticalAlignment="Center"
-                                           Text="{Binding MaximumImageCacheSizeInMb, Converter={StaticResource StorageSizeHumanizerConverter}}" />
+                            <TextBlock Classes="h6" Text="缓存最大占用" />
+                            <TextBlock Text="图片缓存文件夹的最大空间占用，到达该占用后会自动清空到设定大小" />
+                            <StackPanel
+                                Margin="0,-10,0,0"
+                                Orientation="Horizontal"
+                                Spacing="20">
+                                <Slider
+                                    Cursor="Hand"
+                                    IsSnapToTickEnabled="True"
+                                    Maximum="5120"
+                                    Minimum="128"
+                                    TickFrequency="128"
+                                    Value="{Binding MaximumImageCacheSizeInMb, Mode=TwoWay}"
+                                    Width="500" />
+                                <TextBlock
+                                    FontSize="16"
+                                    Text="{Binding MaximumImageCacheSizeInMb, Converter={StaticResource StorageSizeHumanizerConverter}}"
+                                    VerticalAlignment="Center"
+                                    Width="70" />
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Spacing="5">
-                            <TextBlock Text="手动清空" Classes="h6"></TextBlock>
-                            <TextBlock Text="将缓存文件夹彻底清空"></TextBlock>
-                            <Button attaching:Icon.LucideIconKind="Trash" Content="清空图片文件夹"
-                                    Command="{Binding CleanupCacheCommand}" CommandParameter="image" />
+                            <TextBlock Classes="h6" Text="手动清空" />
+                            <TextBlock Text="将缓存文件夹彻底清空" />
+                            <Button
+                                Command="{Binding CleanupCacheCommand}"
+                                CommandParameter="image"
+                                Content="清空图片文件夹"
+                                attaching:Icon.LucideIconKind="Trash" />
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        <TabItem Header="关于" Classes="PageTabItem">
+        <TabItem Classes="PageTabItem" Header="关于">
             <ScrollViewer>
                 <StackPanel Spacing="20">
+                    <Border
+                        Background="{DynamicResource KanaAccentColor30}"
+                        CornerRadius="20"
+                        Padding="12">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="60" Source="avares://KanaPlayer/Assets/kana-logo.png" />
+                            <StackPanel Margin="15,0,0,0">
+                                <TextBlock Classes="h1" Text="KanaPlayer" />
+                                <TextBlock
+                                    FontWeight="DemiBold"
+                                    Text="{Binding AppVersion, StringFormat=Version: {0}}"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                     <controls:KanaSettingsGroup Header="目录">
                         <StackPanel Spacing="5">
-                            <Button attaching:Icon.LucideIconKind="Folder" Content="KanaPlayer 软件目录"
-                                    Command="{Binding RevealFolderCommand}" CommandParameter="app" />
-                            <Button attaching:Icon.LucideIconKind="Folder" Content="KanaPlayer 数据目录"
-                                    Command="{Binding RevealFolderCommand}" CommandParameter="data" />
+                            <Button
+                                Command="{Binding RevealFolderCommand}"
+                                CommandParameter="app"
+                                Content="KanaPlayer 软件目录"
+                                attaching:Icon.LucideIconKind="Folder" />
+                            <Button
+                                Command="{Binding RevealFolderCommand}"
+                                CommandParameter="data"
+                                Content="KanaPlayer 数据目录"
+                                attaching:Icon.LucideIconKind="Folder" />
                         </StackPanel>
                     </controls:KanaSettingsGroup>
                 </StackPanel>
