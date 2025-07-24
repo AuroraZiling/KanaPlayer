@@ -35,9 +35,7 @@
 KanaPlayer 是一个基于 Bilibili API 的音频播放器，旨在提供一个简洁易用的音频播放体验。
 
 > [!IMPORTANT]  
-> 本项目为免费开源软件，仅供学习和个人使用
-> 不进行任何商业化运营，不对 bilibili 平台进行任何破解行为
-> 有关免责声明，请参阅 [DISCLAIMER](DISCLAIMER.md) 文件
+> 本项目为免费开源软件，仅供学习和个人使用。不进行任何商业化运营，不对 bilibili 平台进行任何破解行为。有关免责声明，请参阅 [DISCLAIMER](DISCLAIMER.md) 文件
 
 ### 特性 / Features
 
@@ -106,13 +104,6 @@ KanaPlayer 依赖 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download
 ## 许可证 / License
 
 KanaPlayer 使用 [MIT 许可证](LICENSE)
-
-### 第三方库许可证 / Third-party Library Licenses
-
-- **LibVLC** - [LGPL 2.1 许可证](https://github.com/videolan/vlc/blob/master/COPYING.LIB)
-   - LibVLC 是 VideoLAN 项目的一部分
-   - 项目主页：https://www.videolan.org/vlc/libvlc.html
-   - 源代码：https://github.com/videolan/vlc
 
 ## 鸣谢 / Acknowledgements
 

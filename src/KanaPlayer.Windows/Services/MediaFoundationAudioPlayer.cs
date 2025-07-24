@@ -52,13 +52,14 @@ public partial class MediaFoundationAudioPlayer : ObservableObject, IAudioPlayer
     private MFByteStream? _audioStream;
     private TaskCompletionSource? _audioLoadedTaskCompletionSource;
 
+#pragma warning disable CS8774 // Member must have a non-null value when exiting.
     [MemberNotNull(nameof(_mediaEngine))]
     private async ValueTask EnsureInitializedAsync()
     {
         if (_mediaEngine is not null) return;
 
         if ((await Task.Run(() => MFStartup(true))).Failure)
-        {
+        {   
             throw new InvalidOperationException("Failed to initialize Media Foundation.");
         }
 
@@ -68,6 +69,7 @@ public partial class MediaFoundationAudioPlayer : ObservableObject, IAudioPlayer
 
         _mediaEngine = factory.CreateInstance(MediaEngineCreateFlags.AudioOnly, attributes, PlaybackCallback);
     }
+#pragma warning restore CS8774 // Member must have a non-null value when exiting.
 
     private void PlaybackCallback(MediaEngineEvent mediaEvent, UIntPtr param1, int param2)
     {

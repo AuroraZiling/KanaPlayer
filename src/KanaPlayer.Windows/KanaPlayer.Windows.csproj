@@ -8,6 +8,8 @@
         <Nullable>enable</Nullable>
         <InvariantGlobalization>true</InvariantGlobalization>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TieredPGO>true</TieredPGO>
+        <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>
     </PropertyGroup>
     
     <PropertyGroup>
