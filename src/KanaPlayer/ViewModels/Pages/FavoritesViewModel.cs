@@ -114,6 +114,31 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         ScopedLogger.Info("双击播放本地歌单音频：{Title}，所属：{FolderName}，播放模式：{playbackMode}", SelectedLocalMediaListItem.Title, SelectedLocalMediaList.Title,
             behavior);
     }
+    
+    [RelayCommand]
+    private void RemoveSelectedLocalMediaListItem(DbCachedMediaListAudioMetadata? removeItem)
+    {
+        if (removeItem is null || SelectedLocalMediaList is null)
+            return;
+        
+        if (!localMediaListManager.RemoveAudioFromLocalMediaList(SelectedLocalMediaList.UniqueId, removeItem.UniqueId))
+        {
+            kanaToastManager.CreateToast().WithTitle("失败")
+                            .WithContent("删除本地歌单音频失败")
+                            .WithType(NotificationType.Error)
+                            .Queue();
+            return;
+        }
+        
+        kanaToastManager.CreateToast().WithTitle("成功")
+                        .WithContent("删除本地歌单音频成功")
+                        .WithType(NotificationType.Success)
+                        .Queue();
+        
+        LocalMediaListItems.Remove(removeItem);
+        RefreshMediaLists();
+        ScopedLogger.Info("已从本地歌单：{FolderName} 中删除音频：{Title}", SelectedLocalMediaList.Title, removeItem.Title);
+    }
 
     [RelayCommand]
     private async Task PlayAllLocalMediaListAsync()

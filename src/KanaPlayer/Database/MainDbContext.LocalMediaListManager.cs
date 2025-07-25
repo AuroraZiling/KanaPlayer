@@ -77,4 +77,24 @@ public partial class MainDbContext: ILocalMediaListManager
         SaveChanges();
         return true;
     }
+    
+    public bool RemoveAudioFromLocalMediaList(LocalMediaListUniqueId localMediaListUniqueId, AudioUniqueId audioUniqueId)
+    {
+        var localMediaListItem = LocalMediaListItemSet
+                                 .Include(item => item.CachedMediaListAudioMetadataSet)
+                                 .FirstOrDefault(item => item.Id.Equals(localMediaListUniqueId.ToString()));
+        if (localMediaListItem is null)
+            return false;
+        
+        var audioMetadata = localMediaListItem.CachedMediaListAudioMetadataSet
+            .FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId));
+
+        if (audioMetadata is null)
+            return false;
+
+        localMediaListItem.CachedMediaListAudioMetadataSet.Remove(audioMetadata);
+        localMediaListItem.MediaCount = localMediaListItem.MediaCount > 0 ? localMediaListItem.MediaCount - 1 : 0;
+        SaveChanges();
+        return true;
+    }
 }

@@ -127,6 +127,14 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type database:DbCachedMediaListAudioMetadata}">
                                     <Grid ColumnDefinitions="60, *, *, 100">
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem
+                                                    Command="{Binding $parent[UserControl].((pages:FavoritesViewModel)DataContext).RemoveSelectedLocalMediaListItemCommand, FallbackValue={x:Null}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="删除" />
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
                                         <TextBlock Grid.Column="0" Text="序号" />
                                         <TextBlock Grid.Column="1" Text="{Binding Title}" />
                                         <TextBlock Grid.Column="2" Text="{Binding OwnerName}" />

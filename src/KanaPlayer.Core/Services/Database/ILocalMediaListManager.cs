@@ -15,5 +15,8 @@ public interface ILocalMediaListManager
     bool IsLocalMediaListExists(LocalMediaListUniqueId localMediaListUniqueId);
     bool AddOrUpdateLocalMediaListItem(LocalMediaListItem item);
     bool DeleteLocalMediaListItem(LocalMediaListUniqueId localMediaListUniqueId);
+    
+    bool RemoveAudioFromLocalMediaList(LocalMediaListUniqueId localMediaListUniqueId, AudioUniqueId audioUniqueId);
+        
     int SaveChanges();
 }

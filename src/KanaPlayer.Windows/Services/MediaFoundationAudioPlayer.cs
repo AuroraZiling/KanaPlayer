@@ -126,7 +126,7 @@ public partial class MediaFoundationAudioPlayer : ObservableObject, IAudioPlayer
         if (_mediaEngine is null) return;
 
         _mediaEngine.Pause();
-        _mediaEngine.QueryInterface<IMFMediaEngineEx>().SetSourceFromByteStream(null, null);
+        //_mediaEngine.QueryInterface<IMFMediaEngineEx>().SetSourceFromByteStream(null, null);
     }
 
     public void Dispose()

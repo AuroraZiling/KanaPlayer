@@ -162,11 +162,18 @@
                 Spacing="3"
                 TextElement.Foreground="{DynamicResource KanaAccentColor}"
                 VerticalAlignment="Center">
-                <TextBlock FontFamily="Consolas, monospace" FontSize="16">
-                    <Run Text="{Binding PlaybackTime, StringFormat='hh\\:mm\\:ss'}" />
-                    <Run Text="/" />
-                    <Run Text="{Binding Duration, StringFormat='hh\\:mm\\:ss'}" />
-                </TextBlock>
+                <TextBlock
+                    FontFamily="Consolas, monospace"
+                    FontSize="16"
+                    Text="{Binding PlaybackTime, StringFormat='hh\\:mm\\:ss'}" />
+                <TextBlock
+                    FontFamily="Consolas, monospace"
+                    FontSize="16"
+                    Text="/" />
+                <TextBlock
+                    FontFamily="Consolas, monospace"
+                    FontSize="16"
+                    Text="{Binding Duration, StringFormat='hh\\:mm\\:ss'}" />
             </StackPanel>
 
             <Slider
