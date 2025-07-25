@@ -36,6 +36,10 @@
                                                 Command="{Binding $parent[UserControl].((pages:FavoritesViewModel)DataContext).RemoveLocalMediaListCommand, FallbackValue={x:Null}}"
                                                 CommandParameter="{Binding}"
                                                 Header="删除" />
+                                            <MenuItem
+                                                Command="{Binding $parent[UserControl].((pages:FavoritesViewModel)DataContext).RenameLocalMediaListCommand, FallbackValue={x:Null}}"
+                                                CommandParameter="{Binding}"
+                                                Header="更改标题与描述" />
                                         </ContextMenu>
                                     </Grid.ContextMenu>
                                     <TextBlock

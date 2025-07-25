@@ -104,7 +104,7 @@ public partial class HomeViewModel(IBilibiliClient bilibiliClient, IPlayerManage
                     ScopedLogger.Warn("错误的添加行为: {Behavior}", behavior);
                     return;
             }
-            ScopedLogger.Info("已将音频添加到播放列表: {Title}，行为: {Behavior}", audioInfoData.Title, behavior);
+            ScopedLogger.Info("已将音频添加到播放列表: {CreateTitle}，行为: {Behavior}", audioInfoData.Title, behavior);
         }
         else
             ScopedLogger.Warn("获取Cookies失败，无法加载音频");

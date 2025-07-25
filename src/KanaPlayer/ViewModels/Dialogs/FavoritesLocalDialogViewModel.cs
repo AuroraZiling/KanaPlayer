@@ -23,6 +23,7 @@ namespace KanaPlayer.ViewModels.Dialogs;
 public enum FavoritesLocalDialogType
 {
     Create,
+    Rename,
     AddAudio
 }
 
@@ -38,22 +39,22 @@ public partial class FavoritesLocalDialogViewModel(FavoritesLocalDialogType favo
 
     #region Create
 
-    [ObservableProperty] public partial string Title { get; set; } = string.Empty;
-    [ObservableProperty] public partial string Description { get; set; } = string.Empty;
+    [ObservableProperty] public partial string CreateTitle { get; set; } = string.Empty;
+    [ObservableProperty] public partial string CreateDescription { get; set; } = string.Empty;
 
     [RelayCommand]
     private void Create()
     {
-        if (string.IsNullOrEmpty(Title) || string.IsNullOrWhiteSpace(Title))
+        if (string.IsNullOrEmpty(CreateTitle) || string.IsNullOrWhiteSpace(CreateTitle))
         {
             kanaToastManager.CreateToast().WithTitle("创建失败").WithContent("歌单标题不能为空").WithType(NotificationType.Error).Queue();
             return;
         }
 
-        if (localMediaListManager.IsLocalMediaListExistsByTitle(Title))
+        if (localMediaListManager.IsLocalMediaListExistsByTitle(CreateTitle))
         {
-            kanaToastManager.CreateToast().WithTitle("创建失败").WithContent($"歌单标题 '{Title}' 已存在").WithType(NotificationType.Error).Queue();
-            ScopedLogger.Warn($"尝试创建本地歌单时，歌单标题 '{Title}' 已存在");
+            kanaToastManager.CreateToast().WithTitle("创建失败").WithContent($"歌单标题 '{CreateTitle}' 已存在").WithType(NotificationType.Error).Queue();
+            ScopedLogger.Warn($"尝试创建本地歌单时，歌单标题 '{CreateTitle}' 已存在");
             return;
         }
 
@@ -61,17 +62,59 @@ public partial class FavoritesLocalDialogViewModel(FavoritesLocalDialogType favo
         localMediaListManager.AddOrUpdateLocalMediaListItem(new LocalMediaListItem
         {
             UniqueId = mediaListId,
-            Title = Title,
+            Title = CreateTitle,
             CoverUrl = "",
-            Description = Description,
+            Description = CreateDescription,
             CreatedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             MediaCount = 0
         });
         navigationService.Navigate(typeof(FavoritesView));
         kanaDialog.Dismiss();
-        kanaToastManager.CreateToast().WithTitle("创建成功").WithContent($"成功创建 {Title} 歌单").WithType(NotificationType.Success).Queue();
-        ScopedLogger.Info($"创建本地歌单成功，歌单标题：{Title}，歌单 ID：{mediaListId}");
+        kanaToastManager.CreateToast().WithTitle("创建成功").WithContent($"成功创建 {CreateTitle} 歌单").WithType(NotificationType.Success).Queue();
+        ScopedLogger.Info($"创建本地歌单成功，歌单标题：{CreateTitle}，歌单 ID：{mediaListId}");
+    }
+
+    #endregion
+
+    #region Rename
+
+    [ObservableProperty] public partial string RenameTitle { get; set; } = dbLocalMediaListItem?.Title ?? string.Empty;
+    [ObservableProperty] public partial string RenameDescription { get; set; } = dbLocalMediaListItem?.Description ?? string.Empty;
+
+
+    [RelayCommand]
+    private void Rename()
+    {
+        if (string.IsNullOrEmpty(RenameTitle) || string.IsNullOrWhiteSpace(RenameTitle))
+        {
+            kanaToastManager.CreateToast().WithTitle("更改失败").WithContent("歌单标题不能为空").WithType(NotificationType.Error).Queue();
+            return;
+        }
+
+        if (dbLocalMediaListItem is null)
+        {
+            kanaToastManager.CreateToast().WithTitle("更改失败").WithContent("歌单不存在或未选择").WithType(NotificationType.Error).Queue();
+            ScopedLogger.Warn("尝试更改本地歌单信息时，未指定歌单 ID");
+            return;
+        }
+
+        if (localMediaListManager.IsLocalMediaListExistsByTitle(RenameTitle))
+        {
+            kanaToastManager.CreateToast().WithTitle("更改失败").WithContent($"歌单标题 '{RenameTitle}' 已存在").WithType(NotificationType.Error).Queue();
+            ScopedLogger.Warn($"尝试更改本地歌单信息时，歌单标题 '{RenameTitle}' 已存在");
+            return;
+        }
+        
+        dbLocalMediaListItem.Title = RenameTitle;
+        dbLocalMediaListItem.Description = RenameDescription;
+        dbLocalMediaListItem.ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        localMediaListManager.SaveChanges();
+        
+        navigationService.Navigate(typeof(FavoritesView));
+        kanaDialog.Dismiss();
+        kanaToastManager.CreateToast().WithTitle("更改成功").WithContent($"成功更改 {RenameTitle} 歌单信息").WithType(NotificationType.Success).Queue();
+        ScopedLogger.Info($"更改本地歌单信息成功，歌单标题：{RenameTitle}");
     }
 
     #endregion

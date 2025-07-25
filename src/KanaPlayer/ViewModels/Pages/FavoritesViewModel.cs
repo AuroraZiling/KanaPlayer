@@ -65,6 +65,22 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         LocalMediaLists.Remove(removeItem);
         ScopedLogger.Info("已删除本地歌单：{FolderName}", removeItem.Title);
     }
+    
+    [RelayCommand]
+    private void RenameLocalMediaList(DbLocalMediaListItem? renameItem)
+    {
+        if (renameItem is null)
+            return;
+
+        kanaDialogManager.CreateDialog()
+                         .WithView(new FavoritesLocalDialog())
+                         .WithViewModel(dialog =>
+                             new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Rename, dialog, localMediaListManager, kanaToastManager,
+                                 navigationService, bilibiliClient, renameItem))
+                         .WithDismissWithBackgroundClick()
+                         .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))
+                         .TryShow();
+    }
 
     partial void OnSelectedLocalMediaListChanged(DbLocalMediaListItem? value)
     {
@@ -111,7 +127,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                 return;
         }
         await playerManager.LoadAndPlayAsync(selectedPlayListItem);
-        ScopedLogger.Info("双击播放本地歌单音频：{Title}，所属：{FolderName}，播放模式：{playbackMode}", SelectedLocalMediaListItem.Title, SelectedLocalMediaList.Title,
+        ScopedLogger.Info("双击播放本地歌单音频：{CreateTitle}，所属：{FolderName}，播放模式：{playbackMode}", SelectedLocalMediaListItem.Title, SelectedLocalMediaList.Title,
             behavior);
     }
     
@@ -136,8 +152,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                         .Queue();
         
         LocalMediaListItems.Remove(removeItem);
-        RefreshMediaLists();
-        ScopedLogger.Info("已从本地歌单：{FolderName} 中删除音频：{Title}", SelectedLocalMediaList.Title, removeItem.Title);
+        ScopedLogger.Info("已从本地歌单：{FolderName} 中删除音频：{CreateTitle}", SelectedLocalMediaList.Title, removeItem.Title);
     }
 
     [RelayCommand]
@@ -312,7 +327,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                 return;
         }
         await playerManager.LoadAndPlayAsync(selectedPlayListItem);
-        ScopedLogger.Info("双击播放B站收藏夹/合集音频：{Title}，所属收藏夹/合集：{FolderName}，播放模式：{playbackMode}", SelectedBiliMediaListItem.Title, SelectedBiliMediaList.Title,
+        ScopedLogger.Info("双击播放B站收藏夹/合集音频：{CreateTitle}，所属收藏夹/合集：{FolderName}，播放模式：{playbackMode}", SelectedBiliMediaListItem.Title, SelectedBiliMediaList.Title,
             behavior);
     }
 

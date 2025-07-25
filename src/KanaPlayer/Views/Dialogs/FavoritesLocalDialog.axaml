@@ -1,64 +1,140 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:dialogs="clr-namespace:KanaPlayer.ViewModels.Dialogs"
-             x:DataType="dialogs:FavoritesLocalDialogViewModel"
-             x:Class="KanaPlayer.Views.Dialogs.FavoritesLocalDialog">
+﻿<UserControl
+    x:Class="KanaPlayer.Views.Dialogs.FavoritesLocalDialog"
+    x:DataType="dialogs:FavoritesLocalDialogViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:dialogs="clr-namespace:KanaPlayer.ViewModels.Dialogs"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Panel>
-        <StackPanel Spacing="12"
-                    IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesLocalDialogType.Create}}">
-            <TextBlock Text="创建本地歌单" FontSize="22" FontWeight="DemiBold"></TextBlock>
+        <StackPanel IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesLocalDialogType.Create}}" Spacing="12">
+            <TextBlock
+                FontSize="22"
+                FontWeight="DemiBold"
+                Text="创建本地歌单" />
 
             <StackPanel Spacing="10">
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="标题" VerticalAlignment="Center"></TextBlock>
-                    <TextBox Watermark="必填" Text="{Binding Title, Mode=TwoWay}" Width="320" MaxLength="20"></TextBox>
+                    <TextBlock Text="标题" VerticalAlignment="Center" />
+                    <TextBox
+                        MaxLength="20"
+                        Text="{Binding CreateTitle, Mode=TwoWay}"
+                        Watermark="必填"
+                        Width="320" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Text="描述" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
-                    <TextBox Text="{Binding Description, Mode=TwoWay}" Width="400" MaxLength="200" Height="160"
-                             TextWrapping="Wrap" AcceptsReturn="True">
-                    </TextBox>
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        Text="描述"
+                        VerticalAlignment="Center" />
+                    <TextBox
+                        AcceptsReturn="True"
+                        Height="160"
+                        MaxLength="200"
+                        Text="{Binding CreateDescription, Mode=TwoWay}"
+                        TextWrapping="Wrap"
+                        Width="400" />
                 </StackPanel>
             </StackPanel>
 
-            <Button Content="继续" HorizontalAlignment="Right" Command="{Binding CreateCommand}"
-                    IsEnabled="{Binding Title, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            </Button>
+            <Button
+                Command="{Binding CreateCommand}"
+                Content="继续"
+                HorizontalAlignment="Right"
+                IsEnabled="{Binding CreateTitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
         </StackPanel>
 
-        <StackPanel Spacing="12"
-                    IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesLocalDialogType.AddAudio}}">
-            <TextBlock Text="新增歌曲" FontSize="22" FontWeight="DemiBold"></TextBlock>
-            
-            <StackPanel IsVisible="{Binding !AddedMediaCount}" Spacing="10">
-                <TextBox Watermark="请在此框输入 B站网址/BV号/AV号，换行隔开" Text="{Binding ReadyAddMedia, Mode=TwoWay}" Width="500"
-                         Height="300" AcceptsReturn="True">
-                </TextBox>
-                <StackPanel Orientation="Horizontal" Spacing="7">
-                    <TextBlock Text="{Binding PassAddMediaUrlCount, StringFormat='检测到 {0} 个网址'}"
-                               VerticalAlignment="Center" IsVisible="{Binding !!PassAddMediaCount}">
-                    </TextBlock>
-                    <TextBlock Text="{Binding PassAddMediaBvIdCount, StringFormat='检测到 {0} 个 BV 号'}"
-                               VerticalAlignment="Center" IsVisible="{Binding !!PassAddMediaBvIdCount}">
-                    </TextBlock>
-                    <TextBlock Text="{Binding PassAddMediaAvIdCount, StringFormat='检测到 {0} 个 AV 号'}"
-                               VerticalAlignment="Center" IsVisible="{Binding !!PassAddMediaAvIdCount}">
-                    </TextBlock>
+        <StackPanel IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesLocalDialogType.Rename}}" Spacing="12">
+            <TextBlock
+                FontSize="22"
+                FontWeight="DemiBold"
+                Text="更改歌单信息" />
+
+            <StackPanel Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="标题" VerticalAlignment="Center" />
+                    <TextBox
+                        MaxLength="20"
+                        Text="{Binding RenameTitle, Mode=TwoWay}"
+                        Watermark="必填"
+                        Width="320" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        Text="描述"
+                        VerticalAlignment="Center" />
+                    <TextBox
+                        AcceptsReturn="True"
+                        Height="160"
+                        MaxLength="200"
+                        Text="{Binding RenameDescription, Mode=TwoWay}"
+                        TextWrapping="Wrap"
+                        Width="400" />
                 </StackPanel>
             </StackPanel>
 
-            <Button IsVisible="{Binding !AddedMediaCount}" Content="继续" HorizontalAlignment="Right"
-                    Command="{Binding AddAudioCommand}" IsEnabled="{Binding !!PassAddMediaCount}">
-            </Button>
-            
-            <ProgressBar IsVisible="{Binding !!AddedMediaCount}" Maximum="{Binding PassAddMediaCount}" Minimum="0" Value="{Binding AddedMediaCount}"></ProgressBar>
-            <Grid IsVisible="{Binding !!AddedMediaCount}" ColumnDefinitions="*, *">
-                <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
-                    <TextBlock Text="{Binding AddedMediaCount}" VerticalAlignment="Center"></TextBlock>
-                    <TextBlock Text="{Binding PassAddMediaCount, StringFormat=' / {0} 条'}" VerticalAlignment="Center"></TextBlock>
+            <Button
+                Command="{Binding RenameCommand}"
+                Content="继续"
+                HorizontalAlignment="Right"
+                IsEnabled="{Binding RenameTitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding DialogType, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static dialogs:FavoritesLocalDialogType.AddAudio}}" Spacing="12">
+            <TextBlock
+                FontSize="22"
+                FontWeight="DemiBold"
+                Text="新增歌曲" />
+
+            <StackPanel IsVisible="{Binding !AddedMediaCount}" Spacing="10">
+                <TextBox
+                    AcceptsReturn="True"
+                    Height="300"
+                    Text="{Binding ReadyAddMedia, Mode=TwoWay}"
+                    Watermark="请在此框输入 B站网址/BV号/AV号，换行隔开"
+                    Width="500" />
+                <StackPanel Orientation="Horizontal" Spacing="7">
+                    <TextBlock
+                        IsVisible="{Binding !!PassAddMediaCount}"
+                        Text="{Binding PassAddMediaUrlCount, StringFormat='检测到 {0} 个网址'}"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        IsVisible="{Binding !!PassAddMediaBvIdCount}"
+                        Text="{Binding PassAddMediaBvIdCount, StringFormat='检测到 {0} 个 BV 号'}"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        IsVisible="{Binding !!PassAddMediaAvIdCount}"
+                        Text="{Binding PassAddMediaAvIdCount, StringFormat='检测到 {0} 个 AV 号'}"
+                        VerticalAlignment="Center" />
                 </StackPanel>
-                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding AddedMediaTitle}" VerticalAlignment="Center"></TextBlock>
+            </StackPanel>
+
+            <Button
+                Command="{Binding AddAudioCommand}"
+                Content="继续"
+                HorizontalAlignment="Right"
+                IsEnabled="{Binding !!PassAddMediaCount}"
+                IsVisible="{Binding !AddedMediaCount}" />
+
+            <ProgressBar
+                IsVisible="{Binding !!AddedMediaCount}"
+                Maximum="{Binding PassAddMediaCount}"
+                Minimum="0"
+                Value="{Binding AddedMediaCount}" />
+            <Grid ColumnDefinitions="*, *" IsVisible="{Binding !!AddedMediaCount}">
+                <StackPanel
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+                    <TextBlock Text="{Binding AddedMediaCount}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding PassAddMediaCount, StringFormat=' / {0} 条'}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Text="{Binding AddedMediaTitle}"
+                    VerticalAlignment="Center" />
             </Grid>
 
         </StackPanel>
