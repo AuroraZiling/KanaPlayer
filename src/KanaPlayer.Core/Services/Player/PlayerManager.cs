@@ -147,7 +147,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     {
         _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = value?.AudioUniqueId;
         _configurationService.SaveImmediate(
-            $"最后一次播放列表项已更改: {value?.Title} | {value?.AudioUniqueId}, 已保存");;
+            $"最后一次播放列表项已更改: {value?.Title} | {value?.AudioUniqueId}, 已保存");
     }
 
     public TimeSpan PlaybackTime

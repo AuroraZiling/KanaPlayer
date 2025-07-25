@@ -2,9 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KanaPlayer.Core.Models.PlayerManager;
-using KanaPlayer.Core.Services.Configuration;
 using KanaPlayer.Core.Services.Player;
-using KanaPlayer.Models;
 using NLog;
 
 namespace KanaPlayer.ViewModels.Pages;
@@ -34,11 +32,9 @@ public partial class PlayListViewModel : ViewModelBase
     }
 
     public IPlayerManager PlayerManager { get; }
-    private readonly IConfigurationService<SettingsModel> _configurationService;
-    public PlayListViewModel(IPlayerManager playerManager, IConfigurationService<SettingsModel> configurationService)
+    public PlayListViewModel(IPlayerManager playerManager)
     {
         PlayerManager = playerManager;
-        _configurationService = configurationService;
         
         playerManager.PropertyChanged += (_, args) =>
         {

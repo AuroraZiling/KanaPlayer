@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace KanaPlayer.Core.Models.Database;
 

@@ -2,8 +2,6 @@
 using KanaPlayer.Core.Helpers;
 using KanaPlayer.Core.Models;
 using KanaPlayer.Core.Models.Database;
-using KanaPlayer.Core.Models.Wrappers;
-using KanaPlayer.Core.Services.Database;
 using KanaPlayer.Database.Converters;
 using Microsoft.EntityFrameworkCore;
 using NLog;
