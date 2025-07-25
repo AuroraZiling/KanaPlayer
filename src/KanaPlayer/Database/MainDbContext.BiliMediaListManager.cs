@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using KanaPlayer.Core.Extensions;
 using KanaPlayer.Core.Models;
@@ -14,21 +15,21 @@ public partial class MainDbContext : IBiliMediaListManager
 {
     public DbCachedMediaListAudioMetadata? GetCachedMediaListAudioMetadataByUniqueId(AudioUniqueId uniqueId)
         => CachedMediaListAudioMetadataSet
-           .FirstOrDefault(metadata => metadata.UniqueId.Equals(uniqueId));
+            .FirstOrDefault(metadata => metadata.UniqueId.Equals(uniqueId));
 
     public List<DbBiliMediaListItem> GetBiliMediaListItems()
         => BiliMediaListItemSet
-           .Include(item => item.CachedMediaListAudioMetadataSet)
-           .OrderByDescending(item => item.CreatedTimestamp)
-           .ToList();
+            .Include(item => item.CachedMediaListAudioMetadataSet)
+            .OrderByDescending(item => item.CreatedTimestamp)
+            .ToList();
 
     public List<DbCachedMediaListAudioMetadata> GetCachedMediaListAudioMetadataList(DbBiliMediaListItem item)
         => BiliMediaListItemSet
-           .Include(folder => folder.CachedMediaListAudioMetadataSet)
-           .Where(folder => folder.Id.Equals(item.UniqueId.ToString()))
-           .SelectMany(folder => folder.CachedMediaListAudioMetadataSet)
-           .OrderByDescending(metadata => metadata.PublishTimestamp)
-           .ToList();
+            .Include(folder => folder.CachedMediaListAudioMetadataSet)
+            .Where(folder => folder.Id.Equals(item.UniqueId.ToString()))
+            .SelectMany(folder => folder.CachedMediaListAudioMetadataSet)
+            .OrderByDescending(metadata => metadata.PublishTimestamp)
+            .ToList();
 
     public bool IsBiliMediaListExists(BiliMediaListUniqueId biliMediaListUniqueId)
         => BiliMediaListItemSet
@@ -37,8 +38,8 @@ public partial class MainDbContext : IBiliMediaListManager
     public void ImportFromBilibili(BiliMediaListItem importItem, List<BiliMediaListCommonMediaModel> importMedias)
     {
         var biliMediaListItem = BiliMediaListItemSet
-                                      .Include(item => item.CachedMediaListAudioMetadataSet)
-                                      .FirstOrDefault(item => item.Id.Equals(new BiliMediaListUniqueId(importItem.Id, importItem.BiliMediaListType).ToString()));
+            .Include(item => item.CachedMediaListAudioMetadataSet)
+            .FirstOrDefault(item => item.Id.Equals(new BiliMediaListUniqueId(importItem.Id, importItem.BiliMediaListType).ToString()));
 
         if (biliMediaListItem is null)
         {
@@ -61,8 +62,8 @@ public partial class MainDbContext : IBiliMediaListManager
 
         var importMediaUniqueIds = importMedias.Select(media => new AudioUniqueId(media.Bvid)).ToHashSet();
         var existedMediaList = CachedMediaListAudioMetadataSet
-                               .Where(metadata => importMediaUniqueIds.Contains(metadata.UniqueId))
-                               .ToList();
+            .Where(metadata => importMediaUniqueIds.Contains(metadata.UniqueId))
+            .ToList();
 
         foreach (var media in importMedias)
         {
@@ -137,4 +138,7 @@ public partial class MainDbContext : IBiliMediaListManager
         SaveChanges();
         return audioMetadata;
     }
+    public bool IsLocalMediaListExistsByTitle(string title)
+        => LocalMediaListItemSet
+            .Any(item => item.Title.Equals(title));
 }

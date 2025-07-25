@@ -12,7 +12,8 @@ public interface ILocalMediaListManager
     List<DbCachedMediaListAudioMetadata> GetCachedMediaListAudioMetadataList(LocalMediaListUniqueId uniqueId);
     
     List<DbLocalMediaListItem> GetLocalMediaListItems();
-    bool IsLocalMediaListExists(LocalMediaListUniqueId localMediaListUniqueId);
+    bool IsLocalMediaListExistsByUniqueId(LocalMediaListUniqueId localMediaListUniqueId);
+    bool IsLocalMediaListExistsByTitle(string title);
     bool AddOrUpdateLocalMediaListItem(LocalMediaListItem item);
     bool DeleteLocalMediaListItem(LocalMediaListUniqueId localMediaListUniqueId);
     

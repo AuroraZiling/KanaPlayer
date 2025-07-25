@@ -25,7 +25,7 @@ public partial class MainDbContext: ILocalMediaListManager
            .OrderByDescending(item => item.CreatedTimestamp)
            .ToList();
     
-    public bool IsLocalMediaListExists(LocalMediaListUniqueId localMediaListUniqueId)
+    public bool IsLocalMediaListExistsByUniqueId(LocalMediaListUniqueId localMediaListUniqueId)
         => LocalMediaListItemSet
             .Any(item => item.Id.Equals(localMediaListUniqueId.ToString()));
     public bool AddOrUpdateMediaInLocalMediaList(LocalMediaListUniqueId localMediaListUniqueId, AudioUniqueId audioUniqueId) => throw new System.NotImplementedException();
@@ -88,7 +88,6 @@ public partial class MainDbContext: ILocalMediaListManager
         
         var audioMetadata = localMediaListItem.CachedMediaListAudioMetadataSet
             .FirstOrDefault(metadata => metadata.UniqueId.Equals(audioUniqueId));
-
         if (audioMetadata is null)
             return false;
 

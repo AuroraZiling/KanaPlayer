@@ -50,6 +50,13 @@ public partial class FavoritesLocalDialogViewModel(FavoritesLocalDialogType favo
             return;
         }
 
+        if (localMediaListManager.IsLocalMediaListExistsByTitle(Title))
+        {
+            kanaToastManager.CreateToast().WithTitle("创建失败").WithContent($"歌单标题 '{Title}' 已存在").WithType(NotificationType.Error).Queue();
+            ScopedLogger.Warn($"尝试创建本地歌单时，歌单标题 '{Title}' 已存在");
+            return;
+        }
+
         var mediaListId = new LocalMediaListUniqueId(Guid.CreateVersion7());
         localMediaListManager.AddOrUpdateLocalMediaListItem(new LocalMediaListItem
         {
