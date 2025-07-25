@@ -76,7 +76,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                          .WithView(new FavoritesLocalDialog())
                          .WithViewModel(dialog =>
                              new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Rename, dialog, localMediaListManager, kanaToastManager,
-                                 navigationService, bilibiliClient, renameItem))
+                                 navigationService, BilibiliClient, renameItem))
                          .WithDismissWithBackgroundClick()
                          .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))
                          .TryShow();

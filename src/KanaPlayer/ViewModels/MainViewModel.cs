@@ -82,7 +82,7 @@ public partial class MainViewModel : ViewModelBase
         trayMenuService.SwitchPlaybackMode(PlaybackMode, false);
         
         IsLoggedIn = bilibiliClient.IsAuthenticated;
-        bilibiliClient.PropertyChanged += (sender, args) =>
+        bilibiliClient.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IBilibiliClient.IsAuthenticated)) 
                 IsLoggedIn = bilibiliClient.IsAuthenticated;
@@ -102,7 +102,7 @@ public partial class MainViewModel : ViewModelBase
     {
         PlayerManager.Volume = value;
         _configurationService.Settings.CommonSettings.BehaviorHistory.Volume = value;
-        _configurationService.SaveDelayed();
+        _configurationService.SaveDelayed($"音量设置变更为: {value}");
     }
     
     private double _beforeMuteVolume;
@@ -127,8 +127,7 @@ public partial class MainViewModel : ViewModelBase
         PlaybackMode = (PlaybackMode)((int)(PlaybackMode + 1) % (int)PlaybackMode.MaxValue);
         PlayerManager.PlaybackMode = PlaybackMode;
         _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = PlaybackMode;
-        _configurationService.SaveImmediate();
-        ScopedLogger.Info("切换播放模式到 {PlaybackMode}", PlaybackMode);
+        _configurationService.SaveImmediate($"切换播放模式到 {PlaybackMode}");
     }
     
     [RelayCommand]

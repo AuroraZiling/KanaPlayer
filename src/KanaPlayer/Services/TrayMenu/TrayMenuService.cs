@@ -76,7 +76,7 @@ public class TrayMenuService : ITrayMenuService
         if (save)
         {
             _configurationService.Settings.CommonSettings.BehaviorHistory.PlaybackMode = playbackMode;
-            _configurationService.SaveImmediate();
+            _configurationService.SaveImmediate($"播放模式已切换为: {playbackMode.ToFriendlyString()}");
         }
     }
 

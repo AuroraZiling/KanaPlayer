@@ -82,8 +82,7 @@ public partial class AccountViewModel(
                             RefreshToken = succeedLoginQrCodeModel.EnsureData().RefreshToken,
                             Cookies = succeedLoginQrCodeModel.Cookies!
                         };
-                        ScopedLogger.Info("登录信息保存成功");
-                        configurationService.SaveImmediate();
+                        configurationService.SaveImmediate("登录信息保存成功");
                         await bilibiliClient.AuthenticateAsync();
                         LoadUserInfo(configurationService.Settings.CommonSettings.Account);
                         IsLoggedIn = true;
@@ -131,7 +130,7 @@ public partial class AccountViewModel(
     {
         configurationService.Settings.CommonSettings.Authentication = null;
         configurationService.Settings.CommonSettings.Account = null;
-        configurationService.SaveImmediate();
+        configurationService.SaveImmediate("用户信息已清除");
         await bilibiliClient.AuthenticateAsync();
         ClearUserInfo();
         IsLoggedIn = false;

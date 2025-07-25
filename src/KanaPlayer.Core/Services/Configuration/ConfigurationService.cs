@@ -15,6 +15,7 @@ public class ConfigurationService<TSettings> : IConfigurationService<TSettings>
     private readonly Timer _saveTimer;
     private readonly Lock _saveLock = new();
     private bool _hasChanges;
+    private string _saveLog = "配置文件已保存";
     
     public TSettings Settings { get; private set; }
     
@@ -53,23 +54,27 @@ public class ConfigurationService<TSettings> : IConfigurationService<TSettings>
         {
             var settingsJson = JsonSerializer.Serialize(Settings, JsonHelper.JsonSerializerOptions);
             File.WriteAllText(AppHelper.SettingsFilePath, settingsJson);
+            ScopedLogger.Info(_saveLog);
             _hasChanges = false;
+            _saveLog = "配置文件已保存";
         }
     }
     
-    public void SaveDelayed()
+    public void SaveDelayed(string saveLog)
     {
         lock (_saveLock)
         {
+            _saveLog = saveLog;
             _hasChanges = true;
             _saveTimer.Stop();
             _saveTimer.Start();
         }
     }
     
-    public void SaveImmediate()
+    public void SaveImmediate(string saveLog)
     {
         _hasChanges = true;
+        _saveLog = saveLog;
         lock (_saveLock)
         {
             if (_hasChanges)
@@ -89,7 +94,7 @@ public class ConfigurationService<TSettings> : IConfigurationService<TSettings>
     
     public void Dispose()
     {
-        SaveImmediate();
+        SaveImmediate("释放保存");
         _saveTimer.Dispose();
         GC.SuppressFinalize(this);
     }

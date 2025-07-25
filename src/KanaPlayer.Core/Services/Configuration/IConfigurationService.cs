@@ -10,10 +10,10 @@ public interface IConfigurationService<out TSettings> : IDisposable
     /// <summary>
     /// 延迟保存配置，避免频繁写入（推荐用于滑动条等频繁变化的设置）
     /// </summary>
-    void SaveDelayed();
+    void SaveDelayed(string saveLog);
     
     /// <summary>
     /// 立即保存配置（如果有待保存的更改）
     /// </summary>
-    void SaveImmediate();
+    void SaveImmediate(string saveLog);
 }

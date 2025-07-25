@@ -110,7 +110,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            _configurationService.SaveImmediate();
+            _configurationService.SaveImmediate(
+                $"播放列表已更新，当前播放列表包含 {_playList.Count} 个音频，已保存");
         }
 
         _playList.CollectionChanged += OnPlayListOnCollectionChanged;
@@ -145,7 +146,8 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
     partial void OnCurrentPlayListItemChanged(PlayListItem? value)
     {
         _configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId = value?.AudioUniqueId;
-        _configurationService.SaveImmediate();
+        _configurationService.SaveImmediate(
+            $"最后一次播放列表项已更改: {value?.Title} | {value?.AudioUniqueId}, 已保存");;
     }
 
     public TimeSpan PlaybackTime

@@ -29,8 +29,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnSelectedCloseBehaviorChanged(CloseBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.CloseBehavior = value;
-        configurationService.SaveImmediate();
-        ScopedLogger.Info($"窗口关闭按钮行为变更为: {value}");
+        configurationService.SaveImmediate($"窗口关闭按钮行为变更为: {value}");
     }
 
     // Favorites - Play All Button Warning
@@ -40,8 +39,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnIsFavoritesPlayAllReplaceWarningEnabledChanged(bool value)
     {
         configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled = value;
-        configurationService.SaveImmediate();
-        ScopedLogger.Info($"收藏夹播放全部警告已设置为: {value}");
+        configurationService.SaveImmediate($"收藏夹播放全部警告已设置为: {value}");
     }
 
     // Home - Add Behavior
@@ -52,8 +50,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeHomeAddBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.HomeAddBehavior = value;
-        configurationService.SaveImmediate();
-        ScopedLogger.Info($"主页添加单曲行为变更为: {value}");
+        configurationService.SaveImmediate($"主页添加单曲行为变更为: {value}");
     }
 
     // Favorites - DoubleTapped PlayListItem Behavior
@@ -64,8 +61,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeDoubleTappedPlayListItemBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.FavoritesDoubleTappedPlayListItemBehavior = value;
-        configurationService.SaveImmediate();
-        ScopedLogger.Info($"收藏夹双击列表项行为变更为: {value}");
+        configurationService.SaveImmediate($"收藏夹双击列表项行为变更为: {value}");
     }
 
     // Favorites - Add All Behavior
@@ -76,8 +72,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     private void ChangeFavoritesAddAllBehaviors(FavoritesAddBehaviors value)
     {
         configurationService.Settings.UiSettings.Behaviors.FavoritesAddAllBehavior = value;
-        configurationService.SaveImmediate();
-        ScopedLogger.Info($"收藏夹添加全部行为变更为: {value}");
+        configurationService.SaveImmediate($"收藏夹添加全部行为变更为: {value}");
     }
 
     #endregion
@@ -92,7 +87,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnMaximumAudioCacheSizeInMbChanged(int value)
     {
         configurationService.Settings.CommonSettings.AudioCache.MaximumCacheSizeInMb = value;
-        configurationService.SaveDelayed();
+        configurationService.SaveDelayed($"最大音频缓存容量设置为: {value} MB");
     }
 
     // Maximum Image Cache Size (128MB - 5120MB)
@@ -103,7 +98,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
     partial void OnMaximumImageCacheSizeInMbChanged(int value)
     {
         configurationService.Settings.CommonSettings.ImageCache.MaximumCacheSizeInMb = value;
-        configurationService.SaveDelayed();
+        configurationService.SaveDelayed($"最大图片缓存容量设置为: {value} MB");
     }
 
     // Manual Cache Cleanup
@@ -148,7 +143,7 @@ public partial class SettingsViewModel(IConfigurationService<SettingsModel> conf
 
     public void Dispose()
     {
-        configurationService.SaveImmediate();
+        configurationService.SaveImmediate("释放保存");
         ScopedLogger.Debug("SettingsViewModel 已被释放，所有设置已保存");
         GC.SuppressFinalize(this);
     }

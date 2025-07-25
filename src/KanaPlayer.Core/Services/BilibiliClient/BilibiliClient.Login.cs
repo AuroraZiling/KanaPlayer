@@ -40,8 +40,7 @@ public partial class BilibiliClient<TSettings>
                 cookies["buvid4"] = $"buvid4={buVid.BuVid4}";
                 configurationService.Settings.CommonSettings.Authentication.Cookies = cookies;
             }
-            configurationService.SaveImmediate();
-            ScopedLogger.Info("登录态更新成功");
+            configurationService.SaveImmediate("登录态更新成功");
         }
 
         if (configurationService.Settings.CommonSettings.Authentication == null)
@@ -57,7 +56,7 @@ public partial class BilibiliClient<TSettings>
             new CommonAccountLevelSettings(accountNavInfo.Data.LevelInfo.CurrentLevel,
                 accountNavInfo.Data.LevelInfo.CurrentMin, accountNavInfo.Data.LevelInfo.CurrentExp),
             accountNavInfo.Data.VipLabel.ImgLabelUri);
-        configurationService.SaveImmediate();
+        configurationService.SaveImmediate("登录信息已保存");
         IsAuthenticated = configurationService.Settings.CommonSettings.Authentication != null;
         ScopedLogger.Info("登录成功");
     }
