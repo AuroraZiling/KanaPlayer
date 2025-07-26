@@ -18,7 +18,9 @@ public class BiliMediaListCommonMediaModel
     [JsonPropertyName("cover")] public required string CoverUrl { get; set; }
     [JsonPropertyName("duration")] public required ulong DurationSeconds { get; set; }
     [JsonPropertyName("pubtime")] public required long PublishTimestamp { get; set; }
+    [JsonPropertyName("fav_time")] public long FavoriteTimestamp { get; set; } = -1;  // 仅收藏夹内视频
     [JsonPropertyName("upper")] public required CommonOwnerModel Owner { get; set; }
+    [JsonPropertyName("attr")] public int Attribute { get; set; } = 0;  // 仅收藏夹内视频 0: 正常；9: up自己删除；1: 其他原因删除
     [JsonPropertyName("bvid")] public required string Bvid { get; set; }
     [JsonPropertyName("cnt_info")] public required BiliMediaListCommonStatisticsModel Statistics { get; set; }
 }

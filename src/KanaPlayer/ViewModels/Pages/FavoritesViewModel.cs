@@ -26,15 +26,15 @@ using NLog;
 namespace KanaPlayer.ViewModels.Pages;
 
 public partial class FavoritesViewModel(INavigationService navigationService, IBiliMediaListManager biliMediaListManager,
-                                        ILocalMediaListManager localMediaListManager, IPlayerManager playerManager,
-                                        IKanaToastManager kanaToastManager,
-                                        IConfigurationService<SettingsModel> configurationService, IKanaDialogManager kanaDialogManager,
-                                        IBilibiliClient bilibiliClient)
+    ILocalMediaListManager localMediaListManager, IPlayerManager playerManager,
+    IKanaToastManager kanaToastManager,
+    IConfigurationService<SettingsModel> configurationService, IKanaDialogManager kanaDialogManager,
+    IBilibiliClient bilibiliClient)
     : ViewModelBase, INavigationAware
 {
     private static readonly Logger ScopedLogger = LogManager.GetLogger(nameof(FavoritesViewModel));
     public IBilibiliClient BilibiliClient { get; } = bilibiliClient;
-    
+
     #region Local Media List
 
     [ObservableProperty] public partial ObservableCollection<DbLocalMediaListItem> LocalMediaLists { get; set; } = [];
@@ -51,21 +51,21 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         if (!localMediaListManager.DeleteLocalMediaListItem(removeItem.UniqueId))
         {
             kanaToastManager.CreateToast().WithTitle("失败")
-                            .WithContent("删除本地歌单失败")
-                            .WithType(NotificationType.Error)
-                            .Queue();
+                .WithContent("删除本地歌单失败")
+                .WithType(NotificationType.Error)
+                .Queue();
             return;
         }
 
         kanaToastManager.CreateToast().WithTitle("成功")
-                        .WithContent("删除本地歌单成功")
-                        .WithType(NotificationType.Success)
-                        .Queue();
+            .WithContent("删除本地歌单成功")
+            .WithType(NotificationType.Success)
+            .Queue();
 
         LocalMediaLists.Remove(removeItem);
         ScopedLogger.Info("已删除本地歌单：{FolderName}", removeItem.Title);
     }
-    
+
     [RelayCommand]
     private void RenameLocalMediaList(DbLocalMediaListItem? renameItem)
     {
@@ -73,13 +73,13 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
             return;
 
         kanaDialogManager.CreateDialog()
-                         .WithView(new FavoritesLocalDialog())
-                         .WithViewModel(dialog =>
-                             new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Rename, dialog, localMediaListManager, kanaToastManager,
-                                 navigationService, BilibiliClient, renameItem))
-                         .WithDismissWithBackgroundClick()
-                         .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))
-                         .TryShow();
+            .WithView(new FavoritesLocalDialog())
+            .WithViewModel(dialog =>
+                new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Rename, dialog, localMediaListManager, kanaToastManager,
+                    navigationService, BilibiliClient, renameItem))
+            .WithDismissWithBackgroundClick()
+            .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))
+            .TryShow();
     }
 
     partial void OnSelectedLocalMediaListChanged(DbLocalMediaListItem? value)
@@ -130,27 +130,27 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         ScopedLogger.Info("双击播放本地歌单音频：{CreateTitle}，所属：{FolderName}，播放模式：{playbackMode}", SelectedLocalMediaListItem.Title, SelectedLocalMediaList.Title,
             behavior);
     }
-    
+
     [RelayCommand]
     private void RemoveSelectedLocalMediaListItem(DbCachedMediaListAudioMetadata? removeItem)
     {
         if (removeItem is null || SelectedLocalMediaList is null)
             return;
-        
+
         if (!localMediaListManager.RemoveAudioFromLocalMediaList(SelectedLocalMediaList.UniqueId, removeItem.UniqueId))
         {
             kanaToastManager.CreateToast().WithTitle("失败")
-                            .WithContent("删除本地歌单音频失败")
-                            .WithType(NotificationType.Error)
-                            .Queue();
+                .WithContent("删除本地歌单音频失败")
+                .WithType(NotificationType.Error)
+                .Queue();
             return;
         }
-        
+
         kanaToastManager.CreateToast().WithTitle("成功")
-                        .WithContent("删除本地歌单音频成功")
-                        .WithType(NotificationType.Success)
-                        .Queue();
-        
+            .WithContent("删除本地歌单音频成功")
+            .WithType(NotificationType.Success)
+            .Queue();
+
         LocalMediaListItems.Remove(removeItem);
         ScopedLogger.Info("已从本地歌单：{FolderName} 中删除音频：{CreateTitle}", SelectedLocalMediaList.Title, removeItem.Title);
     }
@@ -164,10 +164,10 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         if (configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled)
         {
             if (!await kanaDialogManager.CreateDialog()
-                                        .WithTitle("替换播放列表")
-                                        .WithContent("此操作将会替换当前播放列表，是否继续？")
-                                        .WithYesNoResult("继续", "取消")
-                                        .TryShowAsync())
+                    .WithTitle("替换播放列表")
+                    .WithContent("此操作将会替换当前播放列表，是否继续？")
+                    .WithYesNoResult("继续", "取消")
+                    .TryShowAsync())
                 return;
         }
 
@@ -192,11 +192,11 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         {
             case FavoritesAddBehaviors.AddToNextInPlayList:
                 playerManager.InsertAfterCurrentPlayItemRangeAsync(localMediaListManager.GetCachedMediaListAudioMetadataList(SelectedLocalMediaList.UniqueId)
-                                                                                        .Select(cachedAudioMetadata =>
-                                                                                            new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
-                                                                                                cachedAudioMetadata.OwnerName,
-                                                                                                cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId,
-                                                                                                TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
+                    .Select(cachedAudioMetadata =>
+                        new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
+                            cachedAudioMetadata.OwnerName,
+                            cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId,
+                            TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
             {
@@ -219,12 +219,12 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
     private void CreateLocalMediaList()
     {
         kanaDialogManager.CreateDialog()
-                         .WithView(new FavoritesLocalDialog())
-                         .WithViewModel(dialog =>
-                             new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Create, dialog, localMediaListManager, kanaToastManager, navigationService,
-                                 BilibiliClient))
-                         .WithDismissWithBackgroundClick()
-                         .TryShow();
+            .WithView(new FavoritesLocalDialog())
+            .WithViewModel(dialog =>
+                new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.Create, dialog, localMediaListManager, kanaToastManager, navigationService,
+                    BilibiliClient))
+            .WithDismissWithBackgroundClick()
+            .TryShow();
     }
 
     [RelayCommand]
@@ -233,21 +233,21 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         if (SelectedLocalMediaList is null)
         {
             kanaToastManager.CreateToast().WithTitle("错误")
-                            .WithContent("请先选择一个本地歌单")
-                            .WithType(NotificationType.Error)
-                            .Queue();
+                .WithContent("请先选择一个本地歌单")
+                .WithType(NotificationType.Error)
+                .Queue();
             return;
         }
 
         kanaDialogManager.CreateDialog()
-                               .WithView(new FavoritesLocalDialog())
-                               .WithViewModel(dialog =>
-                                   new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.AddAudio, dialog, localMediaListManager, kanaToastManager,
-                                       navigationService,
-                                       BilibiliClient, SelectedLocalMediaList))
-                               .WithDismissWithBackgroundClick()
-                               .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))    
-                               .TryShow();
+            .WithView(new FavoritesLocalDialog())
+            .WithViewModel(dialog =>
+                new FavoritesLocalDialogViewModel(FavoritesLocalDialogType.AddAudio, dialog, localMediaListManager, kanaToastManager,
+                    navigationService,
+                    BilibiliClient, SelectedLocalMediaList))
+            .WithDismissWithBackgroundClick()
+            .OnDismissed(_ => RefreshMediaListsCommand.Execute(SelectedLocalMediaList))
+            .TryShow();
     }
 
     #endregion
@@ -268,16 +268,16 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         if (!biliMediaListManager.DeleteBiliMediaListItem(removeItem.UniqueId))
         {
             kanaToastManager.CreateToast().WithTitle("失败")
-                            .WithContent("删除B站收藏夹/合集失败")
-                            .WithType(NotificationType.Error)
-                            .Queue();
+                .WithContent("删除B站收藏夹/合集失败")
+                .WithType(NotificationType.Error)
+                .Queue();
             return;
         }
 
         kanaToastManager.CreateToast().WithTitle("成功")
-                        .WithContent("删除B站收藏夹/合集成功")
-                        .WithType(NotificationType.Success)
-                        .Queue();
+            .WithContent("删除B站收藏夹/合集成功")
+            .WithType(NotificationType.Success)
+            .Queue();
 
         BiliMediaLists.Remove(removeItem);
         ScopedLogger.Info("已删除B站收藏夹/合集：{FolderName}", removeItem.Title);
@@ -286,7 +286,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
     {
         if (value is null)
             return;
-        BiliMediaListItems.Reset(biliMediaListManager.GetCachedMediaListAudioMetadataList(value));
+        BiliMediaListItems.Reset(biliMediaListManager.GetCachedMediaListAudioMetadataList(value).OrderByDescending(item => item.FavoriteTimestamp));
         ScopedLogger.Info("已选择B站收藏夹/合集：{FolderName}，音频数量：{Count}", value.Title, BiliMediaListItems.Count);
     }
 
@@ -333,9 +333,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
 
     [RelayCommand]
     private void ImportFromBilibili()
-    {
-        navigationService.Navigate(App.GetService<FavoritesBilibiliImportView>());
-    }
+        => navigationService.Navigate(App.GetService<FavoritesBilibiliImportView>());
 
     [RelayCommand]
     private async Task PlayAllBiliMediaListAsync()
@@ -346,15 +344,15 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         if (configurationService.Settings.UiSettings.Behaviors.IsFavoritesPlayAllReplaceWarningEnabled)
         {
             if (!await kanaDialogManager.CreateDialog()
-                                        .WithTitle("替换播放列表")
-                                        .WithContent("此操作将会替换当前播放列表，是否继续？")
-                                        .WithYesNoResult("继续", "取消")
-                                        .TryShowAsync())
+                    .WithTitle("替换播放列表")
+                    .WithContent("此操作将会替换当前播放列表，是否继续？")
+                    .WithYesNoResult("继续", "取消")
+                    .TryShowAsync())
                 return;
         }
 
         playerManager.Clear();
-        foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedMediaListAudioMetadataList(SelectedBiliMediaList))
+        foreach (var cachedAudioMetadata in BiliMediaListItems)
         {
             await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                 cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
@@ -374,11 +372,11 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         {
             case FavoritesAddBehaviors.AddToNextInPlayList:
                 playerManager.InsertAfterCurrentPlayItemRangeAsync(biliMediaListManager.GetCachedMediaListAudioMetadataList(SelectedBiliMediaList)
-                                                                                       .Select(cachedAudioMetadata =>
-                                                                                           new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
-                                                                                               cachedAudioMetadata.OwnerName,
-                                                                                               cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId,
-                                                                                               TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
+                    .Select(cachedAudioMetadata =>
+                        new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
+                            cachedAudioMetadata.OwnerName,
+                            cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId,
+                            TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds))));
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
             {
@@ -404,26 +402,26 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
             return;
 
         kanaDialogManager.CreateDialog()
-                         .WithView(new FavoritesBilibiliDialog())
-                         .WithViewModel(dialog =>
-                             new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Sync, dialog, new BiliMediaListItem
-                                 {
-                                     Id = SelectedBiliMediaList.UniqueId.Id,
-                                     Title = SelectedBiliMediaList.Title,
-                                     CoverUrl = SelectedBiliMediaList.CoverUrl,
-                                     Description = SelectedBiliMediaList.Description,
-                                     Owner = new CommonOwnerModel
-                                     {
-                                         Mid = SelectedBiliMediaList.OwnerMid,
-                                         Name = SelectedBiliMediaList.OwnerName,
-                                     },
-                                     BiliMediaListType = SelectedBiliMediaList.BiliMediaListType,
-                                     CreatedTimestamp = SelectedBiliMediaList.CreatedTimestamp,
-                                     ModifiedTimestamp = SelectedBiliMediaList.ModifiedTimestamp,
-                                     MediaCount = SelectedBiliMediaList.MediaCount
-                                 },
-                                 BilibiliClient, biliMediaListManager, kanaToastManager, navigationService))
-                         .TryShow();
+            .WithView(new FavoritesBilibiliDialog())
+            .WithViewModel(dialog =>
+                new FavoritesBilibiliDialogViewModel(FavoritesBilibiliDialogType.Sync, dialog, new BiliMediaListItem
+                    {
+                        Id = SelectedBiliMediaList.UniqueId.Id,
+                        Title = SelectedBiliMediaList.Title,
+                        CoverUrl = SelectedBiliMediaList.CoverUrl,
+                        Description = SelectedBiliMediaList.Description,
+                        Owner = new CommonOwnerModel
+                        {
+                            Mid = SelectedBiliMediaList.OwnerMid,
+                            Name = SelectedBiliMediaList.OwnerName,
+                        },
+                        BiliMediaListType = SelectedBiliMediaList.BiliMediaListType,
+                        CreatedTimestamp = SelectedBiliMediaList.CreatedTimestamp,
+                        ModifiedTimestamp = SelectedBiliMediaList.ModifiedTimestamp,
+                        MediaCount = SelectedBiliMediaList.MediaCount
+                    },
+                    BilibiliClient, biliMediaListManager, kanaToastManager, navigationService))
+            .TryShow();
     }
 
     #endregion
@@ -437,10 +435,10 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         var previousSelectedLocalMediaList = SelectedLocalMediaList;
         LocalMediaLists.Reset(localMediaListManager.GetLocalMediaListItems());
         ScopedLogger.Info("刷新本地歌单列表，数量：{Count}", LocalMediaLists.Count);
-        
-        if (previousSelectedBiliMediaList is not null) 
+
+        if (previousSelectedBiliMediaList is not null)
             SelectedBiliMediaList = BiliMediaLists.FirstOrDefault(item => item.UniqueId == previousSelectedBiliMediaList.UniqueId);
-        if (previousSelectedLocalMediaList is not null) 
+        if (previousSelectedLocalMediaList is not null)
             SelectedLocalMediaList = LocalMediaLists.FirstOrDefault(item => item.UniqueId == previousSelectedLocalMediaList.UniqueId);
     }
 

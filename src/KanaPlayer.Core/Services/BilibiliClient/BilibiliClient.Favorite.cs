@@ -140,7 +140,7 @@ public partial class BilibiliClient<TSettings>
         fetchedCountProgress?.Report(templatePageData.Medias.Count);
 
         var allCollected = new List<BiliMediaListCommonMediaModel>();
-        allCollected.AddRange(templatePageData.Medias);
+        allCollected.AddRange(templatePageData.Medias.Where(media => media.Attribute == 0));
         
         if (hasMore)
         {
@@ -150,7 +150,7 @@ public partial class BilibiliClient<TSettings>
                 var pageModel = await GetPageAsync(page);
                 var pageData = pageModel.EnsureData();
                 fetchedCountProgress?.Report(pageData.Medias.Count);
-                allCollected.AddRange(pageData.Medias);
+                allCollected.AddRange(pageData.Medias.Where(media => media.Attribute == 0));
                 if (!pageData.HasMore)
                     break;
                 page++;

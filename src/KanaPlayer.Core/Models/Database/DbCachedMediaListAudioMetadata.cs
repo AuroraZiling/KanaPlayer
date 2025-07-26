@@ -13,6 +13,7 @@ public class DbCachedMediaListAudioMetadata
     public required string CoverUrl { get; set; }
     public required ulong DurationSeconds { get; set; }
     public required long PublishTimestamp { get; set; }
+    public long FavoriteTimestamp { get; set; }
     public required ulong OwnerMid { get; set; }
     [MaxLength(64)]
     public required string OwnerName { get; set; }

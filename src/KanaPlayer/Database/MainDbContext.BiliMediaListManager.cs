@@ -27,7 +27,6 @@ public partial class MainDbContext : IBiliMediaListManager
             .Include(folder => folder.CachedMediaListAudioMetadataSet)
             .Where(folder => folder.Id.Equals(item.UniqueId.ToString()))
             .SelectMany(folder => folder.CachedMediaListAudioMetadataSet)
-            .OrderByDescending(metadata => metadata.PublishTimestamp)
             .ToList();
 
     public bool IsBiliMediaListExists(BiliMediaListUniqueId biliMediaListUniqueId)
@@ -53,7 +52,7 @@ public partial class MainDbContext : IBiliMediaListManager
                 BiliMediaListType = importItem.BiliMediaListType,
                 CreatedTimestamp = importItem.CreatedTimestamp,
                 ModifiedTimestamp = importItem.ModifiedTimestamp,
-                MediaCount = importItem.MediaCount
+                MediaCount = 0
             };
 
             BiliMediaListItemSet.Add(biliMediaListItem);
@@ -75,6 +74,7 @@ public partial class MainDbContext : IBiliMediaListManager
                     CoverUrl = media.CoverUrl.SafeSubstring(0, 1024),
                     DurationSeconds = media.DurationSeconds,
                     PublishTimestamp = media.PublishTimestamp,
+                    FavoriteTimestamp = media.FavoriteTimestamp,
                     OwnerMid = media.Owner.Mid,
                     OwnerName = media.Owner.Name.SafeSubstring(0, 64),
                     CollectCount = media.Statistics.CollectCount,
@@ -83,9 +83,24 @@ public partial class MainDbContext : IBiliMediaListManager
                 };
                 CachedMediaListAudioMetadataSet.Add(audioMetadata);
             }
+            else
+            {
+                audioMetadata.UniqueId = new AudioUniqueId(media.Bvid);
+                audioMetadata.Title = media.Title.SafeSubstring(0, 128);
+                audioMetadata.CoverUrl = media.CoverUrl.SafeSubstring(0, 1024);
+                audioMetadata.DurationSeconds = media.DurationSeconds;
+                audioMetadata.PublishTimestamp = media.PublishTimestamp;
+                audioMetadata.FavoriteTimestamp = media.FavoriteTimestamp;
+                audioMetadata.OwnerMid = media.Owner.Mid;
+                audioMetadata.OwnerName = media.Owner.Name.SafeSubstring(0, 64);
+                audioMetadata.CollectCount = media.Statistics.CollectCount;
+                audioMetadata.DanmakuCount = media.Statistics.DanmakuCount;
+                audioMetadata.PlayCount = media.Statistics.PlayCount;
+            }
             biliMediaListItem.CachedMediaListAudioMetadataSet.Add(audioMetadata);
         }
 
+        biliMediaListItem.MediaCount = biliMediaListItem.CachedMediaListAudioMetadataSet.Count;
         SaveChanges();
     }
     public bool DeleteBiliMediaListItem(BiliMediaListUniqueId biliMediaListUniqueId)
