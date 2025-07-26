@@ -162,9 +162,11 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             else if (_bilibiliClient.TryGetCookies(out var cookies))
             {
                 var audioInfo = await _bilibiliClient.GetAudioInfoAsync(audioUniqueId, cookies);
-                var audioInfoData = audioInfo.EnsureData();
-                playListItem = new PlayListItem(audioInfoData);
-                _biliMediaListManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
+                if (audioInfo.Data is { } audioInfoData)
+                {
+                    playListItem = new PlayListItem(audioInfoData);
+                    _biliMediaListManager.AddOrUpdateAudioToCache(audioUniqueId, audioInfoData);
+                }
             }
             return playListItem;
         }
