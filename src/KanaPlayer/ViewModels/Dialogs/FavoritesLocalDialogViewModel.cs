@@ -167,6 +167,7 @@ public partial class FavoritesLocalDialogViewModel(FavoritesLocalDialogType favo
                     {
                         audioInfoData = new AudioInfoDataModel(cachedAudioMetadata);
                     }
+                    cachedAudioMetadata.FavoriteTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                     dbLocalMediaListItem.CachedMediaListAudioMetadataSet.Add(cachedAudioMetadata);
                     AddedMediaCount += 1;
                     AddedMediaTitle = audioInfoData.Title;

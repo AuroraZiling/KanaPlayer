@@ -86,7 +86,8 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
     {
         if (value is null)
             return;
-        LocalMediaListItems = new ObservableCollection<DbCachedMediaListAudioMetadata>(localMediaListManager.GetCachedMediaListAudioMetadataList(value.UniqueId));
+        LocalMediaListItems = new ObservableCollection<DbCachedMediaListAudioMetadata>(localMediaListManager.GetCachedMediaListAudioMetadataList(value.UniqueId)
+            .OrderByDescending(item => item.FavoriteTimestamp));
         ScopedLogger.Info("已选择本地歌单：{FolderName}，音频数量：{Count}", value.Title, LocalMediaListItems.Count);
     }
 
@@ -304,7 +305,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
             case FavoritesAddBehaviors.ReplaceCurrentPlayList:
             {
                 playerManager.Clear();
-                foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedMediaListAudioMetadataList(SelectedBiliMediaList))
+                foreach (var cachedAudioMetadata in BiliMediaListItems)
                 {
                     await playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                         cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
@@ -371,7 +372,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
         switch (behavior)
         {
             case FavoritesAddBehaviors.AddToNextInPlayList:
-                playerManager.InsertAfterCurrentPlayItemRangeAsync(biliMediaListManager.GetCachedMediaListAudioMetadataList(SelectedBiliMediaList)
+                playerManager.InsertAfterCurrentPlayItemRangeAsync(BiliMediaListItems
                     .Select(cachedAudioMetadata =>
                         new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl,
                             cachedAudioMetadata.OwnerName,
@@ -380,7 +381,7 @@ public partial class FavoritesViewModel(INavigationService navigationService, IB
                 break;
             case FavoritesAddBehaviors.AddToEndOfPlayList:
             {
-                foreach (var cachedAudioMetadata in biliMediaListManager.GetCachedMediaListAudioMetadataList(SelectedBiliMediaList))
+                foreach (var cachedAudioMetadata in BiliMediaListItems)
                 {
                     playerManager.AppendAsync(new PlayListItem(cachedAudioMetadata.Title, cachedAudioMetadata.CoverUrl, cachedAudioMetadata.OwnerName,
                         cachedAudioMetadata.OwnerMid, cachedAudioMetadata.UniqueId, TimeSpan.FromSeconds(cachedAudioMetadata.DurationSeconds)));
