@@ -50,4 +50,5 @@ public class CommonBehaviorHistorySettings
     public AudioUniqueId? LastPlayAudioUniqueId { get; set; }
     
     public List<AudioUniqueId> LastPlayList { get; set; } = [];
+    public List<AudioUniqueId> HistoryPlayList { get; set; } = [];
 }

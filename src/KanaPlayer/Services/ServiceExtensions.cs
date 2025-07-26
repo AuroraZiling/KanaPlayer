@@ -41,6 +41,7 @@ public static class ServiceExtensions
         // Navigation - Top
         services.AddMainPage<HomeView>();
         services.AddMainPage<PlayListView>();
+        services.AddMainPage<HistoryView>();
 
         // Navigation - Account Features
         services.AddMainPage<FavoritesView>();
@@ -63,6 +64,7 @@ public static class ServiceExtensions
         // Navigation - Top
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<PlayListViewModel>();
+        services.AddSingleton<HistoryViewModel>();
 
         // Navigation - Account Features
         services.AddSingleton<FavoritesViewModel>();

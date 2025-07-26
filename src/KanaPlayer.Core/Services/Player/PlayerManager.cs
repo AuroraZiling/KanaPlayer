@@ -58,7 +58,13 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             var playListItem = await GetPlayListItemByAudioUniqueId(audioUniqueId);
             if (playListItem is not null) _playList.Add(playListItem);
         }
-        ScopedLogger.Info("播放列表初始化完成，当前播放列表包含 {Count} 个音频", _playList.Count);
+        ScopedLogger.Info("播放列表初始化完成，包含 {Count} 个音频", _playList.Count);
+        foreach (var audioUniqueId in _configurationService.Settings.CommonSettings.BehaviorHistory.HistoryPlayList)
+        {
+            var playListItem = await GetPlayListItemByAudioUniqueId(audioUniqueId);
+            if (playListItem is not null) _historyPlayList.Insert(0, playListItem);
+        }
+        ScopedLogger.Info("历史播放列表初始化完成，包含 {Count} 个音频", _playList.Count);
 
         if (_configurationService.Settings.CommonSettings.BehaviorHistory.LastPlayAudioUniqueId is { } value)
         {
@@ -83,6 +89,10 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 ScopedLogger.Warn("上次播放的音频 {Title} | {UniqueId} 不在播放列表中，清除记录", playListItem?.Title, value);
             }
         }
+
+        _playList.CollectionChanged += OnPlayListOnCollectionChanged;
+        _historyPlayList.CollectionChanged += OnHistoryPlayListOnCollectionChanged;
+        return;
 
         void OnPlayListOnCollectionChanged(in NotifyCollectionChangedEventArgs<PlayListItem> args)
         {
@@ -111,11 +121,35 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                     throw new ArgumentOutOfRangeException();
             }
             _configurationService.SaveImmediate(
-                $"播放列表已更新，当前播放列表包含 {_playList.Count} 个音频，已保存");
+                $"播放列表已更新，包含 {_playList.Count} 个音频，已保存");
         }
-
-        _playList.CollectionChanged += OnPlayListOnCollectionChanged;
-        return;
+        
+        void OnHistoryPlayListOnCollectionChanged(in NotifyCollectionChangedEventArgs<PlayListItem> args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add when args.IsSingleItem:
+                {
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.HistoryPlayList.Insert(args.NewStartingIndex, args.NewItem.AudioUniqueId);
+                    break;
+                }
+                case NotifyCollectionChangedAction.Remove when args.IsSingleItem:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.HistoryPlayList.Remove(args.OldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var argsOldItem in args.OldItems) _configurationService.Settings.CommonSettings.BehaviorHistory.HistoryPlayList.Remove(argsOldItem.AudioUniqueId);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    _configurationService.Settings.CommonSettings.BehaviorHistory.HistoryPlayList.Clear();
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            _configurationService.SaveImmediate(
+                $"历史播放列表已更新，包含 {_playList.Count} 个音频，已保存");
+        }
 
         async Task<PlayListItem?> GetPlayListItemByAudioUniqueId(AudioUniqueId audioUniqueId)
         {
@@ -135,6 +169,12 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
             return playListItem;
         }
     }
+
+    [field: AllowNull, MaybeNull]
+    public NotifyCollectionChangedSynchronizedViewList<PlayListItem> HistoryPlayList =>
+        field ??= _historyPlayList.ToNotifyCollectionChangedSlim();
+
+    private readonly ObservableList<PlayListItem> _historyPlayList = [];
 
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<PlayListItem> PlayList =>
@@ -266,6 +306,12 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
                 _loadCancellationTokenSource.Token));
 
         CurrentPlayListItem = playListItem;
+
+        HistoryPlayList.Remove(playListItem);
+        HistoryPlayList.Insert(0, playListItem);
+        while (HistoryPlayList.Count > 100) 
+            HistoryPlayList.RemoveAt(HistoryPlayList.Count - 1);
+        
         if (PlayList.Contains(playListItem))
         {
             CanLoadPrevious = _playList.IndexOf(playListItem) > 0 || PlaybackMode == PlaybackMode.RepeatAll || PlaybackMode == PlaybackMode.RepeatOne
@@ -515,6 +561,11 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _audioPlayer.Stop();
         _playList.Clear();
         ScopedLogger.Info("播放列表已清空");
+    }
+    public void ClearHistory()
+    {
+        _historyPlayList.Clear();
+        ScopedLogger.Info("历史播放列表已清空");
     }
 
     private enum PlayDirection

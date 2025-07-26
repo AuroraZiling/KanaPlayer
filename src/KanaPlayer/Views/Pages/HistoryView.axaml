@@ -1,0 +1,54 @@
+﻿<UserControl
+    x:Class="KanaPlayer.Views.Pages.HistoryView"
+    x:DataType="pages:HistoryViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:attaching="clr-namespace:KanaPlayer.Controls.Attaching"
+    xmlns:pages="clr-namespace:KanaPlayer.ViewModels.Pages"
+    xmlns:playerManager="clr-namespace:KanaPlayer.Core.Models.PlayerManager;assembly=KanaPlayer.Core"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowDefinitions="Auto, *">
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            Orientation="Horizontal"
+            Spacing="20"
+            VerticalAlignment="Center">
+            <TextBlock Classes="h1" Text="历史记录" />
+            <Button
+                Command="{Binding ClearHistoryCommand}"
+                Content="清空"
+                CornerRadius="10"
+                attaching:Icon.LucideIconKind="Trash" />
+        </StackPanel>
+
+        <ListBox
+            Background="{DynamicResource KanaAccentColor20}"
+            CornerRadius="15"
+            Grid.Row="1"
+            ItemsSource="{Binding PlayerManager.HistoryPlayList}"
+            Margin="0,30,0,0"
+            SelectedItem="{Binding SelectedHistoryPlayListItem, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type playerManager:PlayListItem}">
+                    <Grid ColumnDefinitions="60, *, *, 100">
+                        <!-- <TextBlock Grid.Column="0" Text="序号"></TextBlock> -->
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="0,0,20,0"
+                            Text="{Binding Title}"
+                            TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="2" Text="{Binding AuthorName}" />
+                        <TextBlock Grid.Column="3" Text="{Binding Duration}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding PlaySelectedItemCommand}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+        </ListBox>
+    </Grid>
+</UserControl>

@@ -1,6 +1,6 @@
 param(
     [string] $Architecture = "x64",
-    [string] $Version = "0.2.0.0"
+    [string] $Version = "0.2.0"
 )
 
 $ErrorActionPreference = "Stop";
@@ -24,5 +24,24 @@ dotnet publish  src/KanaPlayer.Windows/KanaPlayer.Windows.csproj -c Release -r "
 Copy-Item -Path ".\src\KanaPlayer.Launcher\build\windows\x64\release\KanaLauncher.exe" -Destination ".\build\$Version\withoutRuntime\KanaPlayer.exe"
 
 Write-Output "Build Finished";
+
+Write-Output "Creating zip packages...";
+
+$zipOutputDir = "build/$Version"
+if (!(Test-Path $zipOutputDir)) {
+    New-Item -ItemType Directory -Path $zipOutputDir -Force
+}
+
+$withRuntimeSource = "build/$Version/withRuntime"
+$withRuntimeZip = "$zipOutputDir/KanaPlayer-$Version-win-$Architecture-runtime.zip"
+Compress-Archive -Path "$withRuntimeSource\*" -DestinationPath $withRuntimeZip -Force
+
+$withoutRuntimeSource = "build/$Version/withoutRuntime"
+$withoutRuntimeZip = "$zipOutputDir/KanaPlayer-$Version-win-$Architecture.zip"
+Compress-Archive -Path "$withoutRuntimeSource\*" -DestinationPath $withoutRuntimeZip -Force
+
+Write-Output "Zip packages created:";
+Write-Output "  - $withRuntimeZip";
+Write-Output "  - $withoutRuntimeZip";
 
 [Console]::ReadKey()

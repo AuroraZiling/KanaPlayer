@@ -7,6 +7,7 @@ namespace KanaPlayer.Core.Services.Player;
 
 public interface IPlayerManager : INotifyPropertyChanged
 {
+    NotifyCollectionChangedSynchronizedViewList<PlayListItem> HistoryPlayList { get; }
     NotifyCollectionChangedSynchronizedViewList<PlayListItem> PlayList { get; }
     double Volume { get; set; }
     double BufferedProgress { get; }
@@ -27,4 +28,5 @@ public interface IPlayerManager : INotifyPropertyChanged
     Task InsertAfterCurrentPlayItemAsync(PlayListItem playListItem);
     Task InsertAfterCurrentPlayItemRangeAsync(IEnumerable<PlayListItem> playListItems);
     void Clear();
+    void ClearHistory();
 }
