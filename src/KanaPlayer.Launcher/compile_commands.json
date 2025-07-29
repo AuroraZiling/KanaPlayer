@@ -1,6 +1,6 @@
 [
 {
-  "directory": "C:\\CodeSpace\\KanaPlayer\\src\\KanaPlayer.Launcher",
+  "directory": "C:\\CodeSpace\\Projects\\KanaPlayer\\src\\KanaPlayer.Launcher",
   "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Preview\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/MD", "/O2", "/std:c++20", "/EHsc", "/utf-8", "/DNDEBUG", "/Fobuild\\.objs\\KanaLauncher\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
   "file": "src\\main.cpp"
 }]
