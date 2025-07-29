@@ -26,12 +26,20 @@ public partial class BilibiliClient<TSettings>
 
             if (checkRefreshCookies.Data == null || checkRefreshCookies.Data.Refresh) // 登录失效
             {
-                var correspondPath = GenerateCorrespondPath();
-                var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
-                var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
-                var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
-                confirmRefreshCookies.EnsureSuccess();
-                configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
+                try
+                {
+                    var correspondPath = GenerateCorrespondPath();
+                    var refreshCsrf = await GetRefreshCsrfAsync(correspondPath, cookies);
+                    var refreshCookies = await RefreshCookiesAsync(refreshToken, refreshCsrf, cookies);
+                    var confirmRefreshCookies = await ConfirmRefreshCookiesAsync(refreshToken, refreshCookies.NewCookies);
+                    confirmRefreshCookies.EnsureSuccess();
+                    configurationService.Settings.CommonSettings.Authentication.Cookies = refreshCookies.NewCookies;
+                }
+                catch (Exception e)
+                {
+                    ScopedLogger.Error(e, "在刷新 Cookies 时发生错误");
+                    configurationService.Settings.CommonSettings.Authentication = null;
+                }
             }
             else
             {
