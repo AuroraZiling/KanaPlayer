@@ -497,7 +497,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         ScopedLogger.Info("正在暂停音频: {Title} | {UniqueId}", CurrentPlayListItem?.Title, CurrentPlayListItem?.AudioUniqueId);
         _audioPlayer.Pause();
     }
-    public async Task AppendAsync(PlayListItem playListItem)
+    public async Task AppendAsync(PlayListItem playListItem, bool detectFirstPlay = true)
     {
         if (_playList.Contains(playListItem))
         {
@@ -507,7 +507,7 @@ public partial class PlayerManager<TSettings> : ObservableObject, IPlayerManager
         _playList.Add(playListItem);
         ScopedLogger.Info("音频 {AudioUniqueId} 已添加到播放列表", playListItem.AudioUniqueId);
 
-        if (CurrentPlayListItem is null)
+        if (CurrentPlayListItem is null && detectFirstPlay)
             await LoadFirstAsync();
     }
     public async Task InsertAfterCurrentPlayItemAsync(PlayListItem playListItem)

@@ -24,6 +24,7 @@ public partial class HistoryViewModel(IPlayerManager playerManager): ViewModelBa
             ScopedLogger.Warn("尝试播放空的选中项");
             return;
         }
+        await PlayerManager.AppendAsync(SelectedHistoryPlayListItem, detectFirstPlay: false);
         await PlayerManager.LoadAndPlayAsync(SelectedHistoryPlayListItem);
     }
     

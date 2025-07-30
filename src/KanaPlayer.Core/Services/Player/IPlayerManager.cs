@@ -24,7 +24,7 @@ public interface IPlayerManager : INotifyPropertyChanged
     Task LoadForward(bool isManuallyTriggered, bool playWhenLoaded);
     void Play();
     void Pause();
-    Task AppendAsync(PlayListItem playListItem);
+    Task AppendAsync(PlayListItem playListItem, bool detectFirstPlay = true);
     Task InsertAfterCurrentPlayItemAsync(PlayListItem playListItem);
     Task InsertAfterCurrentPlayItemRangeAsync(IEnumerable<PlayListItem> playListItems);
     void Clear();
